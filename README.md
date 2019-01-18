@@ -12,16 +12,12 @@
 - [ ] ...
 
 ## Compiler Environment
-```
-AndroidStudio 3.0+
-
-JDK 1.8
-
-Gradle 4.6
-```
+- AndroidStudio 3.0+
+- JDK 1.8
+- Gradle 4.6
 
 ## Dependent library
-- [poss.aar SDK]()
+- [POSS SDK Java](https://github.com/ppio/ppio-skd-java)
 - [web3j]()
 - [BIP39]()
 - [Multidex]()
@@ -29,12 +25,14 @@ Gradle 4.6
 - [SCrypt]()
 - [Guava]()
 - [BIP39]()
-- [RPC]()
 - [Guava]()
+- [RPC]()
 
 
 ## Download
-- [Android](), [Github]() for Android
+- [Windows](), [Github]() for Windows
+- [Mac OS](), [Github]() for Mac OS
+- [Android]() 
 
 ## How to use the demo app
 #### First Step: Generate a Wallet
