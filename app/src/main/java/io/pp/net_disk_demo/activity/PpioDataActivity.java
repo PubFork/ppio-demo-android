@@ -527,7 +527,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
         Toast.makeText(PpioDataActivity.this, "not login!", Toast.LENGTH_SHORT).show();
 
-        startActivity(new Intent(PpioDataActivity.this, LogInOrRegisterActivity.class));
+        //startActivity(new Intent(PpioDataActivity.this, LogInOrRegisterActivity.class));
+        startActivity(new Intent(PpioDataActivity.this, KeyStoreLogInActivity.class));
         finish();
     }
 

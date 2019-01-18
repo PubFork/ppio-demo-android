@@ -1,21 +1,29 @@
 package io.pp.net_disk_demo.activity;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import io.pp.net_disk_demo.R;
-import io.pp.net_disk_demo.ppio.KeyStoreUtil;
+import io.pp.net_disk_demo.mvp.presenter.presenterimpl.CheckHasKeyStorePresenterImpl;
+import io.pp.net_disk_demo.mvp.view.CheckHasKeyStoreView;
+import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.util.XPermissionUtils;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-public class CheckHasKeyStoreActivity extends BaseActivity {
+public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKeyStoreView {
 
     private static final String TAG = "LoadingActivity";
+
+    private ProgressDialog mProgressDialog = null;
+
+    private CheckHasKeyStorePresenterImpl mCheckHasKeyStorePresenter = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,19 +93,9 @@ public class CheckHasKeyStoreActivity extends BaseActivity {
             Util.runNetOperation(CheckHasKeyStoreActivity.this, new Util.RunNetOperationCallBack() {
                 @Override
                 public void onRunOperation() {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (KeyStoreUtil.checkHasRememberKeyStore(CheckHasKeyStoreActivity.this)) {
-                                startActivity(new Intent(CheckHasKeyStoreActivity.this, InputPassPhraseActivity.class));
-                                finish();
-                            } else {
-                                startActivity(new Intent(CheckHasKeyStoreActivity.this, KeystoreOrPrivateKeyActivity.class));
-                                finish();
-                            }
-                        }
-                    }).start();
-
+                    if (mCheckHasKeyStorePresenter != null) {
+                        mCheckHasKeyStorePresenter.checkHasKeyStore();
+                    }
                 }
             });
         } else {
@@ -107,11 +105,45 @@ public class CheckHasKeyStoreActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        hideProgressDialog();
+
+        mCheckHasKeyStorePresenter = null;
+
         super.onDestroy();
+    }
+
+    @Override
+    public void showCheckingHasKeyStoreView() {
+        showProgressDialog();
+    }
+
+    @Override
+    public void showCheckHasKeyStoreFailView(String errMsg) {
+        hideProgressDialog();
+
+        ToastUtil.showToast(CheckHasKeyStoreActivity.this, errMsg, Toast.LENGTH_SHORT);
+    }
+
+    @Override
+    public void showHasKeyStoreView() {
+        hideProgressDialog();
+
+        startActivity(new Intent(CheckHasKeyStoreActivity.this, InputPassPhraseActivity.class));
+        finish();
+    }
+
+    @Override
+    public void showNotHasKeyStoreView() {
+        hideProgressDialog();
+
+        startActivity(new Intent(CheckHasKeyStoreActivity.this, KeyStoreLogInActivity.class));
+        finish();
     }
 
     private void init() {
         setImmersiveStatusBar();
+
+        mCheckHasKeyStorePresenter = new CheckHasKeyStorePresenterImpl(CheckHasKeyStoreActivity.this, CheckHasKeyStoreActivity.this);
 
         if (!XPermissionUtils.checkPermissionsForActivity(CheckHasKeyStoreActivity.this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -129,18 +161,9 @@ public class CheckHasKeyStoreActivity extends BaseActivity {
                     new XPermissionUtils.OnPermissionListener() {
                         @Override
                         public void onPermissionGranted() {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (KeyStoreUtil.checkHasRememberKeyStore(CheckHasKeyStoreActivity.this)) {
-                                        startActivity(new Intent(CheckHasKeyStoreActivity.this, InputPassPhraseActivity.class));
-                                        finish();
-                                    } else {
-                                        startActivity(new Intent(CheckHasKeyStoreActivity.this, KeystoreOrPrivateKeyActivity.class));
-                                        finish();
-                                    }
-                                }
-                            }).start();
+                            if (mCheckHasKeyStorePresenter != null) {
+                                mCheckHasKeyStorePresenter.checkHasKeyStore();
+                            }
                         }
 
                         @Override
@@ -150,19 +173,26 @@ public class CheckHasKeyStoreActivity extends BaseActivity {
                     });
         } else {
             //Whether all permissions are given, if given, check if has log in
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if (KeyStoreUtil.checkHasRememberKeyStore(CheckHasKeyStoreActivity.this)) {
-                        startActivity(new Intent(CheckHasKeyStoreActivity.this, InputPassPhraseActivity.class));
-                        finish();
-                    } else {
-                        startActivity(new Intent(CheckHasKeyStoreActivity.this, KeystoreOrPrivateKeyActivity.class));
-                        finish();
-                    }
-                }
-            }).start();
+            if (mCheckHasKeyStorePresenter != null) {
+                mCheckHasKeyStorePresenter.checkHasKeyStore();
+            }
+        }
+    }
 
+    private void showProgressDialog() {
+        hideProgressDialog();
+
+        mProgressDialog = new ProgressDialog(CheckHasKeyStoreActivity.this);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCanceledOnTouchOutside(false);
+
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
         }
     }
 }

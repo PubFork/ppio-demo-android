@@ -21,7 +21,7 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static android.content.Context.MODE_PRIVATE;
+import static android.content.Context.MODE_APPEND;
 
 public class KeyStoreUtil {
 
@@ -40,11 +40,7 @@ public class KeyStoreUtil {
 
             String privateKeyStr = bytesToHexString(key);
 
-            Log.e(TAG, "private key = " + privateKeyStr);
-
             String address = PpioAccountUtil.generatePpioAddressStr(privateKeyStr);
-
-            Log.e(TAG, "address = " + address);
 
             return privateKeyStr;
         } catch (Exception e) {
@@ -54,15 +50,14 @@ public class KeyStoreUtil {
         }
     }
 
-    public static boolean logInByPrivateKey(String privateKey) {
-        return true;
-    }
-
-    public static boolean checkHasRememberKeyStore(Context context) {
+    public static boolean checkHasRememberKeyStore(Context context, CheckHasKeyStoreListener checkHasKeyStoreListener) {
         try {
             String[] files = context.fileList();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
+                    //
+                    Log.e(TAG, "checkHasRememberKeyStore() file = " + files[i]);
+                    //
                     if ("PPIO_KEYSTORE.json".equals(files[i])) {
                         FileInputStream fileInputStream = context.openFileInput("PPIO_KEYSTORE.json");
                         byte[] keyStoreBytes = new byte[fileInputStream.available()];
@@ -73,11 +68,25 @@ public class KeyStoreUtil {
                     }
                 }
 
+                Log.e(TAG, "checkHasRememberKeyStore() don't have private keystore file");
+
                 return false;
             } else {
+                if (checkHasKeyStoreListener != null) {
+                    checkHasKeyStoreListener.onCheckFail("app has 0 private files");
+                }
+
+                Log.e(TAG, "checkHasRememberKeyStore() don't have private  file");
+
                 return false;
             }
         } catch (Exception e) {
+            Log.e(TAG, "checkHasRememberKeyStore() error: " + e.getMessage());
+
+            if (checkHasKeyStoreListener != null) {
+                checkHasKeyStoreListener.onCheckFail(e.getMessage());
+            }
+
             e.printStackTrace();
             return false;
         }
@@ -152,7 +161,7 @@ public class KeyStoreUtil {
 
                 KeyJSON keyJSON = new KeyJSON(address, cryptoJSON);
 
-                FileOutputStream fileOutputStream = context.getApplicationContext().openFileOutput("PPIO_KEYSTORE.json", MODE_PRIVATE);
+                FileOutputStream fileOutputStream = context.getApplicationContext().openFileOutput("PPIO_KEYSTORE.json", MODE_APPEND);
                 fileOutputStream.write(JSONUtils.Stringify(keyJSON).getBytes());
                 fileOutputStream.close();
 
@@ -165,6 +174,8 @@ public class KeyStoreUtil {
 
                 return true;
             } catch (Exception e) {
+                Log.e(TAG, "rememberKeyStore() error: " + e.getMessage());
+
                 e.printStackTrace();
 
                 return false;
@@ -209,6 +220,7 @@ public class KeyStoreUtil {
 
             return generateKeyStore(privateKey, passPhrase, keyStoreFilePath);
         } catch (Exception e) {
+            Log.e(TAG, "exportKeyStoreFile() error: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -292,4 +304,10 @@ public class KeyStoreUtil {
             return 'a' <= ch && ch <= 'f' ? ch - 97 + 10 : -1;
         }
     }
+
+    public interface CheckHasKeyStoreListener {
+        void onCheckFail(String errMsg);
+    }
+
+
 }

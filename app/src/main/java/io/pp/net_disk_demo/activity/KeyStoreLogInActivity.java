@@ -52,43 +52,33 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-        }
+        hideProgressDialog();
 
         if (mKeyStoreLogInPresenter != null) {
             mKeyStoreLogInPresenter.onDestroy();
         }
+
+        super.onDestroy();
     }
 
     @Override
     public void showInLogInView() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-        }
+        hideProgressDialog();
 
-        mProgressDialog = new ProgressDialog(KeyStoreLogInActivity.this);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setCanceledOnTouchOutside(false);
-        mProgressDialog.show();
+        showProgressDialog();
     }
 
     @Override
     public void stopShowInLogInView() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-        }
+       hideProgressDialog();
 
         mIsConfirming = false;
     }
 
     @Override
     public void showLogInSucceedView() {
+        hideProgressDialog();
+
         sendBroadcast(new Intent(Constant.Intent.LOGIN_SUCCEED));
 
         startActivity(new Intent(KeyStoreLogInActivity.this, PpioDataActivity.class));
@@ -98,6 +88,8 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
 
     @Override
     public void showLogInFailView(String failStr) {
+        hideProgressDialog();
+
         mIsConfirming = false;
 
         Toast.makeText(KeyStoreLogInActivity.this, failStr, Toast.LENGTH_SHORT).show();
@@ -122,6 +114,23 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
                 mIsConfirming = true;
                 mKeyStoreLogInPresenter.logIn(mKeyStoreEdit.getText().toString(), mPassPhraseEdit.getText().toString());
             }
+        }
+    }
+
+    private void showProgressDialog() {
+        hideProgressDialog();
+
+        mProgressDialog = new ProgressDialog(KeyStoreLogInActivity.this);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCanceledOnTouchOutside(false);
+
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
         }
     }
 }

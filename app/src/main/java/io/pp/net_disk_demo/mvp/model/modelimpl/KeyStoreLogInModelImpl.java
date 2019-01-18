@@ -5,9 +5,6 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.lang.ref.WeakReference;
 
 import io.pp.net_disk_demo.mvp.model.KeyStoreLogInModel;
@@ -15,7 +12,6 @@ import io.pp.net_disk_demo.mvp.presenter.KeyStoreLogInPresenter;
 import io.pp.net_disk_demo.ppio.KeyStoreUtil;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.ppio.PpioAccountUtil;
-import io.pp.net_disk_demo.util.FileUtil;
 
 public class KeyStoreLogInModelImpl implements KeyStoreLogInModel {
 
@@ -92,6 +88,8 @@ public class KeyStoreLogInModelImpl implements KeyStoreLogInModel {
             final String passPhrase = params[1];
             if (!TextUtils.isEmpty(keyStoreStr) && !TextUtils.isEmpty(passPhrase)) {
 
+                KeyStoreUtil.deleteKeyStore(mLogInModelImplWeakReference.get().getContext());
+
                 final String privateKeyStr = KeyStoreUtil.logInByKeyStore(keyStoreStr, passPhrase);
                 final String addressStr = PpioAccountUtil.generatePpioAddressStr(privateKeyStr);
 
@@ -113,7 +111,6 @@ public class KeyStoreLogInModelImpl implements KeyStoreLogInModel {
                     PossUtil.setPrivateKeyStr(privateKeyStr);
                     PossUtil.setAddressStr(addressStr);
 
-                    Log.e(TAG, "log in end...");
                     return true;
                 } else {
                     return false;

@@ -121,9 +121,7 @@ public class InputPassPhraseActivity extends BaseActivity {
         mNewAccountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                KeyStoreUtil.deleteKeyStore(InputPassPhraseActivity.this);
-
-                startActivity(new Intent(InputPassPhraseActivity.this, KeystoreOrPrivateKeyActivity.class));
+                startActivity(new Intent(InputPassPhraseActivity.this, KeyStoreLogInActivity.class));
                 finish();
             }
         });
