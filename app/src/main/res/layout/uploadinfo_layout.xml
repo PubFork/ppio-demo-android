@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/upload_fileinfo_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp">
+
+        <ImageView
+            android:id="@+id/file_iv"
+            android:layout_width="17dp"
+            android:layout_height="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="24dp"
+            android:background="@mipmap/all_file"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/filename_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="65dp"
+            android:text="Framework.word"
+            android:textColor="#303133"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DCDFE6" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp">
+
+        <ImageView
+            android:id="@+id/secure_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="26dp"
+            android:background="@mipmap/secure"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/secure_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="65dp"
+            android:text="Secure"
+            android:textColor="#303133"
+            android:textSize="16sp" />
+
+        <io.pp.net_disk_demo.widget.CustomSwitchButton
+            android:id="@+id/upload_secure_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:background="#DCDFE6" />
+
+    <RelativeLayout
+        android:id="@+id/expiredtime_layout"
+        android:layout_width="match_parent"
+        android:layout_height="65dp">
+
+        <ImageView
+            android:id="@+id/expiredtime_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="24dp"
+            android:background="@mipmap/storagetime"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/expiredtime_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="65dp"
+            android:text="Expired Time"
+            android:textColor="#303133"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/expiredtime_right_iv"
+            android:layout_width="8dp"
+            android:layout_height="13dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:background="@mipmap/preference_enter"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/expiredtime_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="19dp"
+            android:layout_toStartOf="@+id/expiredtime_right_iv"
+            android:text="1 Month(30days)"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:background="#DCDFE6" />
+
+    <RelativeLayout
+        android:id="@+id/copies_layout"
+        android:layout_width="match_parent"
+        android:layout_height="65dp">
+
+        <ImageView
+            android:id="@+id/copies_iv"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="24dp"
+            android:background="@mipmap/copies"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/copies_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="65dp"
+            android:text="Copies"
+            android:textColor="#303133"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/copies_right_iv"
+            android:layout_width="8dp"
+            android:layout_height="13dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:background="@mipmap/preference_enter"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/copies_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="40dp"
+            android:layout_toStartOf="@+id/copies_right_iv"
+            android:text="-"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:background="#DCDFE6" />
+
+    <RelativeLayout
+        android:id="@+id/chiprice_layout"
+        android:layout_width="match_parent"
+        android:layout_height="65dp">
+
+        <ImageView
+            android:id="@+id/chiprice_iv"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="23dp"
+            android:background="@mipmap/gas_price"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/chiprice_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="65dp"
+            android:text="ChiPrice"
+            android:textColor="#303133"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/chiprice_right_iv"
+            android:layout_width="8dp"
+            android:layout_height="13dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:background="@mipmap/preference_enter"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/chiprice_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:layout_marginEnd="19dp"
+            android:layout_toStartOf="@+id/chiprice_right_iv"
+            android:text="--"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:background="#DCDFE6" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp">
+
+        <ImageView
+            android:id="@+id/gaslimit_iv"
+            android:layout_width="22dp"
+            android:layout_height="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="24dp"
+            android:background="@mipmap/gas_limit"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/totalgas_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="65dp"
+            android:text="Total Gas"
+            android:textColor="#303133"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/totalgas_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="40dp"
+            android:text="-- Chi"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:background="#DCDFE6" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp">
+
+        <ImageView
+            android:id="@+id/expected_cost_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="25dp"
+            android:background="@mipmap/expected_cost"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/expected_cost_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="65dp"
+            android:text="Expected cost"
+            android:textColor="#303133"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/expected_cost_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="40dp"
+            android:text="-- Chi"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:background="#DCDFE6" />
+
+    <Button
+        android:id="@+id/issue_confirm_btn"
+        style="@style/confirm_button_style"
+        android:layout_width="match_parent"
+        android:layout_marginTop="32dp"
+        android:text="Confirm" />
+
+</LinearLayout>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.pp.net_disk_demo">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <!--<activity-->
+        <!--android:name=".activity.LoadingActivity"-->
+        <!--android:screenOrientation="portrait"-->
+        <!--android:theme="@style/LoadingActivityTheme">-->
+
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.MAIN" />-->
+        <!--<action android:name="android.intent.action.VIEW" />-->
+
+        <!--<category android:name="android.intent.category.LAUNCHER" />-->
+        <!--<category android:name="android.intent.category.DEFAULT" />-->
+        <!--</intent-filter>-->
+
+        <!--</activity>-->
+
+        <activity
+            android:name=".activity.CheckHasKeyStoreActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/LoadingActivityTheme">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
+
+        <activity
+            android:name=".activity.InputPassPhraseActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified">
+
+        </activity>
+
+        <activity
+            android:name=".activity.LogInOrRegisterActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified">
+
+        </activity>
+
+        <activity
+            android:name=".activity.LogInActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified">
+
+        </activity>
+
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified">
+
+        </activity>
+
+        <activity
+            android:name=".activity.KeystoreOrPrivateKeyActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified">
+
+        </activity>
+
+        <activity
+            android:name=".activity.KeyStoreLogInActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified">
+
+        </activity>
+
+        <activity
+            android:name=".activity.PrivateKeyLogInActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified">
+
+        </activity>
+
+        <activity
+            android:name=".activity.PpioDataActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity
+            android:name=".activity.UploadActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="com.pplabs.qukuailian_demo_1.UPLOAD_LOCAL_FILE" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activity.RenewActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="com.pplabs.qukuailian_demo_1.RENEW_FILE" />
+            </intent-filter>
+
+        </activity>
+
+        <activity
+            android:name=".activity.GetActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity
+            android:name=".activity.RecordActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity
+            android:name=".activity.VersionActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity
+            android:name=".activity.TestActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity
+            android:name=".activity.FeedbackActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity android:name=".activity.BaseActivity">
+
+        </activity>
+
+        <provider
+            android:name=".database.AccountContentProvider"
+            android:authorities="io.pp.net_disk_demo"
+            android:exported="false" />
+
+        <service android:name=".service.ExecuteTaskService" />
+
+    </application>
+
+
+</manifest>

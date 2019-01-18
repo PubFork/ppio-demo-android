@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#243243"
+    android:fitsSystemWindows="true">
+
+    <ImageView
+        android:id="@+id/login_log_iv"
+        android:layout_width="170dp"
+        android:layout_height="60dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="148dp"
+        android:background="@mipmap/logo"
+        android:contentDescription="@string/app_name" />
+
+    <TextView
+        android:id="@+id/login_log_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login_log_iv"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:text="PPDISK-Demo"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/private-key_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login_log_iv"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="109dp"
+        android:text="Private Key"
+        android:textColor="#A0FFFFFF"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/privatekey_login_edit"
+        style="@style/private_key_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:layout_below="@id/private-key_label_tv"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="48dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="48dp"
+        android:gravity="center"
+        android:hint="input private key"
+        android:inputType="textMultiLine|text"
+        android:labelFor="@+id/privatekey_login_edit"
+        android:textColorHint="#A0FFFFFF" />
+
+    <Button
+        android:id="@+id/privatekey_login_btn"
+        style="@style/new_account_button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/privatekey_login_edit"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="48dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginRight="48dp"
+        android:text="Confirm" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="42dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Has forgot private key?"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/keystore_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="keystore"
+            android:textColor="#F56C6C"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

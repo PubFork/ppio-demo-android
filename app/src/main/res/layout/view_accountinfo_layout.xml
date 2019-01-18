@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/account_info_layout"
+    android:layout_width="264dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/photo_name_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:background="#2297F3"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/user_photo_iv"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_margin="15dp"
+            android:background="@mipmap/user_photo"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/user_code_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="17dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:contentDescription="@string/app_name"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/used_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/used_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:includeFontPadding="false"
+            android:text="Used"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/used_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginBottom="13dp"
+            android:includeFontPadding="false"
+            android:text="-- G"
+            android:textColor="#909399"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#dcdef6" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/balance_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/balance_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:includeFontPadding="false"
+            android:text="Balance"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/balance_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginBottom="13dp"
+            android:includeFontPadding="false"
+            android:text="-- Chi"
+            android:textColor="#909399"
+            android:textSize="12sp" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#dcdef6" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fund_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/fund_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:includeFontPadding="false"
+            android:text="Fund"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/fund_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginBottom="13dp"
+            android:includeFontPadding="false"
+            android:text="-- Chi"
+            android:textColor="#909399"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#dcdef6" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/recharge_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/recharge_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="13dp"
+            android:includeFontPadding="false"
+            android:text="Recharge"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/recharge_enter_iv"
+            android:layout_width="8dp"
+            android:layout_height="13dp"
+            android:layout_alignBaseline="@id/recharge_tv"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="26dp"
+            android:background="@mipmap/preference_enter"
+            android:contentDescription="@string/app_name" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/recharge_tv"
+            android:background="#dcdef6" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/record_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/record_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="13dp"
+            android:includeFontPadding="false"
+            android:text="Record"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/bill_enter_iv"
+            android:layout_width="8dp"
+            android:layout_height="13dp"
+            android:layout_alignBaseline="@id/record_tv"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="26dp"
+            android:background="@mipmap/preference_enter"
+            android:contentDescription="@string/app_name" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/record_tv"
+            android:background="#dcdef6" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/checkversion_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/version_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="13dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/version_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="Check for update"
+                android:textColor="#606266"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/version_value_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="Demo(V1.0)"
+                android:textColor="#909399"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/version_enter_iv"
+            android:layout_width="8dp"
+            android:layout_height="13dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="26dp"
+            android:background="@mipmap/preference_enter"
+            android:contentDescription="@string/app_name" />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/version_line_v"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#dcdef6" />
+
+    <RelativeLayout
+        android:id="@+id/feedback_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/feedback_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="13dp"
+            android:includeFontPadding="false"
+            android:text="Feedback"
+            android:textColor="#606266"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/feedback_enter_iv"
+            android:layout_width="8dp"
+            android:layout_height="13dp"
+            android:layout_alignBaseline="@id/feedback_tv"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="26dp"
+            android:background="@mipmap/preference_enter"
+            android:contentDescription="@string/app_name" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/feedback_tv"
+            android:background="#dcdef6" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/logout_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="13dp"
+        android:includeFontPadding="false"
+        android:text="Log out"
+        android:textColor="#F56C6C"
+        android:textSize="16sp" />
+
+    <View
+        android:id="@+id/logout_line_v"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#dcdef6" />
+
+</LinearLayout>

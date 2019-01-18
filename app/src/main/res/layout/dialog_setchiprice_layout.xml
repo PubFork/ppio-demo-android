@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp">
+
+        <TextView
+            android:id="@+id/chi_unit_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="Chi"
+            android:textColor="#303133"
+            android:textSize="21sp" />
+
+        <EditText
+            android:id="@+id/setchiprice_edittext"
+            style="@style/get_edit_style"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:layout_toStartOf="@id/chi_unit_tv"
+            android:inputType="number|numberDecimal"
+            android:labelFor="@+id/setchiprice_edittext" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="21dp"
+        android:background="#DCDFE6" />
+
+    <include
+        android:id="@+id/ok_cancel_layout"
+        layout="@layout/buttons_ok_cancel_layout" />
+
+</LinearLayout>

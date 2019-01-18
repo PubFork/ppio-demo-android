@@ -1,0 +1,94 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- Base application theme. -->
+    <style name="LoadingActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="android:background">#243243</item>
+    </style>
+
+    <style name="confirm_button_style">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginLeft">48dp</item>
+        <item name="android:layout_marginRight">48dp</item>
+        <item name="android:background">@drawable/background_custom_newaccount_button</item>
+    </style>
+
+    <style name="get_edit_style">
+        <item name="android:background">@drawable/background_custom_get_edit</item>
+    </style>
+
+    <style name="MyDialogNoShadow" parent="@android:style/Theme.Holo.Dialog">
+        <!-- Is there a border? -->
+        <item name="android:windowFrame">@null</item>
+        <!-- Whether it is suspended above the Activity -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- title -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- shadow -->
+        <item name="android:windowIsTranslucent">true</item><!--half transparent-->
+        <item name="android:backgroundDimEnabled">false</item>
+        <!-- background transparent-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- You can also add some pop-up and exit animations. (lan)-->
+    </style>
+
+    <style name="MyDialog" parent="@android:style/Theme.Holo.Dialog">
+        <!-- Is there a border? -->
+        <item name="android:windowFrame">@null</item>
+        <!-- Whether it is suspended above the Activity -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- title -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- shadow  -->
+
+        <!--If the two are not commented out, there will be no shadow overlay behind the pop-up window.Activity-->
+        <!--<item name="android:windowIsTranslucent">true</item>-->
+        <!--<item name="android:backgroundDimEnabled">false</item>-->
+
+        <!--if commented，there will has blank between the dialog's border with Activity-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <!-- You can also add some pop-up and exit animations.-->
+    </style>
+
+    <style name="new_account_button">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/background_custom_newaccount_button</item>
+    </style>
+
+    <style name="log_in_button">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#1989FA</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/background_custom_login_button</item>
+    </style>
+
+    <style name="private_key_edittext">
+        <item name="android:background">@drawable/background_custom_privatekey_edit</item>
+        <item name="android:cursorVisible">true</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textCursorDrawable">@drawable/drawable_transparent_edittext_cursor</item>
+    </style>
+
+</resources>

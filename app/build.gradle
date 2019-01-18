@@ -1,0 +1,107 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "io.pp.net_disk_demo"
+        minSdkVersion 17
+        targetSdkVersion 28
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            //abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+            //abiFilters 'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+            //abiFilters 'armeabi' ,'arm64-v8a'
+        }
+
+        multiDexEnabled true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            def date = new Date().format("yyyyMMdd", TimeZone.getTimeZone("GMT+08"))
+
+            if (variant.buildType.name.equals('debug')) {
+                outputFileName = "netdisk_demo_android_v${versionName}_${date}.apk"
+            }
+
+            if (variant.buildType.name.equals('release')) {
+                outputFileName = "netdisk_demo_android_v${versionName}.apk"
+            }
+        }
+    }
+
+    signingConfigs {
+        build {
+            keyAlias 'demo'
+            keyPassword '123456'
+            storeFile file('D:/Application/Android/demo.jks')
+            storePassword '123456'
+        }
+
+        release {
+            keyAlias 'demo'
+            keyPassword '123456'
+            storeFile file('D:/Application/Android/demo.jks')
+            storePassword '123456'
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            //runProguard false
+
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    implementation(name: 'poss', ext: 'aar')
+    implementation 'org.web3j:core:3.3.1-android'
+
+    //Used to generate mnemonic words
+    implementation('io.github.novacrypto:BIP39:0.1.9', {
+        exclude group: "com.madgag.spongycastle:core:1.58.0.0"
+    })
+
+    implementation 'com.android.support:multidex:1.0.3'
+
+    //implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+
+    implementation 'com.google.code.gson:gson:2.8.4'
+
+    //To use com.google.common.io.BaseEncoding, need
+    implementation 'com.google.guava:guava:27.0.1-jre'
+    // or, for Android:
+    //api 'com.google.guava:guava:27.0.1-android'
+
+    //Use Rpc
+    implementation files('libs/android-json-rpc-0.3.4.jar')
+
+    implementation 'com.lambdaworks:scrypt:1.4.0'
+}

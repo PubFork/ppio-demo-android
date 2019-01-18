@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.pp.net_disk_demo.widget.LeftDrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/left_drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFFFF">
+
+    <include
+        android:id="@+id/account_info_layout"
+        layout="@layout/view_accountinfo_layout"
+        android:layout_width="264dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFFFF"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/ppio_actionbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="#243243">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="#243243">
+
+                <RelativeLayout
+                    android:id="@+id/wei_actionbar_left_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true">
+
+                    <ImageView
+                        android:id="@+id/wei_actionbar_left_iv"
+                        android:layout_width="19dp"
+                        android:layout_height="12dp"
+                        android:layout_margin="19dp"
+                        android:background="@mipmap/cehua_button"
+                        android:contentDescription="@string/app_name" />
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/wei_actionbar_title_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:includeFontPadding="false"
+                    android:text="All file"
+                    android:textColor="#FFFFFF"
+                    android:textSize="19sp" />
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/no_content_iv"
+            android:layout_width="210dp"
+            android:layout_height="160dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="168dp"
+            android:background="@mipmap/no_content"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/no_content_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/no_content_iv"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="No files yet"
+            android:textColor="#909399"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/list_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/ppio_actionbar_layout"
+            android:layout_marginBottom="49dp"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/myfile_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E0E0E0"
+                android:visibility="visible" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/uploadingfile_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E0E0E0"
+                android:visibility="gone" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/downloadingfile_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E0E0E0"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/upload_get_btn"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_alignEnd="@id/list_layout"
+            android:layout_alignBottom="@id/list_layout"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="21dp"
+            android:src="@mipmap/fab_icon"
+            app:backgroundTint="#4285F4"
+            app:elevation="4dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:background="#FFF5F7FA">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentTop="true"
+                android:background="#DCDFE6" />
+
+            <RelativeLayout
+                android:id="@+id/tools_upload_layout"
+                android:layout_width="80dp"
+                android:layout_height="49dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true">
+
+                <ImageView
+                    android:id="@+id/tools_uploading_iv"
+                    android:layout_width="22dp"
+                    android:layout_height="19dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="17dp"
+                    android:layout_marginBottom="0dp"
+                    android:background="@mipmap/uploading_unselected"
+                    android:contentDescription="@string/app_name" />
+
+                <TextView
+                    android:id="@+id/tools_uploading_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tools_uploading_iv"
+                    android:layout_alignBaseline="@id/tools_uploading_iv"
+                    android:layout_centerHorizontal="true"
+                    android:includeFontPadding="false"
+                    android:text="Uploading"
+                    android:textColor="#606266"
+                    android:textSize="10sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/tools_allfile_layout"
+                android:layout_width="80dp"
+                android:layout_height="49dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="56dp">
+
+                <ImageView
+                    android:id="@+id/tools_allfile_iv"
+                    android:layout_width="17dp"
+                    android:layout_height="21dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="13dp"
+                    android:layout_marginBottom="0dp"
+                    android:background="@mipmap/allfile_selected"
+                    android:contentDescription="@string/app_name" />
+
+                <TextView
+                    android:id="@+id/tools_allfile_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tools_allfile_iv"
+                    android:layout_centerHorizontal="true"
+
+                    android:includeFontPadding="false"
+                    android:text="All file"
+                    android:textColor="#1989FA"
+                    android:textSize="10sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/tools_download_layout"
+                android:layout_width="80dp"
+                android:layout_height="49dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="44dp">
+
+                <ImageView
+                    android:id="@+id/tools_downloading_iv"
+                    android:layout_width="22dp"
+                    android:layout_height="19dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="17dp"
+                    android:background="@mipmap/downloading_unselected"
+                    android:contentDescription="@string/app_name" />
+
+                <TextView
+                    android:id="@+id/tools_downloading_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tools_downloading_iv"
+                    android:layout_centerHorizontal="true"
+                    android:includeFontPadding="false"
+                    android:text="Downloading"
+                    android:textColor="#606266"
+                    android:textSize="10sp" />
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</io.pp.net_disk_demo.widget.LeftDrawerLayout>
