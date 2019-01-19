@@ -103,17 +103,20 @@ public class PossUtil {
             if (directoryExist) {
                 config.setDir(cacheDir.getAbsolutePath());
 
+                config.setTestNet("test");
+
                 config.setBootstrap("[\n" +
                         "  {\n" +
-                        "    \"Name\": \"aws-bootstrap\",\n" +
-                        "    \"IP\": \"54.202.181.27\",\n" +
+                        "    \"Name\": \"ali-bootstrap\",\n" +
+                        "    \"IP\": \"47.110.88.167\",\n" +
                         "    \"TCPPort\": 8020,\n" +
                         "    \"UDPPort\": 8020,\n" +
                         "    \"PeerID\": \"\"\n" +
                         "  },\n" +
+
                         "  {\n" +
-                        "    \"Name\": \"ali-bootstrap\",\n" +
-                        "    \"IP\": \"47.110.88.167\",\n" +
+                        "    \"Name\": \"aws-bootstrap\",\n" +
+                        "    \"IP\": \"54.202.181.27\",\n" +
                         "    \"TCPPort\": 8020,\n" +
                         "    \"UDPPort\": 8020,\n" +
                         "    \"PeerID\": \"\"\n" +
@@ -150,7 +153,6 @@ public class PossUtil {
                 config.setKeyPassphrase(passPhrase);
                 mUser = Poss.createUser(config);
 
-                //mUser.init("0x" + privateKey);
                 mUser.initKeyStoreData(keyStoreStr);
 
                 mUser.startDaemon();
@@ -175,7 +177,6 @@ public class PossUtil {
             return false;
         }
     }
-
 
     public static User getUser() {
         return mUser;

@@ -23,14 +23,16 @@
     <EditText
         android:id="@+id/sharecode_edit"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="96dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="16dp"
         android:layout_marginRight="24dp"
         android:background="@drawable/background_custom_get_edit"
         android:cursorVisible="true"
+        android:hint="input share code"
         android:inputType="textMultiLine|text"
         android:labelFor="@+id/sharecode_edit"
+        android:padding="5dp"
         android:textCursorDrawable="@drawable/drawable_transparent_edittext_cursor" />
 
     <Button

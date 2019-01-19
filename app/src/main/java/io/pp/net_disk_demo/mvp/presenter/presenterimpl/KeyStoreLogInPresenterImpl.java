@@ -53,7 +53,7 @@ public class KeyStoreLogInPresenterImpl implements KeyStoreLogInPresenter {
     @Override
     public void showLogInFail(String failStr) {
         if (mKeyStoreLogInView != null) {
-            mKeyStoreLogInView.showLogInSucceedView();
+            mKeyStoreLogInView.showLogInFailView(failStr);
         }
     }
 

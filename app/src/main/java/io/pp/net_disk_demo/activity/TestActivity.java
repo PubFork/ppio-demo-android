@@ -153,7 +153,7 @@ public class TestActivity extends BaseActivity {
                 ClipData mClipData = ClipData.newPlainText("mnemonic", mKeyStoreTv.getText());
                 cm.setPrimaryClip(mClipData);
 
-                ToastUtil.showToast(TestActivity.this, "mnemonic copy succeed!", Toast.LENGTH_SHORT);
+                ToastUtil.showToast(TestActivity.this, "keystore copy succeed!", Toast.LENGTH_SHORT);
             }
         });
 

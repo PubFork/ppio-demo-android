@@ -32,6 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
+                android:padding="5dp"
                 android:textSize="18sp" />
 
             <TextView
@@ -39,7 +40,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="passphrase:"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/passphrase_tv"
@@ -47,14 +49,17 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
-                android:textSize="18sp" />
+                android:padding="5dp"
+                android:textSize="18sp"
+                android:visibility="gone" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="private key:"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/private_key_tv"
@@ -62,7 +67,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
-                android:textSize="18sp" />
+                android:padding="5dp"
+                android:textSize="18sp"
+                android:visibility="gone" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -77,6 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
+                android:padding="5dp"
                 android:textSize="18sp" />
 
             <Button
@@ -87,9 +95,9 @@
                 android:layout_below="@id/hint_tv"
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="48dp"
-                android:layout_marginTop="138dp"
+                android:layout_marginTop="38dp"
                 android:layout_marginRight="48dp"
-                android:layout_marginBottom="80dp"
+                android:layout_marginBottom="10dp"
                 android:text="Export KeyStore File" />
 
             <TextView
@@ -98,6 +106,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
+                android:padding="5dp"
                 android:textSize="18sp" />
 
         </LinearLayout>

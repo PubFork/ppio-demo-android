@@ -176,12 +176,22 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="56dp">
 
+                <!--<ImageView-->
+                <!--android:id="@+id/tools_allfile_iv"-->
+                <!--android:layout_width="17dp"-->
+                <!--android:layout_height="21dp"-->
+                <!--android:layout_centerHorizontal="true"-->
+                <!--android:layout_marginTop="13dp"-->
+                <!--android:layout_marginBottom="0dp"-->
+                <!--android:background="@mipmap/allfile_selected"-->
+                <!--android:contentDescription="@string/app_name" />-->
+
                 <ImageView
                     android:id="@+id/tools_allfile_iv"
-                    android:layout_width="17dp"
-                    android:layout_height="21dp"
+                    android:layout_width="15.4dp"
+                    android:layout_height="19dp"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="13dp"
+                    android:layout_marginTop="17dp"
                     android:layout_marginBottom="0dp"
                     android:background="@mipmap/allfile_selected"
                     android:contentDescription="@string/app_name" />
@@ -192,7 +202,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tools_allfile_iv"
                     android:layout_centerHorizontal="true"
-
                     android:includeFontPadding="false"
                     android:text="All file"
                     android:textColor="#1989FA"
