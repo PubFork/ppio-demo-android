@@ -17,22 +17,20 @@
 - Gradle 4.6
 
 ## Dependent library
-- [POSS SDK Java](https://github.com/ppio/ppio-skd-java)
-- [web3j]()
-- [BIP39]()
-- [Multidex]()
-- [Gson]()
-- [SCrypt]()
-- [Guava]()
-- [BIP39]()
-- [Guava]()
-- [RPC]()
+- [POSS SDK Android](https://github.com/ppio/ppio-skd-android)
+- [Web3j](https://github.com/web3j/web3j)
+- [BIP39](https://github.com/NovaCrypto/BIP39)
+- [Multidex](https://mvnrepository.com/artifact/com.android.support/multidex)
+- [Gson](https://mvnrepository.com/artifact/com.google.code.gson/gson/2.8.5)
+- [SCrypt](https://mvnrepository.com/artifact/com.lambdaworks/scrypt)
+- [Guava](https://mvnrepository.com/artifact/com.google.guava/guava)
+- [RPC](https://code.google.com/archive/p/android-json-rpc/)
 
 
 ## Download
-- [Windows](), [Github]() for Windows
-- [Mac OS](), [Github]() for Mac OS
-- [Android]() 
+- [Windows](https://github.com/PPIO/ppio-demo-desktop/releases), [Github](https://github.com/ppio/ppio-demo-desktop) for Windows
+- [Mac OS](https://github.com/PPIO/ppio-demo-desktop/releases), [Github](https://github.com/ppio/ppio-demo-desktop) for Mac OS
+- [Android](https://github.com/PPIO/ppio-demo-android/releases)
 
 ## How to use the demo app
 #### First Step: Generate a Wallet
