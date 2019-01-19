@@ -97,6 +97,8 @@ public class Constant {
 
         public static final String REGISTER_RECORD_PREFIX = Constant.PPIO_File.CACHE_DIR + "/Register_Record";
         public static final String LOGIN_RECORD_FILE = Constant.PPIO_File.CACHE_DIR + "/LogIn_Record.txt";
+
+        public static final String PRIVATE_KEYSOTR_FILE = "ppio_keystore.json";
     }
 
 }

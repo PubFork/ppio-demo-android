@@ -123,7 +123,7 @@ public class PrivateKeyLogInActivity extends BaseActivity {
                                             }
                                         });
 
-                                        KeyStoreUtil.rememberKeyStore(PrivateKeyLogInActivity.this, mPrivateKeyStr, passPhrase);
+                                        KeyStoreUtil.rememberFromPrivateKey(PrivateKeyLogInActivity.this, mPrivateKeyStr, passPhrase);
 
                                         sendBroadcast(new Intent(Constant.Intent.LOGIN_SUCCEED));
                                         startActivity(new Intent(PrivateKeyLogInActivity.this, PpioDataActivity.class));

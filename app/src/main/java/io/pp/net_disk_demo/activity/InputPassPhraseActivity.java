@@ -1,11 +1,13 @@
 package io.pp.net_disk_demo.activity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -71,6 +73,8 @@ public class InputPassPhraseActivity extends BaseActivity {
         mConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hidePassPhraseEditKeyBoard();
+
                 if (mPassPhraseEdit.getText() != null && !mIsConfirming) {
                     mIsConfirming = true;
                     showProgressDialog();
@@ -78,10 +82,10 @@ public class InputPassPhraseActivity extends BaseActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            String privateKey = KeyStoreUtil.autoLogInByKeyStore(InputPassPhraseActivity.this, mPassPhraseEdit.getText().toString());
+                            String keyStoreStr = KeyStoreUtil.autoLogInByKeyStore(InputPassPhraseActivity.this);
 
-                            if (!TextUtils.isEmpty(privateKey)) {
-                                PossUtil.logIn(privateKey, new PossUtil.LogInListener() {
+                            if (!TextUtils.isEmpty(keyStoreStr)) {
+                                PossUtil.logInFromKeyStore(keyStoreStr, mPassPhraseEdit.getText().toString(), new PossUtil.LogInListener() {
                                     @Override
                                     public void onLogInError(final String errMsg) {
                                         runOnUiThread(new Runnable() {
@@ -108,6 +112,7 @@ public class InputPassPhraseActivity extends BaseActivity {
                                     @Override
                                     public void run() {
                                         mIsConfirming = false;
+
                                         hideProgressDialog();
                                     }
                                 });
@@ -121,6 +126,8 @@ public class InputPassPhraseActivity extends BaseActivity {
         mNewAccountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hidePassPhraseEditKeyBoard();
+
                 startActivity(new Intent(InputPassPhraseActivity.this, KeyStoreLogInActivity.class));
                 finish();
             }
@@ -129,6 +136,8 @@ public class InputPassPhraseActivity extends BaseActivity {
         mCancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hidePassPhraseEditKeyBoard();
+
                 finish();
             }
         });
@@ -147,6 +156,14 @@ public class InputPassPhraseActivity extends BaseActivity {
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
             mProgressDialog = null;
+        }
+    }
+
+    private void hidePassPhraseEditKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) InputPassPhraseActivity.this
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(mPassPhraseEdit.getWindowToken(), 0);
         }
     }
 }

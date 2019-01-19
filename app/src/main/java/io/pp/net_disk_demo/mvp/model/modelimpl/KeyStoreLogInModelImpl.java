@@ -90,10 +90,10 @@ public class KeyStoreLogInModelImpl implements KeyStoreLogInModel {
 
                 KeyStoreUtil.deleteKeyStore(mLogInModelImplWeakReference.get().getContext());
 
-                final String privateKeyStr = KeyStoreUtil.logInByKeyStore(keyStoreStr, passPhrase);
-                final String addressStr = PpioAccountUtil.generatePpioAddressStr(privateKeyStr);
+                //final String privateKeyStr = KeyStoreUtil.logInByKeyStore(keyStoreStr, passPhrase);
+                //final String addressStr = PpioAccountUtil.generatePpioAddressStr(privateKeyStr);
 
-                boolean loginSucceed = PossUtil.logIn(privateKeyStr, new PossUtil.LogInListener() {
+                boolean loginSucceed = PossUtil.logInFromKeyStore(keyStoreStr, passPhrase, new PossUtil.LogInListener() {
                     @Override
                     public void onLogInError(String errMsg) {
                         publishProgress(errMsg);
@@ -102,14 +102,10 @@ public class KeyStoreLogInModelImpl implements KeyStoreLogInModel {
 
                 if (loginSucceed) {
                     if (mLogInModelImplWeakReference.get().getContext() != null) {
-                        KeyStoreUtil.rememberKeyStore(mLogInModelImplWeakReference.get().getContext(),
-                                privateKeyStr, passPhrase);
-                        KeyStoreUtil.exportKeyStoreFile(privateKeyStr, passPhrase);
+                        KeyStoreUtil.rememberFromKeyStore(mLogInModelImplWeakReference.get().getContext(), keyStoreStr);
                     }
 
                     PossUtil.setPasswordStr(passPhrase);
-                    PossUtil.setPrivateKeyStr(privateKeyStr);
-                    PossUtil.setAddressStr(addressStr);
 
                     return true;
                 } else {

@@ -8,6 +8,7 @@ import java.lang.ref.WeakReference;
 import io.pp.net_disk_demo.mvp.model.CheckHasKeyStoreModel;
 import io.pp.net_disk_demo.mvp.presenter.CheckHasKeyStorePresenter;
 import io.pp.net_disk_demo.ppio.KeyStoreUtil;
+import io.pp.net_disk_demo.ppio.PossUtil;
 
 public class CheckHasKeyStoreModelImpl implements CheckHasKeyStoreModel {
 
@@ -21,7 +22,12 @@ public class CheckHasKeyStoreModelImpl implements CheckHasKeyStoreModel {
 
     @Override
     public void checkHasKeyStore() {
-        new CheckAsyncTask(CheckHasKeyStoreModelImpl.this).execute();
+
+        if (PossUtil.getUser() == null) {
+            new CheckAsyncTask(CheckHasKeyStoreModelImpl.this).execute();
+        } else if (mCheckHasKeyStorePresenter != null) {
+            mCheckHasKeyStorePresenter.showHasUser();
+        }
     }
 
     @Override

@@ -125,6 +125,14 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
     }
 
     @Override
+    public void showHasUserView() {
+        hideProgressDialog();
+
+        startActivity(new Intent(CheckHasKeyStoreActivity.this, PpioDataActivity.class));
+        finish();
+    }
+
+    @Override
     public void showHasKeyStoreView() {
         hideProgressDialog();
 

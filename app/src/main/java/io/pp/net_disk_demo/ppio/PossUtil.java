@@ -79,7 +79,11 @@ public class PossUtil {
         return true;
     }
 
-    public static boolean logIn(final String privateKey, LogInListener logInListener) {
+    public static boolean logIn(final String keyStoreStr, LogInListener logInListener) {
+        return true;
+    }
+
+    public static boolean logInFromKeyStore(final String keyStoreStr, final String passPhrase, LogInListener logInListener) {
         try {
             Config config = Poss.createDefaultConfig();
 
@@ -116,17 +120,38 @@ public class PossUtil {
                         "  }\n" +
                         "]");
 
+                config.getPayment().setIP("ad04b30b910c311e9b71c02d26ce9aff-567092461.us-west-2.elb.amazonaws.com");
+                config.getPayment().setUDPPort(0);
+                config.getPayment().setTCPPort(0);
+                config.getPayment().setHTTPPort(18030);
+
                 if (mIsOffice) {
                     config.getQosServerConfig().setEnable(true);
                     config.getQosServerConfig().setNetwork("udp");
                     config.getQosServerConfig().setAddr("192.168.50.208:9090");//if the address is incorrect, the qoslog will saved in local
                     config.getQosServerConfig().setTag("ppioqos");
                     config.getQosServerConfig().setDir(Constant.PPIO_File.CACHE_QOS_DIR);
+                } else {
+                    config.getQosServerConfig().setEnable(true);
+                    config.getQosServerConfig().setNetwork("udp");
+                    config.getQosServerConfig().setAddr("ad416ba1c124611e9a39d06111ae4d23-1840383830.us-west-2.elb.amazonaws.com:80");//if the address is incorrect, the qoslog will saved in local
+                    config.getQosServerConfig().setTag("ppioqos");
+                    config.getQosServerConfig().setDir(Constant.PPIO_File.CACHE_QOS_DIR);
                 }
 
+                //
+                Log.e(TAG, "");
+                //
+
+                //Poss.initKeyStoreData(String keystoreData, String datadir)
+                //the datadir is the datadir in Config
+                Poss.initKeyStoreData(keyStoreStr, config.getDir());
+
+                config.setKeyPassphrase(passPhrase);
                 mUser = Poss.createUser(config);
 
-                mUser.init("0x" + privateKey);
+                //mUser.init("0x" + privateKey);
+                mUser.initKeyStoreData(keyStoreStr);
 
                 mUser.startDaemon();
 
@@ -151,13 +176,15 @@ public class PossUtil {
         }
     }
 
+
     public static User getUser() {
         return mUser;
     }
 
     public static String getAccountKey() {
         try {
-            return mUser.exportWalletKey();
+            return mUser.exportRootHash();
+            //return mUser.exportWalletAccount();
         } catch (Exception e) {
             Log.e(TAG, "getAccountKey() error: " + e.getMessage());
             e.printStackTrace();

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.nebulas.account.KeyJSON;
 import io.pp.net_disk_demo.nebulas.crypto.Crypto;
 import io.pp.net_disk_demo.nebulas.crypto.cipher.Cipher;
@@ -58,8 +59,8 @@ public class KeyStoreUtil {
                     //
                     Log.e(TAG, "checkHasRememberKeyStore() file = " + files[i]);
                     //
-                    if ("PPIO_KEYSTORE.json".equals(files[i])) {
-                        FileInputStream fileInputStream = context.openFileInput("PPIO_KEYSTORE.json");
+                    if (Constant.PPIO_File.PRIVATE_KEYSOTR_FILE.equals(files[i])) {
+                        FileInputStream fileInputStream = context.openFileInput(Constant.PPIO_File.PRIVATE_KEYSOTR_FILE);
                         byte[] keyStoreBytes = new byte[fileInputStream.available()];
                         fileInputStream.read(keyStoreBytes);
                         fileInputStream.close();
@@ -92,32 +93,34 @@ public class KeyStoreUtil {
         }
     }
 
-    public static String autoLogInByKeyStore(Context context, String passPhrase) {
+    //return keyStore data
+    public static String autoLogInByKeyStore(Context context) {
         try {
             String[] files = context.fileList();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
-                    if ("PPIO_KEYSTORE.json".equals(files[i])) {
-                        FileInputStream fileInputStream = context.openFileInput("PPIO_KEYSTORE.json");
+                    if (Constant.PPIO_File.PRIVATE_KEYSOTR_FILE.equals(files[i])) {
+                        FileInputStream fileInputStream = context.openFileInput(Constant.PPIO_File.PRIVATE_KEYSOTR_FILE);
                         byte[] keyStoreBytes = new byte[fileInputStream.available()];
                         fileInputStream.read(keyStoreBytes);
                         fileInputStream.close();
 
                         KeyJSON keyJSON = JSONUtils.Parse(new String(keyStoreBytes), KeyJSON.class);
-                        keyJSON.getCrypto().setVersion(keyJSON.getVersion());
-                        Cipher cipher = new Cipher(Algorithm.SCRYPT);
-                        byte[] key = cipher.decrypt(keyJSON.getCrypto(), passPhrase.getBytes());
 
-                        String privateKey = bytesToHexString(key);
+//                        keyJSON.getCrypto().setVersion(keyJSON.getVersion());
+//                        Cipher cipher = new Cipher(Algorithm.SCRYPT);
+//                        byte[] key = cipher.decrypt(keyJSON.getCrypto(), passPhrase.getBytes());
+//
+//                        String privateKey = bytesToHexString(key);
 
                         //
                         PossUtil.setKeyStoreStr(new String(keyStoreBytes));
-                        PossUtil.setPasswordStr(passPhrase);
-                        PossUtil.setPrivateKeyStr(privateKey);
+//                        PossUtil.setPasswordStr(passPhrase);
+//                        PossUtil.setPrivateKeyStr(privateKey);
                         PossUtil.setAddressStr(keyJSON.getAddress());
                         //
 
-                        return privateKey;
+                        return JSONUtils.Stringify(keyJSON);
                     }
                 }
 
@@ -133,7 +136,8 @@ public class KeyStoreUtil {
 
     public static boolean deleteKeyStore(Context context) {
         try {
-            File keyStoreFile = new File(context.getApplicationContext().getFilesDir().getPath() + "/PPIO_KEYSTORE.json");
+            File keyStoreFile = new File(context.getApplicationContext().getFilesDir().getPath()
+                    + "/" + Constant.PPIO_File.PRIVATE_KEYSOTR_FILE);
 
             if (keyStoreFile.exists()) {
                 return keyStoreFile.delete();
@@ -145,7 +149,33 @@ public class KeyStoreUtil {
         }
     }
 
-    public static boolean rememberKeyStore(Context context, String privateKey, String passPhrase) {
+    public static boolean rememberFromKeyStore(Context context, String keyStoreStr) {
+        if (context != null) {
+            try {
+                KeyJSON keyJSON = JSONUtils.Parse(new String(keyStoreStr), KeyJSON.class);
+
+                FileOutputStream fileOutputStream = context.getApplicationContext().
+                        openFileOutput(Constant.PPIO_File.PRIVATE_KEYSOTR_FILE, MODE_APPEND);//use append mode
+                fileOutputStream.write(keyStoreStr.getBytes());
+                fileOutputStream.close();
+
+                PossUtil.setKeyStoreStr(keyStoreStr);
+                PossUtil.setAddressStr(keyJSON.getAddress());
+
+                return true;
+            } catch (Exception e) {
+                Log.e(TAG, "rememberKeyStore() error: " + e.getMessage());
+
+                e.printStackTrace();
+
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean rememberFromPrivateKey(Context context, String privateKey, String passPhrase) {
         if (context != null) {
             try {
                 String address = PpioAccountUtil.generatePpioAddressStr(privateKey);
@@ -161,7 +191,8 @@ public class KeyStoreUtil {
 
                 KeyJSON keyJSON = new KeyJSON(address, cryptoJSON);
 
-                FileOutputStream fileOutputStream = context.getApplicationContext().openFileOutput("PPIO_KEYSTORE.json", MODE_APPEND);
+                FileOutputStream fileOutputStream = context.getApplicationContext().
+                        openFileOutput(Constant.PPIO_File.PRIVATE_KEYSOTR_FILE, MODE_APPEND);//use append mode
                 fileOutputStream.write(JSONUtils.Stringify(keyJSON).getBytes());
                 fileOutputStream.close();
 
@@ -201,7 +232,8 @@ public class KeyStoreUtil {
 
             KeyJSON keyJSON = new KeyJSON(address, cryptoJSON);
 
-            new ObjectMapper().writeValue(new File(Environment.getExternalStorageDirectory() + "/PPPIO_KEYSTORE.json"), keyJSON);
+            new ObjectMapper().writeValue(new File(Environment.getExternalStorageDirectory()
+                    + "/" + Constant.PPIO_File.PRIVATE_KEYSOTR_FILE), keyJSON);
 
             return JSONUtils.Stringify(keyJSON);
         } catch (Exception e) {
@@ -308,6 +340,4 @@ public class KeyStoreUtil {
     public interface CheckHasKeyStoreListener {
         void onCheckFail(String errMsg);
     }
-
-
 }

@@ -1,10 +1,13 @@
 package io.pp.net_disk_demo.activity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -70,7 +73,7 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
 
     @Override
     public void stopShowInLogInView() {
-       hideProgressDialog();
+        hideProgressDialog();
 
         mIsConfirming = false;
     }
@@ -92,6 +95,10 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
 
         mIsConfirming = false;
 
+        //
+        Log.e(TAG, "showLogInFailView() failStr = " + failStr);
+        //
+
         Toast.makeText(KeyStoreLogInActivity.this, failStr, Toast.LENGTH_SHORT).show();
     }
 
@@ -105,6 +112,8 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     }
 
     public void onConfirm(View view) {
+        hidePassPhraseEditKeyBoard();
+
         if (mKeyStoreLogInPresenter != null) {
             if (mKeyStoreEdit.getText() == null) {
 
@@ -131,6 +140,18 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
             mProgressDialog = null;
+        }
+    }
+
+    private void hidePassPhraseEditKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) KeyStoreLogInActivity.this
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            if (mPassPhraseEdit.hasFocus()) {
+                imm.hideSoftInputFromWindow(mPassPhraseEdit.getWindowToken(), 0);
+            } else {
+                imm.hideSoftInputFromWindow(mKeyStoreEdit.getWindowToken(), 0);
+            }
         }
     }
 }

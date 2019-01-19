@@ -9,6 +9,9 @@ public interface CheckHasKeyStorePresenter {
 
     void showCheckHasKeyStoreFail(String errMsg);
 
+
+    void showHasUser();
+
     void showHasKeyStore();
 
     void showNotHasKeyStore();

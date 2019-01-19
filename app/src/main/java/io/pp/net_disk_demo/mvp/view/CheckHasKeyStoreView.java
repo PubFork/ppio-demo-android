@@ -6,6 +6,8 @@ public interface CheckHasKeyStoreView {
 
     void showCheckHasKeyStoreFailView(String errMsg);
 
+    void showHasUserView();
+
     void showHasKeyStoreView();
 
     void showNotHasKeyStoreView();

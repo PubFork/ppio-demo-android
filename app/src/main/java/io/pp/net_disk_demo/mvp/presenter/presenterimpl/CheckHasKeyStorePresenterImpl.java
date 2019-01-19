@@ -44,6 +44,13 @@ public class CheckHasKeyStorePresenterImpl implements CheckHasKeyStorePresenter 
     }
 
     @Override
+    public void showHasUser() {
+        if (mCheckHasKeyStoreView != null) {
+            mCheckHasKeyStoreView.showHasUserView();
+        }
+    }
+
+    @Override
     public void showHasKeyStore() {
         if (mCheckHasKeyStoreView != null) {
             mCheckHasKeyStoreView.showHasKeyStoreView();
