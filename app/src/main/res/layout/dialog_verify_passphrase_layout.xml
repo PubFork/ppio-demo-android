@@ -15,7 +15,7 @@
         android:gravity="left"
         android:text="keystore passphrase"
         android:textColor="#303133"
-        android:textSize="14sp" />
+        android:textSize="14dp" />
 
     <EditText
         android:id="@+id/original_pass_edit"
@@ -38,7 +38,7 @@
         android:layout_marginRight="24dp"
         android:text="verify passphrase"
         android:textColor="#303133"
-        android:textSize="14sp" />
+        android:textSize="14dp" />
 
     <EditText
         android:id="@+id/verify_pass_edit"

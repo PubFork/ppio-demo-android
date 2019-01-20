@@ -18,7 +18,7 @@
         android:layout_marginTop="16dp"
         android:text="Share code"
         android:textColor="#303133"
-        android:textSize="16sp" />
+        android:textSize="16dp" />
 
     <EditText
         android:id="@+id/sharecode_edit"
@@ -46,6 +46,6 @@
         android:text="Confirm"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+        android:textSize="16dp" />
 
 </LinearLayout>

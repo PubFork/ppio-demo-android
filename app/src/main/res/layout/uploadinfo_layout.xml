@@ -28,7 +28,7 @@
             android:layout_marginStart="65dp"
             android:text="Framework.word"
             android:textColor="#303133"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
     </RelativeLayout>
 
@@ -60,7 +60,7 @@
             android:layout_marginStart="65dp"
             android:text="Secure"
             android:textColor="#303133"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <io.pp.net_disk_demo.widget.CustomSwitchButton
             android:id="@+id/upload_secure_switch"
@@ -102,7 +102,7 @@
             android:layout_marginStart="65dp"
             android:text="Expired Time"
             android:textColor="#303133"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <ImageView
             android:id="@+id/expiredtime_right_iv"
@@ -123,7 +123,7 @@
             android:layout_toStartOf="@+id/expiredtime_right_iv"
             android:text="1 Month(30days)"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
     </RelativeLayout>
 
@@ -157,7 +157,7 @@
             android:layout_marginStart="65dp"
             android:text="Copies"
             android:textColor="#303133"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <ImageView
             android:id="@+id/copies_right_iv"
@@ -179,7 +179,7 @@
             android:layout_toStartOf="@+id/copies_right_iv"
             android:text="-"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
     </RelativeLayout>
 
@@ -213,7 +213,7 @@
             android:layout_marginStart="65dp"
             android:text="ChiPrice"
             android:textColor="#303133"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <ImageView
             android:id="@+id/chiprice_right_iv"
@@ -235,7 +235,7 @@
             android:layout_toStartOf="@+id/chiprice_right_iv"
             android:text="--"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
     </RelativeLayout>
 
@@ -268,7 +268,7 @@
             android:layout_marginStart="65dp"
             android:text="Total Gas"
             android:textColor="#303133"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/totalgas_value_tv"
@@ -279,7 +279,7 @@
             android:layout_marginEnd="40dp"
             android:text="-- Chi"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
     </RelativeLayout>
 
@@ -312,7 +312,7 @@
             android:layout_marginStart="65dp"
             android:text="Expected cost"
             android:textColor="#303133"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/expected_cost_value_tv"
@@ -323,7 +323,7 @@
             android:layout_marginEnd="40dp"
             android:text="-- Chi"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
     </RelativeLayout>
 

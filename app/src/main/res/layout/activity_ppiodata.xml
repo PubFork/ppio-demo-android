@@ -57,7 +57,7 @@
                     android:includeFontPadding="false"
                     android:text="All file"
                     android:textColor="#FFFFFF"
-                    android:textSize="19sp" />
+                    android:textSize="19dp" />
 
             </RelativeLayout>
         </RelativeLayout>
@@ -80,7 +80,7 @@
             android:layout_marginTop="16dp"
             android:text="No files yet"
             android:textColor="#909399"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
 
         <LinearLayout
             android:id="@+id/list_layout"
@@ -165,7 +165,7 @@
                     android:includeFontPadding="false"
                     android:text="Uploading"
                     android:textColor="#606266"
-                    android:textSize="10sp" />
+                    android:textSize="10dp" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -205,7 +205,7 @@
                     android:includeFontPadding="false"
                     android:text="All file"
                     android:textColor="#1989FA"
-                    android:textSize="10sp" />
+                    android:textSize="10dp" />
 
             </RelativeLayout>
 
@@ -235,7 +235,7 @@
                     android:includeFontPadding="false"
                     android:text="Downloading"
                     android:textColor="#606266"
-                    android:textSize="10sp" />
+                    android:textSize="10dp" />
 
             </RelativeLayout>
         </RelativeLayout>

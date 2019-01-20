@@ -34,7 +34,7 @@
             android:layout_centerVertical="true"
             android:text="copies"
             android:textColor="#303133"
-            android:textSize="21sp" />
+            android:textSize="21dp" />
 
     </RelativeLayout>
 

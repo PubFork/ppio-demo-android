@@ -158,7 +158,7 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
                 mProgressBar.setVisibility(View.GONE);
                 mTaskStatusLayout.setVisibility(View.VISIBLE);
                 mTaskErrorIv.setVisibility(View.VISIBLE);
-                mTaskStatusTv.setText("download failed: " + error);
+                mTaskStatusTv.setText(error);
                 mTaskStatusTv.setTextColor(Color.RED);
             }
         }

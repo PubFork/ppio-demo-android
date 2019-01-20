@@ -23,7 +23,7 @@
         android:layout_marginTop="32dp"
         android:text="PPDISK-Demo"
         android:textColor="#FFFFFF"
-        android:textSize="24sp" />
+        android:textSize="24dp" />
 
     <TextView
         android:id="@+id/seedphrase_tv"
@@ -35,7 +35,7 @@
         android:layout_marginTop="109dp"
         android:text="Private Key"
         android:textColor="#A0FFFFFF"
-        android:textSize="14sp" />
+        android:textSize="14dp" />
 
     <EditText
         android:id="@+id/login_mnemonic_edit"
@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:text="Doesn't have an account?"
             android:textColor="#FFFFFF"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
 
         <TextView
             android:id="@+id/signup_tv"
@@ -83,7 +83,7 @@
             android:layout_height="wrap_content"
             android:text="Sign up"
             android:textColor="#F56C6C"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
 
     </LinearLayout>
 

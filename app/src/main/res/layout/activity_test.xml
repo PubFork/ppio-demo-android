@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="current keystore:"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
 
             <TextView
                 android:id="@+id/keystore_tv"
@@ -33,14 +33,14 @@
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
                 android:padding="5dp"
-                android:textSize="18sp" />
+                android:textSize="18dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="passphrase:"
-                android:textSize="14sp"
+                android:textSize="14dp"
                 android:visibility="gone" />
 
             <TextView
@@ -50,7 +50,7 @@
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
                 android:padding="5dp"
-                android:textSize="18sp"
+                android:textSize="18dp"
                 android:visibility="gone" />
 
             <TextView
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="private key:"
-                android:textSize="14sp"
+                android:textSize="14dp"
                 android:visibility="gone" />
 
             <TextView
@@ -68,7 +68,7 @@
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
                 android:padding="5dp"
-                android:textSize="18sp"
+                android:textSize="18dp"
                 android:visibility="gone" />
 
             <TextView
@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="address:"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
 
             <TextView
                 android:id="@+id/address_tv"
@@ -85,7 +85,7 @@
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
                 android:padding="5dp"
-                android:textSize="18sp" />
+                android:textSize="18dp" />
 
             <Button
                 android:id="@+id/export_keystore_btn"
@@ -107,7 +107,7 @@
                 android:layout_margin="10dp"
                 android:background="@drawable/background_custom_get_edit"
                 android:padding="5dp"
-                android:textSize="18sp" />
+                android:textSize="18dp" />
 
         </LinearLayout>
 

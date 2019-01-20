@@ -23,7 +23,7 @@
         android:layout_marginTop="32dp"
         android:text="PPDISK-Demo"
         android:textColor="#FFFFFF"
-        android:textSize="24sp" />
+        android:textSize="24dp" />
 
     <Button
         android:id="@+id/loginorregister_register_btn"

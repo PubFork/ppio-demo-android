@@ -23,7 +23,7 @@
         android:layout_marginTop="32dp"
         android:text="PPDISK-Demo"
         android:textColor="#FFFFFF"
-        android:textSize="24sp" />
+        android:textSize="24dp" />
 
     <TextView
         android:id="@+id/private-key_label_tv"
@@ -35,7 +35,7 @@
         android:layout_marginTop="109dp"
         android:text="Private Key"
         android:textColor="#A0FFFFFF"
-        android:textSize="14sp" />
+        android:textSize="14dp" />
 
     <EditText
         android:id="@+id/privatekey_login_edit"
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:text="Has forgot private key?"
             android:textColor="#FFFFFF"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
 
         <TextView
             android:id="@+id/keystore_tv"
@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:text="keystore"
             android:textColor="#F56C6C"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
 
     </LinearLayout>
 

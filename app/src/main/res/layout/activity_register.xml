@@ -25,7 +25,7 @@
         android:layout_marginRight="48dp"
         android:text="If you ever forget password or move computers, you will need this seed phrase to access your account.\nSave them somewhere safe and secret"
         android:textColor="#FFFFFF"
-        android:textSize="15sp" />
+        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/hint_tv"
@@ -37,7 +37,7 @@
         android:layout_marginTop="109dp"
         android:text="Private Key"
         android:textColor="#A0FFFFFF"
-        android:textSize="14sp" />
+        android:textSize="14dp" />
 
     <LinearLayout
         android:layout_width="match_parent"

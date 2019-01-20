@@ -78,11 +78,6 @@ android {
     }
 
 }
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -95,7 +90,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    implementation(name: 'poss', ext: 'aar')
     implementation 'org.web3j:core:3.3.1-android'
 
     //Used to generate mnemonic words
@@ -116,6 +110,8 @@ dependencies {
 
     //Use Rpc
     implementation files('libs/android-json-rpc-0.3.4.jar')
+
+    implementation files('libs/poss.aar')
 
     implementation 'com.lambdaworks:scrypt:1.4.0'
 }

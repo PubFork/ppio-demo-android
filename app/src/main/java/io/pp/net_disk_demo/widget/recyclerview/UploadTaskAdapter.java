@@ -153,7 +153,7 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
                 mProgressBar.setVisibility(View.GONE);
                 mTaskStatusLayout.setVisibility(View.VISIBLE);
                 mTaskErrorIv.setVisibility(View.VISIBLE);
-                mTaskStatusTv.setText("upload failed: " + error);
+                mTaskStatusTv.setText(error);
                 mTaskStatusTv.setTextColor(Color.RED);
             }
         }

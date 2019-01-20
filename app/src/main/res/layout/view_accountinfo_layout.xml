@@ -32,7 +32,7 @@
             android:contentDescription="@string/app_name"
             android:text=""
             android:textColor="#FFFFFF"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
 
     </LinearLayout>
 
@@ -52,7 +52,7 @@
             android:includeFontPadding="false"
             android:text="Used"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/used_value_tv"
@@ -63,7 +63,7 @@
             android:includeFontPadding="false"
             android:text="-- G"
             android:textColor="#909399"
-            android:textSize="12sp" />
+            android:textSize="12dp" />
 
         <View
             android:layout_width="match_parent"
@@ -88,7 +88,7 @@
             android:includeFontPadding="false"
             android:text="Balance"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/balance_value_tv"
@@ -99,7 +99,7 @@
             android:includeFontPadding="false"
             android:text="-- Chi"
             android:textColor="#909399"
-            android:textSize="12sp" />
+            android:textSize="12dp" />
 
 
         <View
@@ -125,7 +125,7 @@
             android:includeFontPadding="false"
             android:text="Fund"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/fund_value_tv"
@@ -136,7 +136,7 @@
             android:includeFontPadding="false"
             android:text="-- Chi"
             android:textColor="#909399"
-            android:textSize="12sp" />
+            android:textSize="12dp" />
 
         <View
             android:layout_width="match_parent"
@@ -162,7 +162,7 @@
             android:includeFontPadding="false"
             android:text="Recharge"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <ImageView
             android:id="@+id/recharge_enter_iv"
@@ -200,7 +200,7 @@
             android:includeFontPadding="false"
             android:text="Record"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <ImageView
             android:id="@+id/bill_enter_iv"
@@ -244,7 +244,7 @@
                 android:includeFontPadding="false"
                 android:text="Check for update"
                 android:textColor="#606266"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
 
             <TextView
                 android:id="@+id/version_value_tv"
@@ -253,7 +253,7 @@
                 android:includeFontPadding="false"
                 android:text="Demo(V1.0)"
                 android:textColor="#909399"
-                android:textSize="12sp" />
+                android:textSize="12dp" />
 
         </LinearLayout>
 
@@ -292,7 +292,7 @@
             android:includeFontPadding="false"
             android:text="Feedback"
             android:textColor="#606266"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
 
         <ImageView
             android:id="@+id/feedback_enter_iv"
@@ -322,7 +322,7 @@
         android:includeFontPadding="false"
         android:text="Log out"
         android:textColor="#F56C6C"
-        android:textSize="16sp" />
+        android:textSize="16dp" />
 
     <View
         android:id="@+id/logout_line_v"
