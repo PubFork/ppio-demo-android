@@ -5,17 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import io.pp.net_disk_demo.R;
-import io.pp.net_disk_demo.ppio.KeyStoreUtil;
-import io.pp.net_disk_demo.ppio.PossUtil;
+import io.pp.net_disk_demo.mvp.presenter.InputPassPhrasePresenter;
+import io.pp.net_disk_demo.mvp.presenter.presenterimpl.InputPassPhrasePresenterImpl;
+import io.pp.net_disk_demo.mvp.view.InputPassPhraseView;
+import io.pp.net_disk_demo.util.ToastUtil;
 
-public class InputPassPhraseActivity extends BaseActivity {
+public class InputPassPhraseActivity extends BaseActivity implements InputPassPhraseView {
 
     private EditText mPassPhraseEdit = null;
     private Button mConfirmBtn = null;
@@ -24,7 +26,7 @@ public class InputPassPhraseActivity extends BaseActivity {
 
     private ProgressDialog mProgressDialog = null;
 
-    private boolean mIsConfirming = false;
+    private InputPassPhrasePresenter mInputPassPhrasePresenter = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,7 +61,37 @@ public class InputPassPhraseActivity extends BaseActivity {
     protected void onDestroy() {
         hideProgressDialog();
 
+        if (mInputPassPhrasePresenter != null) {
+            mInputPassPhrasePresenter.onDestroy();
+            mInputPassPhrasePresenter = null;
+        }
+
         super.onDestroy();
+    }
+
+    @Override
+    public void showInLogInView() {
+        showProgressDialog();
+    }
+
+    @Override
+    public void stopShowInLogInView() {
+        hideProgressDialog();
+    }
+
+    @Override
+    public void showLogInFailView(String errMsg) {
+        hideProgressDialog();
+
+        ToastUtil.showToast(InputPassPhraseActivity.this, errMsg, Toast.LENGTH_SHORT);
+    }
+
+    @Override
+    public void showLogInSucceedView() {
+        hideProgressDialog();
+
+        startActivity(new Intent(InputPassPhraseActivity.this, PpioDataActivity.class));
+        finish();
     }
 
     private void init() {
@@ -70,55 +102,16 @@ public class InputPassPhraseActivity extends BaseActivity {
         mNewAccountBtn = findViewById(R.id.new_account_btn);
         mCancelBtn = findViewById(R.id.cancel_btn);
 
+        mInputPassPhrasePresenter = new InputPassPhrasePresenterImpl(InputPassPhraseActivity.this,
+                InputPassPhraseActivity.this);
+
         mConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 hidePassPhraseEditKeyBoard();
 
-                if (mPassPhraseEdit.getText() != null && !mIsConfirming) {
-                    mIsConfirming = true;
-                    showProgressDialog();
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            String keyStoreStr = KeyStoreUtil.autoLogInByKeyStore(InputPassPhraseActivity.this);
-
-                            if (!TextUtils.isEmpty(keyStoreStr)) {
-                                PossUtil.logInFromKeyStore(keyStoreStr, mPassPhraseEdit.getText().toString(), new PossUtil.LogInListener() {
-                                    @Override
-                                    public void onLogInError(final String errMsg) {
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                mIsConfirming = false;
-                                                hideProgressDialog();
-                                            }
-                                        });
-                                    }
-                                });
-
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        hideProgressDialog();
-                                        startActivity(new Intent(InputPassPhraseActivity.this, PpioDataActivity.class));
-                                        finish();
-                                    }
-                                });
-
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mIsConfirming = false;
-
-                                        hideProgressDialog();
-                                    }
-                                });
-                            }
-                        }
-                    }).start();
+                if (mInputPassPhrasePresenter != null) {
+                    mInputPassPhrasePresenter.logIn(mPassPhraseEdit.getText().toString());
                 }
             }
         });
@@ -129,7 +122,6 @@ public class InputPassPhraseActivity extends BaseActivity {
                 hidePassPhraseEditKeyBoard();
 
                 startActivity(new Intent(InputPassPhraseActivity.this, KeyStoreLogInActivity.class));
-                finish();
             }
         });
 

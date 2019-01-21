@@ -28,7 +28,7 @@ public class KeyStoreLogInModelImpl implements KeyStoreLogInModel {
 
     @Override
     public void logIn(String keyStore, String passPhrase) {
-        new LoginAsyncTask(KeyStoreLogInModelImpl.this).execute(keyStore, passPhrase);
+        new LogInAsyncTask(KeyStoreLogInModelImpl.this).execute(keyStore, passPhrase);
     }
 
     @Override
@@ -65,11 +65,11 @@ public class KeyStoreLogInModelImpl implements KeyStoreLogInModel {
         }
     }
 
-    static class LoginAsyncTask extends AsyncTask<String, String, Boolean> {
+    static class LogInAsyncTask extends AsyncTask<String, String, Boolean> {
 
         private WeakReference<KeyStoreLogInModelImpl> mLogInModelImplWeakReference;
 
-        public LoginAsyncTask(KeyStoreLogInModelImpl keyStoreLogInModelImpl) {
+        public LogInAsyncTask(KeyStoreLogInModelImpl keyStoreLogInModelImpl) {
             mLogInModelImplWeakReference = new WeakReference<>(keyStoreLogInModelImpl);
         }
 
@@ -86,31 +86,28 @@ public class KeyStoreLogInModelImpl implements KeyStoreLogInModel {
         protected Boolean doInBackground(String... params) {
             final String keyStoreStr = params[0];
             final String passPhrase = params[1];
-            if (!TextUtils.isEmpty(keyStoreStr) && !TextUtils.isEmpty(passPhrase)) {
+            KeyStoreUtil.deleteKeyStore(mLogInModelImplWeakReference.get().getContext());
 
-                KeyStoreUtil.deleteKeyStore(mLogInModelImplWeakReference.get().getContext());
+            if (!KeyStoreUtil.checkKeyStoreAndPassPhrase(keyStoreStr, passPhrase)) {
+                publishProgress("the keystore or passphrase is wrong!");
+                return false;
+            }
 
-                //final String privateKeyStr = KeyStoreUtil.logInByKeyStore(keyStoreStr, passPhrase);
-                //final String addressStr = PpioAccountUtil.generatePpioAddressStr(privateKeyStr);
-
-                boolean loginSucceed = PossUtil.logInFromKeyStore(keyStoreStr, passPhrase, new PossUtil.LogInListener() {
-                    @Override
-                    public void onLogInError(String errMsg) {
-                        publishProgress(errMsg);
-                    }
-                });
-
-                if (loginSucceed) {
-                    if (mLogInModelImplWeakReference.get().getContext() != null) {
-                        KeyStoreUtil.rememberFromKeyStore(mLogInModelImplWeakReference.get().getContext(), keyStoreStr);
-                    }
-
-                    PossUtil.setPasswordStr(passPhrase);
-
-                    return true;
-                } else {
-                    return false;
+            boolean loginSucceed = PossUtil.logInFromKeyStore(keyStoreStr, passPhrase, new PossUtil.LogInListener() {
+                @Override
+                public void onLogInError(String errMsg) {
+                    publishProgress(errMsg);
                 }
+            });
+
+            if (loginSucceed) {
+                if (mLogInModelImplWeakReference.get().getContext() != null) {
+                    KeyStoreUtil.rememberFromKeyStore(mLogInModelImplWeakReference.get().getContext(), keyStoreStr);
+                }
+
+                PossUtil.setPasswordStr(passPhrase);
+
+                return true;
             } else {
                 return false;
             }

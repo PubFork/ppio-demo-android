@@ -109,7 +109,7 @@ public class TestActivity extends BaseActivity {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        String filePath = KeyStoreUtil.exportKeyStoreFile(PossUtil.getPrivateKeyStr(), passPhrase);
+                                        String filePath = KeyStoreUtil.exportKeyStoreFile(TestActivity.this, passPhrase);
 
                                         runOnUiThread(new Runnable() {
                                             @Override

@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.ppio;
 
 import android.content.Context;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,6 +49,32 @@ public class KeyStoreUtil {
             e.printStackTrace();
 
             return null;
+        }
+    }
+
+    public static boolean checkKeyStoreAndPassPhrase(String keyStoreStr, String keyStorePassPhrase) {
+        try {
+            KeyJSON keyJSON = JSONUtils.Parse(keyStoreStr, KeyJSON.class);
+            String keyJSONAddress = keyJSON.getAddress();
+            keyJSON.getCrypto().setVersion(keyJSON.getVersion());
+
+            Cipher cipher = new Cipher(Algorithm.SCRYPT);
+
+            String address = PpioAccountUtil.generatePpioAddressStr(bytesToHexString(cipher.decrypt(keyJSON.getCrypto(),
+                    keyStorePassPhrase.getBytes())));
+
+            if (!TextUtils.isEmpty(keyJSONAddress) &&
+                    keyJSONAddress.equals(address) &&
+                    PpioAccountUtil.checkPpioAddress(address)) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return false;
         }
     }
 
@@ -107,18 +134,8 @@ public class KeyStoreUtil {
 
                         KeyJSON keyJSON = JSONUtils.Parse(new String(keyStoreBytes), KeyJSON.class);
 
-//                        keyJSON.getCrypto().setVersion(keyJSON.getVersion());
-//                        Cipher cipher = new Cipher(Algorithm.SCRYPT);
-//                        byte[] key = cipher.decrypt(keyJSON.getCrypto(), passPhrase.getBytes());
-//
-//                        String privateKey = bytesToHexString(key);
-
-                        //
                         PossUtil.setKeyStoreStr(new String(keyStoreBytes));
-//                        PossUtil.setPasswordStr(passPhrase);
-//                        PossUtil.setPrivateKeyStr(privateKey);
                         PossUtil.setAddressStr(keyJSON.getAddress());
-                        //
 
                         return JSONUtils.Stringify(keyJSON);
                     }
@@ -243,14 +260,32 @@ public class KeyStoreUtil {
         }
     }
 
-    public static String exportKeyStoreFile(String privateKey, String passPhrase) {
+    public static String exportKeyStoreFile(Context context, String passPhrase) {
         try {
-            String address = PpioAccountUtil.generatePpioAddressStr(privateKey);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("'PPIO-UTC-'yyyy_MM_dd'T'HH:mm:ss.SSS'-'");
-            final String keyStoreFilePath = Environment.getExternalStorageDirectory().getPath() + "/" +
-                    dateFormat.format(new Date()) + address + ".json";
+            String[] files = context.fileList();
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    if (Constant.PPIO_File.PRIVATE_KEYSOTR_FILE.equals(files[i])) {
+                        FileInputStream fileInputStream = context.openFileInput(Constant.PPIO_File.PRIVATE_KEYSOTR_FILE);
+                        byte[] keyStoreBytes = new byte[fileInputStream.available()];
+                        fileInputStream.read(keyStoreBytes);
+                        fileInputStream.close();
 
-            return generateKeyStore(privateKey, passPhrase, keyStoreFilePath);
+                        KeyJSON keyJSON = JSONUtils.Parse(new String(keyStoreBytes), KeyJSON.class);
+                        Cipher cipher = new Cipher(Algorithm.SCRYPT);
+                        String privateKey = bytesToHexString(cipher.decrypt(keyJSON.getCrypto(),
+                                passPhrase.getBytes()));
+                        String address = PpioAccountUtil.generatePpioAddressStr(privateKey);
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("'PPIO-UTC-'yyyy_MM_dd'T'HH:mm:ss.SSS'-'");
+                        final String keyStoreFilePath = Environment.getExternalStorageDirectory().getPath() + "/" +
+                                dateFormat.format(new Date()) + address + ".json";
+
+                        return generateKeyStore(privateKey, passPhrase, keyStoreFilePath);
+                    }
+                }
+            }
+
+            return null;
         } catch (Exception e) {
             Log.e(TAG, "exportKeyStoreFile() error: " + e.getMessage());
             e.printStackTrace();
@@ -259,7 +294,8 @@ public class KeyStoreUtil {
     }
 
 
-    public static String generateKeyStore(String privateKey, String passPhrase, final String keyStoreFilePath) {
+    public static String generateKeyStore(String privateKey, String passPhrase,
+                                          final String keyStoreFilePath) {
         try {
             String address = PpioAccountUtil.generatePpioAddressStr(privateKey);
 
@@ -337,7 +373,25 @@ public class KeyStoreUtil {
         }
     }
 
-    public interface CheckHasKeyStoreListener {
-        void onCheckFail(String errMsg);
+    /**
+     * Determine if the string contains only alphanumeric characters and Chinese characters
+     * The range of unicode encoding for various characters:
+     * Chinese character：[0x4e00,0x9fa5]（or decimal[19968,40869]）
+     * digital：[0x30,0x39]（or decimal[48, 57]）
+     * Lower case letters：[0x61,0x7a]（or decimal[97, 122]）
+     * uppercase letter：[0x41,0x5a]（or decimal[65, 90]）
+     */
+    public static boolean isLetterDigitOrChinese(String str) {
+        String regex = "^[a-z0-9A-Z\u4e00-\u9fa5]+$";
+        return str.matches(regex);
     }
+
+    private static boolean isHexStr(String str) {
+        String regex = "^[A-Fa-f0-9]+$";
+        return str.matches(regex);
+    }
+
+public interface CheckHasKeyStoreListener {
+    void onCheckFail(String errMsg);
+}
 }

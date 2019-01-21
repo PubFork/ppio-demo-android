@@ -21,7 +21,7 @@
         android:layout_below="@id/login_log_iv"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
-        android:text="PPDISK-Demo"
+        android:text="PPIO-Demo"
         android:textColor="#FFFFFF"
         android:textSize="24dp" />
 

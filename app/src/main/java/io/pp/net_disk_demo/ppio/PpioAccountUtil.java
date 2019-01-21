@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import org.web3j.crypto.Credentials;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import io.github.novacrypto.bip39.MnemonicGenerator;
 import io.github.novacrypto.bip39.SeedCalculator;
@@ -83,6 +84,59 @@ public class PpioAccountUtil {
         return addressStr;
     }
 
+    public static String generatePpioAddress(byte[]... args) throws Exception {
+        if (args != null) {
+            byte[] addressBytes = new byte[28];
+
+            byte[] headerBytes = toBytes("502A8D78");
+
+            byte[] sha = Hash.Sha3256(args);
+            byte[] content = Hash.Ripemd160(sha);
+            System.arraycopy(headerBytes, 0, addressBytes, 0, 4);
+            System.arraycopy(content, 0, addressBytes, 4, 20);
+
+            byte[] checkData = ByteUtils.SubBytes(addressBytes, 0, 24);
+            byte[] checkSum = checkSum(checkData);
+            System.arraycopy(checkSum, 0, addressBytes, 24, 4);
+
+            return Base58.encode(addressBytes);
+        }
+
+        return "";
+    }
+
+    public static boolean checkPpioAddress(String address) {
+        try {
+            byte[] addressBytes = Base58.decode(address);
+
+            if (addressBytes != null && addressBytes.length == 28) {
+                byte[] headerBytes = ByteUtils.SubBytes(addressBytes, 0, 4);
+                if("502A8D78".equalsIgnoreCase(bytesToHexString(headerBytes))) {
+                    byte[] tailBytes = ByteUtils.SubBytes(addressBytes, 24, 4);
+                    byte[] checkSum = checkSum(ByteUtils.SubBytes(addressBytes, 0, 24));
+
+                    return Arrays.equals(tailBytes, checkSum);
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static byte[] checkSum(byte[] data) {
+        if (data == null || data.length == 0) {
+            return new byte[0];
+        }
+
+        byte[] checkData = Hash.Sha3256(data);
+        return ByteUtils.SubBytes(checkData, 0, 4);
+    }
+
     public static String bytesToHexString(byte[] bytesArr) {
         if (bytesArr != null) {
             StringBuilder stringBuilder = new StringBuilder(bytesArr.length);
@@ -115,35 +169,4 @@ public class PpioAccountUtil {
 
         return bytes;
     }
-
-    public static String generatePpioAddress(byte[]... args) throws Exception {
-        if (args != null) {
-            byte[] addressBytes = new byte[28];
-
-            byte[] headerBytes = toBytes("502A8D78");
-
-            byte[] sha = Hash.Sha3256(args);
-            byte[] content = Hash.Ripemd160(sha);
-            System.arraycopy(headerBytes, 0, addressBytes, 0, 4);
-            System.arraycopy(content, 0, addressBytes, 4, 20);
-
-            byte[] checkData = ByteUtils.SubBytes(addressBytes, 0, 24);
-            byte[] checkSum = checkSum(checkData);
-            System.arraycopy(checkSum, 0, addressBytes, 24, 4);
-
-            return Base58.encode(addressBytes);
-        }
-
-        return "";
-    }
-
-    private static byte[] checkSum(byte[] data) {
-        if (data == null || data.length == 0) {
-            return new byte[0];
-        }
-
-        byte[] checkData = Hash.Sha3256(data);
-        return ByteUtils.SubBytes(checkData, 0, 4);
-    }
-
 }

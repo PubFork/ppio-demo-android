@@ -16,6 +16,7 @@ import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.mvp.presenter.KeyStoreLogInPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.KeyStoreLogInPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.KeyStoreLogInView;
+import io.pp.net_disk_demo.util.ToastUtil;
 
 public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogInView {
     private static final String TAG = "KeyStoreLogInActivity";
@@ -26,8 +27,6 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     private ProgressDialog mProgressDialog = null;
 
     private KeyStoreLogInPresenter mKeyStoreLogInPresenter = null;
-
-    private boolean mIsConfirming = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,8 +73,6 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     @Override
     public void stopShowInLogInView() {
         hideProgressDialog();
-
-        mIsConfirming = false;
     }
 
     @Override
@@ -93,13 +90,7 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     public void showLogInFailView(String failStr) {
         hideProgressDialog();
 
-        mIsConfirming = false;
-
-        //
-        Log.e(TAG, "showLogInFailView() failStr = " + failStr);
-        //
-
-        Toast.makeText(KeyStoreLogInActivity.this, failStr, Toast.LENGTH_SHORT).show();
+        ToastUtil.showToast(KeyStoreLogInActivity.this, failStr, Toast.LENGTH_SHORT);
     }
 
     private void init() {
@@ -115,14 +106,7 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
         hidePassPhraseEditKeyBoard();
 
         if (mKeyStoreLogInPresenter != null) {
-            if (mKeyStoreEdit.getText() == null) {
-
-            } else if (mPassPhraseEdit.getText() == null) {
-
-            } else if (!mIsConfirming) {
-                mIsConfirming = true;
-                mKeyStoreLogInPresenter.logIn(mKeyStoreEdit.getText().toString(), mPassPhraseEdit.getText().toString());
-            }
+            mKeyStoreLogInPresenter.logIn(mKeyStoreEdit.getText().toString(), mPassPhraseEdit.getText().toString());
         }
     }
 
