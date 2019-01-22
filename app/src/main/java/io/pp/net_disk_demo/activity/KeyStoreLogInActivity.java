@@ -3,6 +3,7 @@ package io.pp.net_disk_demo.activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -29,11 +30,15 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
 
     private KeyStoreLogInPresenter mKeyStoreLogInPresenter = null;
 
+    private boolean mHasStartScanCode;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_keystore_login_layout);
+
+        setupUI(findViewById(R.id.keystore_login_layout));
 
         init();
     }
@@ -47,6 +52,10 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == Constant.Code.REQUEST_SCAN_CODE) {
+            mHasStartScanCode = false;
+        }
+
         if (requestCode == Constant.Code.REQUEST_SCAN_CODE &&
                 resultCode == Constant.Code.REQUEST_SCAN_CODE_OK &&
                 data != null) {
@@ -54,6 +63,8 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
 
             if (!TextUtils.isEmpty(keystore)) {
                 mKeyStoreEdit.setText(keystore);
+                mPassPhraseEdit.requestFocus();
+                mPassPhraseEdit.performClick();
             } else {
                 ToastUtil.showToast(KeyStoreLogInActivity.this, "the result is null!", Toast.LENGTH_SHORT);
             }
@@ -114,28 +125,39 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     private void init() {
         setImmersiveStatusBar();
 
-        mKeyStoreEdit = findViewById(R.id.keystore_login_edit);
-        mPassPhraseEdit = findViewById(R.id.keystore_password_edit);
+        mKeyStoreEdit = findViewById(R.id.keystore_edit);
+        mPassPhraseEdit = findViewById(R.id.passphrase_edit);
 
         mKeyStoreLogInPresenter = new KeyStoreLogInPresenterImpl(KeyStoreLogInActivity.this, KeyStoreLogInActivity.this);
     }
 
     public void onConfirm(View view) {
-        hidePassPhraseEditKeyBoard();
+        //hidePassPhraseEditKeyBoard();
+        hideSoftKeyboard();
 
         if (mKeyStoreLogInPresenter != null) {
             mKeyStoreLogInPresenter.logIn(mKeyStoreEdit.getText().toString(), mPassPhraseEdit.getText().toString());
         }
     }
 
-    //
     public void onScanCode(View view) {
         hideProgressDialog();
-        hidePassPhraseEditKeyBoard();
+        //hidePassPhraseEditKeyBoard();
+        hideSoftKeyboard();
 
-        startActivityForResult(new Intent(KeyStoreLogInActivity.this, ScanCodeActivity.class), Constant.Code.REQUEST_SCAN_CODE);
+        if (!mHasStartScanCode) {
+            mHasStartScanCode = true;
+            startActivityForResult(new Intent(KeyStoreLogInActivity.this, ScanCodeActivity.class), Constant.Code.REQUEST_SCAN_CODE);
+        }
     }
-    //
+
+    public void onGenerateAccount(View view) {
+        hideProgressDialog();
+
+        Uri uri = Uri.parse("http://chain-web-wallet.s3-website-us-west-2.amazonaws.com:80");
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
 
     private void showProgressDialog() {
         hideProgressDialog();

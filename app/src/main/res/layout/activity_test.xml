@@ -129,6 +129,13 @@
                 android:layout_marginBottom="10dp"
                 android:text="Export KeyStore Code" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="exported keystore code:"
+                android:textSize="14dp" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
