@@ -33,10 +33,4 @@
 - [Android](https://github.com/PPIO/ppio-demo-android/releases)
 
 ## How to use the demo app
-#### First Step: Generate a Wallet
-
-#### Second Step: Get some test PPCoins
-
-#### Third Step: Send some PPCoins to Demo app
-
-#### Fourth Step: Log in Demo app
+Go to [here](https://www.pp.io/docs/how_to_use_ppio_demo.html)
