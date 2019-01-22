@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="false"
@@ -101,6 +102,15 @@
             android:windowSoftInputMode="adjustUnspecified">
 
         </activity>
+
+        <activity
+            android:name=".activity.ScanCodeActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified">
+
+        </activity>
+
 
         <activity
             android:name=".activity.PpioDataActivity"

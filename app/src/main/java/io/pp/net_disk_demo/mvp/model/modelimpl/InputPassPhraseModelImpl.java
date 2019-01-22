@@ -92,6 +92,7 @@ public class InputPassPhraseModelImpl implements InputPassPhraseModel {
                     publishProgress(errMsg);
                 }
             })) {
+                PossUtil.setPasswordStr(passPhrase);
                 return true;
             } else {
                 return false;

@@ -21,6 +21,8 @@ public class Constant {
         public static final String MNEMONIC = "MNEMONIC";
         public static final String ADDRESS = "ADDRESS";
         public static final String PASSWORD = "PASSWORD";
+
+        public static final String KETSTORE = "KEYSTORE";
     }
 
     public static class Code {
@@ -32,6 +34,9 @@ public class Constant {
 
         public static final int REQUEST_DOWNLOAD = 0x05;
         public static final int RESULT_DOWNLOAD_OK = 0x06;
+
+        public static final int REQUEST_SCAN_CODE = 0x07;
+        public static final int REQUEST_SCAN_CODE_OK = 0x08;
     }
 
     public static class ObjectKey {

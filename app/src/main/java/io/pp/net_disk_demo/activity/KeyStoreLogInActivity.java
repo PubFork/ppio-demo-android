@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -40,6 +41,23 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Constant.Code.REQUEST_SCAN_CODE &&
+                resultCode == Constant.Code.REQUEST_SCAN_CODE_OK &&
+                data != null) {
+            String keystore = data.getStringExtra(Constant.Data.KETSTORE);
+
+            if (!TextUtils.isEmpty(keystore)) {
+                mKeyStoreEdit.setText(keystore);
+            } else {
+                ToastUtil.showToast(KeyStoreLogInActivity.this, "the result is null!", Toast.LENGTH_SHORT);
+            }
+        }
     }
 
     @Override
@@ -109,6 +127,15 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
             mKeyStoreLogInPresenter.logIn(mKeyStoreEdit.getText().toString(), mPassPhraseEdit.getText().toString());
         }
     }
+
+    //
+    public void onScanCode(View view) {
+        hideProgressDialog();
+        hidePassPhraseEditKeyBoard();
+
+        startActivityForResult(new Intent(KeyStoreLogInActivity.this, ScanCodeActivity.class), Constant.Code.REQUEST_SCAN_CODE);
+    }
+    //
 
     private void showProgressDialog() {
         hideProgressDialog();

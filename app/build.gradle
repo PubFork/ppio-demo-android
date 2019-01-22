@@ -114,4 +114,7 @@ dependencies {
     implementation files('libs/poss.aar')
 
     implementation 'com.lambdaworks:scrypt:1.4.0'
+
+    implementation 'cn.bingoogolapple:bga-qrcode-zxing:1.3.6'
+
 }

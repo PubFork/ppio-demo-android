@@ -233,34 +233,51 @@ public class KeyStoreUtil {
         }
     }
 
-    public static String exportKeyStoreStr(String privateKey, String passPhrase) {
+    public static String exportKeyStoreStr(Context context, String passPhrase, String newPassPhrase) {
         try {
-            String address = PpioAccountUtil.generatePpioAddressStr(privateKey);
+            String[] files = context.fileList();
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    if (Constant.PPIO_File.PRIVATE_KEYSOTR_FILE.equals(files[i])) {
+                        Cipher cipher = new Cipher(Algorithm.SCRYPT);
 
-            Keystore keystore = new Keystore(Algorithm.SCRYPT);
+                        FileInputStream fileInputStream = context.openFileInput(Constant.PPIO_File.PRIVATE_KEYSOTR_FILE);
+                        byte[] keyStoreBytes = new byte[fileInputStream.available()];
+                        fileInputStream.read(keyStoreBytes);
+                        fileInputStream.close();
 
-            byte[] bytePrivateKey = parseHexBinary(privateKey);
-            keystore.setKey(address,
-                    Crypto.NewPrivateKey(signatureAlg, bytePrivateKey),
-                    passPhrase.getBytes());
-            Key key = keystore.getKey(address, passPhrase.getBytes());
-            Cipher cipher = new Cipher(encryptAlg);
-            CryptoJSON cryptoJSON = cipher.encrypt(key.encode(), passPhrase.getBytes());
+                        KeyJSON keyJSON = JSONUtils.Parse(new String(keyStoreBytes), KeyJSON.class);
 
-            KeyJSON keyJSON = new KeyJSON(address, cryptoJSON);
+                        //get the private key
+                        String privateKey = bytesToHexString(cipher.decrypt(keyJSON.getCrypto(),
+                                passPhrase.getBytes()));
+                        //get the address
+                        String address = PpioAccountUtil.generatePpioAddressStr(privateKey);
 
-            new ObjectMapper().writeValue(new File(Environment.getExternalStorageDirectory()
-                    + "/" + Constant.PPIO_File.PRIVATE_KEYSOTR_FILE), keyJSON);
+                        //export the new keystore
+                        Keystore newKeystore = new Keystore(Algorithm.SCRYPT);
+                        byte[] bytePrivateKey = parseHexBinary(privateKey);
+                        newKeystore.setKey(address,
+                                Crypto.NewPrivateKey(signatureAlg, bytePrivateKey),
+                                newPassPhrase.getBytes());
+                        Key key = newKeystore.getKey(address, newPassPhrase.getBytes());
 
-            return JSONUtils.Stringify(keyJSON);
+                        CryptoJSON cryptoJSON = cipher.encrypt(key.encode(), newPassPhrase.getBytes());
+
+                        return JSONUtils.Stringify(new KeyJSON(address, cryptoJSON));
+                    }
+                }
+            }
+
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
 
-            return "";
+            return null;
         }
     }
 
-    public static String exportKeyStoreFile(Context context, String passPhrase) {
+    public static String exportKeyStoreFile(Context context, String passPhrase, String newPassPhrase) {
         try {
             String[] files = context.fileList();
             if (files != null) {
@@ -280,7 +297,7 @@ public class KeyStoreUtil {
                         final String keyStoreFilePath = Environment.getExternalStorageDirectory().getPath() + "/" +
                                 dateFormat.format(new Date()) + address + ".json";
 
-                        return generateKeyStore(privateKey, passPhrase, keyStoreFilePath);
+                        return generateKeyStore(privateKey, newPassPhrase, keyStoreFilePath);
                     }
                 }
             }
@@ -320,7 +337,6 @@ public class KeyStoreUtil {
             return null;
         }
     }
-
 
     public static String bytesToHexString(byte[] bytesArr) {
         if (bytesArr != null) {
@@ -391,7 +407,7 @@ public class KeyStoreUtil {
         return str.matches(regex);
     }
 
-public interface CheckHasKeyStoreListener {
-    void onCheckFail(String errMsg);
-}
+    public interface CheckHasKeyStoreListener {
+        void onCheckFail(String errMsg);
+    }
 }
