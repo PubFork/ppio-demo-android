@@ -1,5 +1,7 @@
 package io.pp.net_disk_demo.data;
 
+import io.pp.net_disk_demo.Constant;
+
 public class UploadInfo {
 
     private String mBucket = "";
@@ -14,7 +16,8 @@ public class UploadInfo {
 
 
     public UploadInfo() {
-        mCopiesCount = 1;
+        mCopiesCount = Constant.DEFAULT.COPIES;
+        mChiPrice = Constant.DEFAULT.CHI_PRICE;
     }
 
     public void setBucket(String bucket) {

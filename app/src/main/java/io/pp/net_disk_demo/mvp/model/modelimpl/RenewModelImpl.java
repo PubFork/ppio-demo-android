@@ -2,9 +2,15 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
+import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.FileInfo;
 import io.pp.net_disk_demo.data.RenewInfo;
 import io.pp.net_disk_demo.mvp.model.RenewModel;
@@ -18,6 +24,7 @@ public class RenewModelImpl implements RenewModel {
 
     private Context mContext;
     private final RenewInfo mRenewInfo;
+    private DateInfo mDateInfo;
     private RenewPresenter mRenewPresenter;
 
     public RenewModelImpl(Context context, RenewPresenterImpl renewPresenterImpl) {
@@ -25,12 +32,28 @@ public class RenewModelImpl implements RenewModel {
         mRenewPresenter = renewPresenterImpl;
 
         mRenewInfo = new RenewInfo();
+        mDateInfo = new DateInfo();
     }
 
     @Override
     public void setRenewFile(FileInfo fileInfo) {
         mRenewInfo.setBucket(fileInfo.getBucketName());
         mRenewInfo.setKey(fileInfo.getName());
+
+        Calendar calendar = Calendar.getInstance();
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                    .parse(fileInfo.getStorageTime());
+            calendar.setTime(date);
+        } catch (ParseException e) {
+            Log.e(TAG, "setRenewFile() error: " + e.getMessage());
+
+            e.printStackTrace();
+        }
+
+        mDateInfo = new DateInfo(calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     @Override
@@ -45,7 +68,12 @@ public class RenewModelImpl implements RenewModel {
 
     @Override
     public String getExpiredTime() {
-        return mRenewInfo.getExpiredTime();
+        return mDateInfo.getDate();
+    }
+
+    @Override
+    public DateInfo getDateInfo() {
+        return mDateInfo;
     }
 
     @Override
@@ -54,8 +82,8 @@ public class RenewModelImpl implements RenewModel {
     }
 
     @Override
-    public int getChiPrice() {
-        return Integer.parseInt(mRenewInfo.getChiPrice());
+    public String getChiPrice() {
+        return mRenewInfo.getChiPrice();
     }
 
     @Override
@@ -63,8 +91,9 @@ public class RenewModelImpl implements RenewModel {
     }
 
     @Override
-    public void setExpiredTime(String expiredTime) {
-        mRenewInfo.setExpiredTime(expiredTime);
+    public void setExpiredTime(DateInfo dateInfo) {
+        mDateInfo = dateInfo;
+        mRenewInfo.setExpiredTime(mDateInfo.getDate());
 
         if (mRenewPresenter != null) {
             mRenewPresenter.showExpiredTime(mRenewInfo.getExpiredTime());
@@ -81,8 +110,8 @@ public class RenewModelImpl implements RenewModel {
     }
 
     @Override
-    public void setGasPrice(int gasPrice) {
-        mRenewInfo.setChiPrice("" + gasPrice);
+    public void setChiPrice(String gasPrice) {
+        mRenewInfo.setChiPrice(gasPrice);
 
         if (mRenewPresenter != null) {
             mRenewPresenter.showChiPrice(mRenewInfo.getChiPrice());

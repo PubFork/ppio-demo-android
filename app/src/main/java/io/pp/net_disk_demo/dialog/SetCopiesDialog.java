@@ -26,10 +26,14 @@ public class SetCopiesDialog extends Dialog {
     private OnSetCopiesOnClickListener mOnSetCopiesOnClickListener;
     private OnDismissListener mOnDismissListener;
 
-    public SetCopiesDialog(Context context, OnSetCopiesOnClickListener onSetCopiesOnClickListener, OnDismissListener onDismissListener) {
+    private int mDefaultCopies;
+
+    public SetCopiesDialog(Context context, int defaultCopies, OnSetCopiesOnClickListener onSetCopiesOnClickListener, OnDismissListener onDismissListener) {
         super(context, R.style.MyDialog);
 
         this.mContext = context;
+
+        mDefaultCopies = defaultCopies;
 
         mOnSetCopiesOnClickListener = onSetCopiesOnClickListener;
         mOnDismissListener = onDismissListener;
@@ -62,6 +66,8 @@ public class SetCopiesDialog extends Dialog {
 
             window.setAttributes(params);
         }
+
+        mNameEditText.setText("" + mDefaultCopies);
 
         mOkLayout.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -154,7 +154,8 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     public void onGenerateAccount(View view) {
         hideProgressDialog();
 
-        Uri uri = Uri.parse("http://chain-web-wallet.s3-website-us-west-2.amazonaws.com:80");
+        //Uri uri = Uri.parse("http://chain-web-wallet.s3-website-us-west-2.amazonaws.com:80");
+        Uri uri = Uri.parse(Constant.URL.WALLET_URL);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
     }

@@ -3,6 +3,7 @@ package io.pp.net_disk_demo.widget.recyclerview;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -116,8 +117,15 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
             mFileModifiedDateTv = mItemLayout.findViewById(R.id.file_modifieddate_tv);
         }
 
-        public void setFileName(String fileName) {
-            mFileNameTv.setText(fileName);
+        public void setFileName(String key) {
+            if (!TextUtils.isEmpty(key)) {
+                String fileName = key;
+                if (key.startsWith("/")) {
+                    fileName = key.replaceFirst("/", "");
+                }
+
+                mFileNameTv.setText(fileName);
+            }
         }
 
         public void setFileModifiedDate(String modifiedDate) {

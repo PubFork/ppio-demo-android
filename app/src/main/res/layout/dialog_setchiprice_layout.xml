@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:text="Chi"
+            android:text="wei"
             android:textColor="#303133"
             android:textSize="21dp" />
 

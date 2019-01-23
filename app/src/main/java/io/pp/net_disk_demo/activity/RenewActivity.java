@@ -16,13 +16,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.FileInfo;
 import io.pp.net_disk_demo.dialog.SetChiPriceDialog;
 import io.pp.net_disk_demo.dialog.SetCopiesDialog;
@@ -129,7 +127,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
     }
 
     @Override
-    public void showSetExpiredTime() {
+    public void showSetExpiredTime(DateInfo defaultDateInfo) {
         Calendar calendar = Calendar.getInstance();
         new DatePickerDialog(RenewActivity.this,
                 new DatePickerDialog.OnDateSetListener() {
@@ -148,47 +146,32 @@ public class RenewActivity extends BaseActivity implements RenewView {
                                         //expired today or earlier
                                         furtherThanToday = false;
                                     }
-                                } else {
+                                } else if (monthOfYear < calendar.get(Calendar.MONTH)) {
                                     //expired last month or earlier
                                     furtherThanToday = false;
                                 }
-                            } else {
+                            } else if (year < calendar.get(Calendar.YEAR)) {
                                 //expired last year or earlier
                                 furtherThanToday = false;
                             }
 
                             if (furtherThanToday) {
-                                String monthOfYearStr;
-                                String dayOfMonthStr;
-
-                                monthOfYear = monthOfYear + 1;
-                                if (monthOfYear < 10) {
-                                    monthOfYearStr = "0" + monthOfYear;
-                                } else {
-                                    monthOfYearStr = "" + monthOfYear;
-                                }
-
-                                if (dayOfMonth < 10) {
-                                    dayOfMonthStr = "0" + dayOfMonth;
-                                } else {
-                                    dayOfMonthStr = "" + dayOfMonth;
-                                }
-
-                                mRenewPresenter.setExpiredTime(year + "-" + monthOfYearStr + "-" + dayOfMonthStr);
+                                mRenewPresenter.setExpiredTime(new DateInfo(year, monthOfYear, dayOfMonth));
                             } else {
                                 ToastUtil.showToast(RenewActivity.this, "the expired time is earlier than today", Toast.LENGTH_SHORT);
                             }
                         }
                     }
                 }
-                , calendar.get(Calendar.YEAR)
-                , calendar.get(Calendar.MONTH)
-                , calendar.get(Calendar.DAY_OF_MONTH)).show();
+                , defaultDateInfo.getYear()
+                , defaultDateInfo.getMonthOfYear()
+                , defaultDateInfo.getDayOfMonth()).
+                show();
     }
 
     @Override
-    public void showSetCopies() {
-        mSetCopiesDialog = new SetCopiesDialog(RenewActivity.this, new SetCopiesDialog.OnSetCopiesOnClickListener() {
+    public void showSetCopies(int defaultCopies) {
+        mSetCopiesDialog = new SetCopiesDialog(RenewActivity.this, defaultCopies, new SetCopiesDialog.OnSetCopiesOnClickListener() {
             @Override
             public void onCancel() {
                 mSetCopiesDialog.dismiss();
@@ -213,8 +196,8 @@ public class RenewActivity extends BaseActivity implements RenewView {
     }
 
     @Override
-    public void showSetChiPrice() {
-        mSetChiPriceDialog = new SetChiPriceDialog(RenewActivity.this,
+    public void showSetChiPrice(String defaultChiPrice) {
+        mSetChiPriceDialog = new SetChiPriceDialog(RenewActivity.this, defaultChiPrice,
                 new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
                     @Override
                     public void onCancel() {
@@ -224,7 +207,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
                     @Override
                     public void onSet(int chiPrice) {
                         if (mRenewPresenter != null) {
-                            mRenewPresenter.setChiPrice(chiPrice);
+                            mRenewPresenter.setChiPrice("" + chiPrice);
                         }
 
                         mSetChiPriceDialog.dismiss();
@@ -315,7 +298,6 @@ public class RenewActivity extends BaseActivity implements RenewView {
 
         mToolBarTitleTv.setText("Upload Settings");
 
-
         mExpiredTimeLayout = findViewById(R.id.expiredtime_layout);
         mCopiesLayout = findViewById(R.id.copies_layout);
         mChiPriceLayout = findViewById(R.id.chiprice_layout);
@@ -391,39 +373,6 @@ public class RenewActivity extends BaseActivity implements RenewView {
             mOperationAction = mIntent.getAction();
             FileInfo mFileInfo = (FileInfo) mIntent.getSerializableExtra(Constant.Data.RENEW_FILE);
             if (mFileInfo != null) {
-
-                try {
-                    Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                            .parse(mFileInfo.getStorageTime());
-                    mOldExpiredTime = Calendar.getInstance();
-                    mOldExpiredTime.setTime(date);
-
-                    int year = mOldExpiredTime.get(Calendar.YEAR);
-                    int monthOfYear = mOldExpiredTime.get(Calendar.MONTH) + 1;
-                    int dayOfMonth = mOldExpiredTime.get(Calendar.DAY_OF_MONTH);
-
-                    String monthOfYearStr;
-                    String dayOfMonthStr;
-
-                    if (monthOfYear < 10) {
-                        monthOfYearStr = "0" + monthOfYear;
-                    } else {
-                        monthOfYearStr = "" + monthOfYear;
-                    }
-
-                    if (dayOfMonth < 10) {
-                        dayOfMonthStr = "0" + dayOfMonth;
-                    } else {
-                        dayOfMonthStr = "" + dayOfMonth;
-                    }
-
-                    mExpiredTimeValueTv.setText((year + "-" + monthOfYearStr + "-" + dayOfMonthStr));
-                } catch (ParseException e) {
-                    Log.e(TAG, "init() error: " + e.getMessage());
-
-                    e.printStackTrace();
-                }
-
                 mFileNameTv.setText(mFileInfo.getName());
             } else {
                 Log.e(TAG, "init() if (mFileInfo == null)");

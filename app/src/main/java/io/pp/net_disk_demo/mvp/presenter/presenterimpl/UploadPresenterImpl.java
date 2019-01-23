@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.mvp.presenter.presenterimpl;
 
 import android.content.Context;
 
+import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.mvp.presenter.UploadPresenter;
 import io.pp.net_disk_demo.mvp.view.UploadView;
 import io.pp.net_disk_demo.data.UploadInfo;
@@ -106,22 +107,22 @@ public class UploadPresenterImpl implements UploadPresenter {
 
     @Override
     public void showSetExpiredTime() {
-        if (mUploadView != null) {
-            mUploadView.showSetExpiredTime();
+        if (mUploadView != null && mUploadModel != null) {
+            mUploadView.showSetExpiredTime(mUploadModel.getDateInfo());
         }
     }
 
     @Override
     public void showSetCopies() {
-        if (mUploadView != null) {
-            mUploadView.showSetCopies();
+        if (mUploadView != null && mUploadModel != null) {
+            mUploadView.showSetCopies(mUploadModel.getCopies());
         }
     }
 
     @Override
     public void showSetChiPrice() {
-        if (mUploadView != null) {
-            mUploadView.showSetChiPrice();
+        if (mUploadView != null && mUploadModel != null) {
+            mUploadView.showSetChiPrice(mUploadModel.getChiPrice());
         }
     }
 
@@ -133,9 +134,9 @@ public class UploadPresenterImpl implements UploadPresenter {
     }
 
     @Override
-    public void setExpiredTime(String expiredTime) {
+    public void setExpiredTime(DateInfo dateInfo) {
         if (mUploadModel != null) {
-            mUploadModel.setExpiredTime(expiredTime);
+            mUploadModel.setExpiredTime(dateInfo);
         }
     }
 

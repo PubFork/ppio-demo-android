@@ -72,3 +72,7 @@
 #Bugly
 -dontwarn com.tencent.bugly
 -keep class com.tencent.bugly.**{*;}
+
+-dontwarn com.fasterxml.jackson
+-keep class com.fasterxml.jackson.*
+-keep class com.fasterxml.jackson.**{*;}

@@ -1,5 +1,6 @@
 package io.pp.net_disk_demo.mvp.presenter;
 
+import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.FileInfo;
 
 public interface RenewPresenter {
@@ -28,9 +29,9 @@ public interface RenewPresenter {
 
     void setSecure(boolean isSecure);
 
-    void setExpiredTime(String expiredTime);
+    void setExpiredTime(DateInfo dateInfo);
 
-    void setChiPrice(int chiPrice);
+    void setChiPrice(String chiPrice);
 
     void setCopies(int copies);
 

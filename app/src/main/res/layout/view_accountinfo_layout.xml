@@ -251,7 +251,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="Demo(V1.0)"
+                android:text="Demo(V0.1.0)"
                 android:textColor="#909399"
                 android:textSize="12dp" />
 

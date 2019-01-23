@@ -1,5 +1,6 @@
 package io.pp.net_disk_demo.mvp.model;
 
+import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.FileInfo;
 
 public interface RenewModel {
@@ -12,18 +13,20 @@ public interface RenewModel {
 
     String getExpiredTime();
 
+    DateInfo getDateInfo();
+
     int getCopies();
 
-    int getChiPrice();
+    String getChiPrice();
 
 
     void setSecure(boolean secure);
 
-    void setExpiredTime(String expiredTime);
+    void setExpiredTime(DateInfo dateInfo);
 
     void setCopies(int copies);
 
-    void setGasPrice(int gasPrice);
+    void setChiPrice(String chiPrice);
 
     void renew();
 

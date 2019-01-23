@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.mvp.presenter.presenterimpl;
 
 import android.content.Context;
 
+import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.mvp.view.RenewView;
 import io.pp.net_disk_demo.data.FileInfo;
 import io.pp.net_disk_demo.mvp.model.RenewModel;
@@ -41,6 +42,9 @@ public class RenewPresenterImpl implements RenewPresenter {
         if (mRenewModel != null) {
             showFileName(mRenewModel.getFileName());
             showSecure(mRenewModel.isSecure());
+            showExpiredTime(mRenewModel.getExpiredTime());
+            showCopies(mRenewModel.getCopies());
+            showChiPrice(mRenewModel.getChiPrice());
         }
     }
 
@@ -81,22 +85,22 @@ public class RenewPresenterImpl implements RenewPresenter {
 
     @Override
     public void showSetExpiredTime() {
-        if (mRenewView != null) {
-            mRenewView.showSetExpiredTime();
+        if (mRenewView != null && mRenewModel != null) {
+            mRenewView.showSetExpiredTime(mRenewModel.getDateInfo());
         }
     }
 
     @Override
     public void showSetCopies() {
-        if (mRenewView != null) {
-            mRenewView.showSetCopies();
+        if (mRenewView != null && mRenewModel != null) {
+            mRenewView.showSetCopies(mRenewModel.getCopies());
         }
     }
 
     @Override
     public void showSetChiPrice() {
-        if (mRenewView != null) {
-            mRenewView.showSetChiPrice();
+        if (mRenewView != null && mRenewModel != null) {
+            mRenewView.showSetChiPrice(mRenewModel.getChiPrice());
         }
     }
 
@@ -108,16 +112,16 @@ public class RenewPresenterImpl implements RenewPresenter {
     }
 
     @Override
-    public void setExpiredTime(String expiredTime) {
+    public void setExpiredTime(DateInfo dateInfo) {
         if (mRenewModel != null) {
-            mRenewModel.setExpiredTime(expiredTime);
+            mRenewModel.setExpiredTime(dateInfo);
         }
     }
 
     @Override
-    public void setChiPrice(int chiPrice) {
+    public void setChiPrice(String chiPrice) {
         if (mRenewModel != null) {
-            mRenewModel.setGasPrice(chiPrice);
+            mRenewModel.setChiPrice(chiPrice);
         }
     }
 

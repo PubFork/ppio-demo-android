@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 
+import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.dialog.SetChiPriceDialog;
 import io.pp.net_disk_demo.mvp.presenter.GetPresenter;
@@ -89,7 +90,7 @@ public class GetActivity extends BaseActivity implements GetView {
             mSetChiPriceDialog.dismiss();
         }
 
-        mSetChiPriceDialog = new SetChiPriceDialog(GetActivity.this, new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
+        mSetChiPriceDialog = new SetChiPriceDialog(GetActivity.this, Constant.DEFAULT.CHI_PRICE, new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
             @Override
             public void onCancel() {
                 mSetChiPriceDialog.dismiss();

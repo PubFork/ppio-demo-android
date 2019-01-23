@@ -462,7 +462,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     public void showGetBalanceFailView(String errMsg) {
         String functionStr = "get balance error: ";
-        showNetWorkingErrorView(functionStr, errMsg);
+        //showNetWorkingErrorView(functionStr, errMsg);
     }
 
     @Override
@@ -478,32 +478,37 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     public void showGetFundFailView(String errMsg) {
         String functionStr = "get fund error: ";
-        showNetWorkingErrorView(functionStr, errMsg);
+        //showNetWorkingErrorView(functionStr, errMsg);
     }
 
     @Override
     public void showRechargeView() {
-        Uri uri = Uri.parse("http://chain-web-wallet.s3-website-us-west-2.amazonaws.com:80");
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
+        //Uri uri = Uri.parse("http://chain-web-wallet.s3-website-us-west-2.amazonaws.com:80");
+//        Uri uri = Uri.parse(Constant.URL.WALLET_URL);
+//        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+//        startActivity(intent);
+
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL.WALLET_URL)));
     }
 
     @Override
     public void showRecordView() {
-        ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
-        //startActivity(new Intent(PpioDataActivity.this, RecordActivity.class));
+        //ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
+        startActivity(new Intent(PpioDataActivity.this, RecordActivity.class));
     }
 
     @Override
     public void showCheckVersionView() {
         ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
         //startActivity(new Intent(PpioDataActivity.this, VersionActivity.class));
+        //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL.UPDATE_URL)));
     }
 
     @Override
     public void showFeedbackView() {
-        ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
+        //ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
         //startActivity(new Intent(PpioDataActivity.this, FeedbackActivity.class));
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL.FEEDBACK_URL)));
     }
 
     @Override
@@ -1165,7 +1170,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                             public void onDownload() {
                                 mBlockFileOptionsBottomDialog.dismiss();
 
-                                mSetChiPriceDialog = new SetChiPriceDialog(PpioDataActivity.this, new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
+                                mSetChiPriceDialog = new SetChiPriceDialog(PpioDataActivity.this, Constant.DEFAULT.CHI_PRICE, new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
                                     @Override
                                     public void onCancel() {
                                         mSetChiPriceDialog.dismiss();

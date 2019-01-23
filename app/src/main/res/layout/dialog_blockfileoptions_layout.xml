@@ -59,12 +59,14 @@
         android:text="Rename"
         android:textAllCaps="false"
         android:textColor="#606266"
-        android:textSize="16dp" />
+        android:textSize="16dp"
+        android:visibility="gone" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#DCEFE6" />
+        android:background="#DCEFE6"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/blockfile_renew_btn"

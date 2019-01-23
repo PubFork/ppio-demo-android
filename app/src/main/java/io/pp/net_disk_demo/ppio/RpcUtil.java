@@ -6,10 +6,13 @@ import org.alexd.jsonrpc.JSONRPCHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import io.pp.net_disk_demo.Constant;
+
 public class RpcUtil {
 
     private static final String TAG = "RpcUtil";
-    private static final String mRpcUrlStr = "http://ad04b30b910c311e9b71c02d26ce9aff-567092461.us-west-2.elb.amazonaws.com:18030/rpc";
+    //private static final String mRpcUrlStr = "http://ad04b30b910c311e9b71c02d26ce9aff-567092461.us-west-2.elb.amazonaws.com:18030/rpc";
+    private static final String mRpcUrlStr = Constant.URL.RPC_URL;
     private static JSONRPCHttpClient mRpcClient;
 
     public static boolean peerAvailable() {
@@ -63,7 +66,7 @@ public class RpcUtil {
 
         try {
             Log.e(TAG, "address = " + PossUtil.getAccount());
-            queryAccountResultStr  = mRpcClient.callString("queryAccount", PossUtil.getAccount());
+            queryAccountResultStr = mRpcClient.callString("queryAccount", PossUtil.getAccount());
             JSONObject queryAccountJSONObject = new JSONObject(queryAccountResultStr);
             balanceStr = queryAccountJSONObject.getString("Balance");
 

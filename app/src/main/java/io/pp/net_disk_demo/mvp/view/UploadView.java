@@ -1,5 +1,7 @@
 package io.pp.net_disk_demo.mvp.view;
 
+import io.pp.net_disk_demo.data.DateInfo;
+
 public interface UploadView {
 
     void back();
@@ -14,11 +16,11 @@ public interface UploadView {
 
     void showChiPrice(String chiPrice);
 
-    void showSetExpiredTime();
+    void showSetExpiredTime(DateInfo defaultDateInfo);
 
-    void showSetCopies();
+    void showSetCopies(int defaultCopies);
 
-    void showSetChiPrice();
+    void showSetChiPrice(String defaultChiPrice);
 
 
     void showRequestingUploadView();

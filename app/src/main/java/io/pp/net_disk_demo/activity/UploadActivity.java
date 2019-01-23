@@ -29,6 +29,7 @@ import java.util.Calendar;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.UploadInfo;
 import io.pp.net_disk_demo.dialog.SetChiPriceDialog;
 import io.pp.net_disk_demo.dialog.SetCopiesDialog;
@@ -204,7 +205,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
 
     @Override
     public void showCopies(int copies) {
-        mCopiesValueTv.setText("Copies: " + copies);
+        mCopiesValueTv.setText("" + copies);
         mCopies = copies;
     }
 
@@ -219,43 +220,48 @@ public class UploadActivity extends BaseActivity implements UploadView {
     }
 
     @Override
-    public void showSetExpiredTime() {
-        //
-        Calendar calendar = Calendar.getInstance();
+    public void showSetExpiredTime(DateInfo defaultDateInfo) {
         new DatePickerDialog(UploadActivity.this,
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        if (mUploadPresenter != null) {
-                            String monthOfYearStr;
-                            String dayOfMonthStr;
+                        Calendar calendar = Calendar.getInstance();
+                        boolean furtherThanToday = true;
 
-                            monthOfYear = monthOfYear + 1;
-                            if (monthOfYear < 10) {
-                                monthOfYearStr = "0" + monthOfYear;
-                            } else {
-                                monthOfYearStr = "" + monthOfYear;
+                        if (year == calendar.get(Calendar.YEAR)) {
+                            //expired this year
+                            if (monthOfYear == calendar.get(Calendar.MONTH)) {
+                                //expired this month
+                                if (dayOfMonth <= calendar.get(Calendar.DAY_OF_MONTH)) {
+                                    //expired today or earlier
+                                    furtherThanToday = false;
+                                }
+                            } else if (monthOfYear < calendar.get(Calendar.MONTH)) {
+                                //expired last month or earlier
+                                furtherThanToday = false;
                             }
+                        } else if (year < calendar.get(Calendar.YEAR)) {
+                            //expired last year or earlier
+                            furtherThanToday = false;
+                        }
 
-                            if (dayOfMonth < 10) {
-                                dayOfMonthStr = "0" + dayOfMonth;
-                            } else {
-                                dayOfMonthStr = "" + dayOfMonth;
+                        if (furtherThanToday) {
+                            if (mUploadPresenter != null) {
+                                mUploadPresenter.setExpiredTime(new DateInfo(year, monthOfYear, dayOfMonth));
                             }
-
-                            mUploadPresenter.setExpiredTime(year + "-" + monthOfYearStr + "-" + dayOfMonthStr);
+                        } else {
+                            ToastUtil.showToast(UploadActivity.this, "the expired time is earlier than today", Toast.LENGTH_SHORT);
                         }
                     }
                 }
-                , calendar.get(Calendar.YEAR)
-                , calendar.get(Calendar.MONTH)
-                , calendar.get(Calendar.DAY_OF_MONTH)).show();
-        //
+                , defaultDateInfo.getYear()
+                , defaultDateInfo.getMonthOfYear()
+                , defaultDateInfo.getDayOfMonth()).show();
     }
 
     @Override
-    public void showSetCopies() {
-        mSetCopiesDialog = new SetCopiesDialog(UploadActivity.this, new SetCopiesDialog.OnSetCopiesOnClickListener() {
+    public void showSetCopies(int defaultCopies) {
+        mSetCopiesDialog = new SetCopiesDialog(UploadActivity.this, defaultCopies, new SetCopiesDialog.OnSetCopiesOnClickListener() {
             @Override
             public void onCancel() {
                 mSetCopiesDialog.dismiss();
@@ -281,8 +287,8 @@ public class UploadActivity extends BaseActivity implements UploadView {
     }
 
     @Override
-    public void showSetChiPrice() {
-        mSetChiPriceDialog = new SetChiPriceDialog(UploadActivity.this,
+    public void showSetChiPrice(String defaultChiPrice) {
+        mSetChiPriceDialog = new SetChiPriceDialog(UploadActivity.this, defaultChiPrice,
                 new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
                     @Override
                     public void onCancel() {

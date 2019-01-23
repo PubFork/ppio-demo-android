@@ -3,7 +3,9 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 import android.content.Context;
 
 import java.io.File;
+import java.util.Calendar;
 
+import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.UploadInfo;
 import io.pp.net_disk_demo.mvp.model.UploadModel;
 import io.pp.net_disk_demo.mvp.presenter.UploadPresenter;
@@ -16,6 +18,7 @@ public class UploadModelImpl implements UploadModel,
 
     private Context mContext;
     private UploadInfo mUploadInfo;
+    private DateInfo mDateInfo;
     private UploadPresenter mUploadPresenter;
 
     private ExecuteTaskService mExecuteTaskService;
@@ -25,6 +28,8 @@ public class UploadModelImpl implements UploadModel,
         mUploadPresenter = uploadPresenter;
 
         mUploadInfo = new UploadInfo();
+
+        mDateInfo = new DateInfo();
     }
 
     @Override
@@ -41,6 +46,13 @@ public class UploadModelImpl implements UploadModel,
 
         mUploadInfo.setFileName(file.getName());
         mUploadInfo.setFile(filePath);
+
+        Calendar calendar = Calendar.getInstance();
+        //default expired date is a month later
+        calendar.add(Calendar.MONTH, 1);
+        mDateInfo = new DateInfo(calendar.get(Calendar.YEAR)
+                , calendar.get(Calendar.MONTH)
+                , calendar.get(Calendar.DAY_OF_MONTH));
 
         if (mUploadPresenter != null) {
             mUploadPresenter.showUploadSettings();
@@ -74,7 +86,12 @@ public class UploadModelImpl implements UploadModel,
 
     @Override
     public String getExpiredTime() {
-        return mUploadInfo.getExpiredTime();
+        return mDateInfo.getDate();
+    }
+
+    @Override
+    public DateInfo getDateInfo() {
+        return mDateInfo;
     }
 
     @Override
@@ -93,8 +110,9 @@ public class UploadModelImpl implements UploadModel,
     }
 
     @Override
-    public void setExpiredTime(String expiredTime) {
-        mUploadInfo.setExpiredTime(expiredTime);
+    public void setExpiredTime(DateInfo dateInfo) {
+        mDateInfo = dateInfo;
+        mUploadInfo.setExpiredTime(dateInfo.getDate());
 
         if (mUploadPresenter != null) {
             mUploadPresenter.showExpiredTime(mUploadInfo.getExpiredTime());

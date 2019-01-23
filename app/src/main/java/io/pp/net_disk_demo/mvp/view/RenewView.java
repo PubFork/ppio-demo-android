@@ -1,5 +1,7 @@
 package io.pp.net_disk_demo.mvp.view;
 
+import io.pp.net_disk_demo.data.DateInfo;
+
 public interface RenewView {
 
     void back();
@@ -15,11 +17,11 @@ public interface RenewView {
     void showChiPrice(String gasPrice);
 
 
-    void showSetExpiredTime();
+    void showSetExpiredTime(DateInfo defaultDateInfo);
 
-    void showSetCopies();
+    void showSetCopies(int defaultCopies);
 
-    void showSetChiPrice();
+    void showSetChiPrice(String defaultChiPrice);
 
 
     void showRenewingView();

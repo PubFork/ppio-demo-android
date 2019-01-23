@@ -23,13 +23,17 @@ public class SetChiPriceDialog extends Dialog {
 
     private Context mContext;
 
+    private String mDefaultChiPrice = "";
+
     private OnSetChiPriceOnClickListener mOnSetChiPriceOnClickListener;
     private OnDismissListener mOnDismissListener;
 
-    public SetChiPriceDialog(Context context, OnSetChiPriceOnClickListener onSetChiPriceOnClickListener, OnDismissListener onDismissListener) {
+    public SetChiPriceDialog(Context context, String defaultChiPrice, OnSetChiPriceOnClickListener onSetChiPriceOnClickListener, OnDismissListener onDismissListener) {
         super(context, R.style.MyDialog);
 
         this.mContext = context;
+
+        mDefaultChiPrice = defaultChiPrice;
 
         mOnSetChiPriceOnClickListener = onSetChiPriceOnClickListener;
         mOnDismissListener = onDismissListener;
@@ -62,6 +66,8 @@ public class SetChiPriceDialog extends Dialog {
 
             window.setAttributes(params);
         }
+
+        mNameEditText.setText(mDefaultChiPrice);
 
         mOkLayout.setOnClickListener(new View.OnClickListener() {
             @Override

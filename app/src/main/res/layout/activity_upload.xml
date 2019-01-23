@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,6 +8,7 @@
         android:id="@+id/upload_toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:background="#243243"
         android:fitsSystemWindows="true">
 
@@ -37,7 +38,19 @@
     </android.support.v7.widget.Toolbar>
 
     <include
-        android:id="@id/upload_fileinfo_layout"
-        layout="@layout/uploadinfo_layout" />
+        android:id="@id/upload_fileinfo_scroll"
+        layout="@layout/uploadinfo_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/upload_toolbar_layout" />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/issue_confirm_btn"
+        style="@style/confirm_button_style"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="46dp"
+        android:text="Confirm" />
+
+</RelativeLayout>

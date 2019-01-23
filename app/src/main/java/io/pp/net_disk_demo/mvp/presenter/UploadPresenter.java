@@ -1,5 +1,6 @@
 package io.pp.net_disk_demo.mvp.presenter;
 
+import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.UploadInfo;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
 
@@ -35,7 +36,7 @@ public interface UploadPresenter {
 
     void setSecure(boolean isSecure);
 
-    void setExpiredTime(String expiredTime);
+    void setExpiredTime(DateInfo dateInfo);
 
     void setCopies(int copies);
 

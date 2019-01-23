@@ -1,16 +1,19 @@
 package io.pp.net_disk_demo.data;
 
+import io.pp.net_disk_demo.Constant;
+
 public class RenewInfo {
 
     private String mBucket = "";
     private String mKey = "";
     private boolean mIsSecure = false;
     private String mExpiredTime = "";
-    private int mCopiesCount = 0;
-    private String mChiPrice = "0";
+    private int mCopiesCount;
+    private String mChiPrice;
 
     public RenewInfo() {
-
+        mCopiesCount = Constant.DEFAULT.COPIES;
+        mChiPrice = Constant.DEFAULT.CHI_PRICE;
     }
 
     public void setBucket(String bucketName) {
