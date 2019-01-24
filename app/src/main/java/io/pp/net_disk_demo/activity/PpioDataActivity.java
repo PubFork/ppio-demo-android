@@ -1335,7 +1335,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                     public void onDismiss(DialogInterface dialog) {
 
                                     }
-                                });
+                                }, 0, mMyFileAdapter.getFileInfo(position).getLength());
 
                                 mSetChiPriceDialog.show();
                             }

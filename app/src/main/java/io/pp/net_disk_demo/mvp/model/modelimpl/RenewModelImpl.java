@@ -17,6 +17,8 @@ import io.pp.net_disk_demo.mvp.model.RenewModel;
 import io.pp.net_disk_demo.mvp.presenter.RenewPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.RenewPresenterImpl;
 import io.pp.net_disk_demo.ppio.PossUtil;
+import io.pp.net_disk_demo.ppio.RpcUtil;
+import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
 
 public class RenewModelImpl implements RenewModel {
 
@@ -24,8 +26,11 @@ public class RenewModelImpl implements RenewModel {
 
     private Context mContext;
     private final RenewInfo mRenewInfo;
+    private int mChunkCount;
     private DateInfo mDateInfo;
     private RenewPresenter mRenewPresenter;
+
+    private CancelFixedThreadPool mRequestStorageChiPool;
 
     public RenewModelImpl(Context context, RenewPresenterImpl renewPresenterImpl) {
         mContext = context;
@@ -33,12 +38,16 @@ public class RenewModelImpl implements RenewModel {
 
         mRenewInfo = new RenewInfo();
         mDateInfo = new DateInfo();
+
+        mRequestStorageChiPool = new CancelFixedThreadPool(1);
     }
 
     @Override
     public void setRenewFile(FileInfo fileInfo) {
         mRenewInfo.setBucket(fileInfo.getBucketName());
         mRenewInfo.setKey(fileInfo.getName());
+
+        mChunkCount = (int) Math.ceil(((double) fileInfo.getLength()) / 1024 / 1024 / 16);
 
         Calendar calendar = Calendar.getInstance();
         try {
@@ -69,6 +78,11 @@ public class RenewModelImpl implements RenewModel {
     @Override
     public String getExpiredTime() {
         return mDateInfo.getDate();
+    }
+
+    @Override
+    public int getChunkCount() {
+        return mChunkCount;
     }
 
     @Override
@@ -129,6 +143,11 @@ public class RenewModelImpl implements RenewModel {
         mRenewPresenter = null;
     }
 
+    @Override
+    public void requestStorageChi() {
+        mRequestStorageChiPool.execute(new RequestStorageChiRunnable(RenewModelImpl.this, mChunkCount, mDateInfo, mRenewInfo.getChiPrice()));
+    }
+
     public Context getContext() {
         return mContext;
     }
@@ -152,6 +171,24 @@ public class RenewModelImpl implements RenewModel {
     private void showRenewComplete() {
         if (mRenewPresenter != null) {
             mRenewPresenter.renewComplete();
+        }
+    }
+
+    private void showInRequestTotalChi() {
+        if (mRenewPresenter != null) {
+            mRenewPresenter.showRequestTotalChi();
+        }
+    }
+
+    private void showGetTotalChi(int totalChi, String chiPrice) {
+        if (mRenewPresenter != null) {
+            mRenewPresenter.showGetTotalChi(totalChi);
+        }
+    }
+
+    private void showGetTotalChiFailed(String errMsg) {
+        if (mRenewPresenter != null) {
+            mRenewPresenter.showGetTotalChiFailed(errMsg);
         }
     }
 
@@ -242,6 +279,48 @@ public class RenewModelImpl implements RenewModel {
 
             if (mRenewAsyncTaskWeakReference.get() != null && success) {
                 mRenewAsyncTaskWeakReference.get().showRenewComplete();
+            }
+        }
+    }
+
+    static class RequestStorageChiRunnable implements Runnable {
+        final WeakReference<RenewModelImpl> mModelImplWeakReference;
+
+        private int mChunkSize;
+        private long mDuration;
+        private String mChiPrice;
+
+        public RequestStorageChiRunnable(RenewModelImpl renewModelImpl, int chunkSize, DateInfo dateInfo, String chiPrice) {
+            mModelImplWeakReference = new WeakReference<>(renewModelImpl);
+
+            Calendar calendar = Calendar.getInstance();
+            long currentSeconds = calendar.getTimeInMillis() / 1000;
+            calendar.set(dateInfo.getYear(), dateInfo.getMonthOfYear(), dateInfo.getDayOfMonth(), 0, 0, 0);
+            long expiredSeconds = calendar.getTimeInMillis() / 1000;
+
+            mChunkSize = chunkSize;
+            mDuration = expiredSeconds - currentSeconds;
+            mChiPrice = chiPrice;
+        }
+
+        @Override
+        public void run() {
+            if (mModelImplWeakReference.get() != null) {
+                mModelImplWeakReference.get().showInRequestTotalChi();
+            }
+
+            int totalChi = RpcUtil.getStorageChi(mChunkSize, mDuration, mChiPrice, new RpcUtil.QueryAccountListener() {
+                @Override
+                public void onQueryAccountError(String errMsg) {
+                    Log.e(TAG, "getStorageChi error : " + errMsg);
+                    if (mModelImplWeakReference.get() != null) {
+                        mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                    }
+                }
+            });
+
+            if (totalChi > 0 && mModelImplWeakReference.get() != null) {
+                mModelImplWeakReference.get().showGetTotalChi(totalChi, mChiPrice);
             }
         }
     }

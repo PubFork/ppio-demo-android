@@ -651,7 +651,7 @@ public class PossUtil {
 
         }
 
-        Log.e(TAG, "listTask() taskStr = " + taskStr);
+        //Log.e(TAG, "listTask() taskStr = " + taskStr);
 
         return taskInfoMap;
     }

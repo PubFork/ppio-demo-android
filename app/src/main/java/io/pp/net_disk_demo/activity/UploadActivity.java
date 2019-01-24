@@ -14,8 +14,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -25,6 +29,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 
 import io.pp.net_disk_demo.Constant;
@@ -75,11 +80,19 @@ public class UploadActivity extends BaseActivity implements UploadView {
     private TextView mCopiesValueTv = null;
     private TextView mChiPriceValueTv = null;
 
+    private TextView mProphecyTotalChiTv = null;
+    private ImageView mRequestProphecyTotalChiStatusIv = null;
+    private TextView mRequestProphecyTotalChiStatusTv = null;
+
+    private TextView mExpectedCostTv = null;
+
     private Button mIssueConfirmBtn = null;
 
     private SetCopiesDialog mSetCopiesDialog = null;
     private SetChiPriceDialog mSetChiPriceDialog = null;
     private ProgressDialog mProgressDialog = null;
+
+    private RotateAnimation mRequestProphecyTotalChiRotateAnimation = null;
 
     private UploadPresenter mUploadPresenter = null;
 
@@ -99,6 +112,9 @@ public class UploadActivity extends BaseActivity implements UploadView {
     private int mChiPrice = 0;
 
     private UploadInfo mUploadInfo = null;
+
+    private DecimalFormat mDecimalFormat = null;
+    private long mTotalChi;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -135,6 +151,10 @@ public class UploadActivity extends BaseActivity implements UploadView {
         bindService(new Intent(UploadActivity.this, ExecuteTaskService.class),
                 mExecuteTaskServiceConnection,
                 BIND_AUTO_CREATE);
+
+        mTotalChi = 0;
+
+        mDecimalFormat = new DecimalFormat("0.000000000000000000");
     }
 
     @Override
@@ -248,6 +268,8 @@ public class UploadActivity extends BaseActivity implements UploadView {
                         if (furtherThanToday) {
                             if (mUploadPresenter != null) {
                                 mUploadPresenter.setExpiredTime(new DateInfo(year, monthOfYear, dayOfMonth));
+
+                                mUploadPresenter.requestStorageChi();
                             }
                         } else {
                             ToastUtil.showToast(UploadActivity.this, "the expired time is earlier than today", Toast.LENGTH_SHORT);
@@ -272,6 +294,8 @@ public class UploadActivity extends BaseActivity implements UploadView {
             public void onSet(int copies) {
                 if (mUploadPresenter != null) {
                     mUploadPresenter.setCopies(copies);
+
+                    mUploadPresenter.requestStorageChi();
                 }
 
                 mSetCopiesDialog.dismiss();
@@ -287,7 +311,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
     }
 
     @Override
-    public void showSetChiPrice(String defaultChiPrice) {
+    public void showSetChiPrice(String defaultChiPrice, int chunkCount, DateInfo expiredTime, int copies) {
         mSetChiPriceDialog = new SetChiPriceDialog(UploadActivity.this, defaultChiPrice,
                 new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
                     @Override
@@ -309,7 +333,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
                     public void onDismiss(DialogInterface dialog) {
                         mSetChiPriceDialog = null;
                     }
-                });
+                }, mTotalChi, chunkCount, expiredTime, copies);
 
         mSetChiPriceDialog.show();
     }
@@ -365,6 +389,68 @@ public class UploadActivity extends BaseActivity implements UploadView {
         });
     }
 
+    @Override
+    public void showRequestTotalChiView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestProphecyTotalChiStatusTv.setText("");
+                mRequestProphecyTotalChiStatusTv.setVisibility(View.INVISIBLE);
+
+                mRequestProphecyTotalChiStatusIv.setVisibility(View.VISIBLE);
+                mRequestProphecyTotalChiStatusIv.setBackgroundResource(R.mipmap.blue_loading);
+                mRequestProphecyTotalChiStatusIv.startAnimation(mRequestProphecyTotalChiRotateAnimation);
+            }
+        });
+    }
+
+    @Override
+    public void showGetTotalChiView(int totalChi) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestProphecyTotalChiStatusTv.setText("");
+                mRequestProphecyTotalChiStatusTv.setVisibility(View.INVISIBLE);
+
+                mRequestProphecyTotalChiStatusIv.clearAnimation();
+                mRequestProphecyTotalChiStatusIv.setVisibility(View.INVISIBLE);
+
+                if (mUploadPresenter != null) {
+                    mTotalChi = totalChi * mUploadPresenter.getCopies();
+
+                    mProphecyTotalChiTv.setText("" + mTotalChi);
+                    try {
+                        long chiPrice = Long.parseLong(mUploadPresenter.getChiPrice());
+                        double expectedCost = (double) (chiPrice * mTotalChi) / 1000000000000000000l;
+                        mExpectedCostTv.setText(mDecimalFormat.format(expectedCost));
+                    } catch (Exception e) {
+                        Log.e(TAG, "err: " + e.getMessage());
+                        e.printStackTrace();
+
+                        mExpectedCostTv.setText("0");
+                    }
+                } else {
+                    mExpectedCostTv.setText("0");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void showGetTotalChiFailedView(String errMsg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestProphecyTotalChiStatusTv.setText("prophecy failed");
+                mRequestProphecyTotalChiStatusTv.setVisibility(View.VISIBLE);
+
+                mRequestProphecyTotalChiStatusIv.clearAnimation();
+                mRequestProphecyTotalChiStatusIv.setBackgroundResource(R.mipmap.task_error_icon);
+                mRequestProphecyTotalChiStatusIv.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
     private void init() {
         setImmersiveStatusBar();
 
@@ -400,11 +486,23 @@ public class UploadActivity extends BaseActivity implements UploadView {
         mCopiesValueTv = findViewById(R.id.copies_value_tv);
         mChiPriceValueTv = findViewById(R.id.chiprice_value_tv);
 
+        mProphecyTotalChiTv = findViewById(R.id.total_chi_value_tv);
+        mRequestProphecyTotalChiStatusIv = findViewById(R.id.request_total_chi_status_iv);
+        mRequestProphecyTotalChiStatusTv = findViewById(R.id.request_total_chi_status_tv);
+
+        mExpectedCostTv = findViewById(R.id.expected_cost_value_tv);
+
         mIssueConfirmBtn = findViewById(R.id.issue_confirm_btn);
 
         mSecureSwitch.setTrackOffBitmap(R.mipmap.custom_switch_track_off);
         mSecureSwitch.setTrackOnBitmap(R.mipmap.custom_switch_track_on);
         mSecureSwitch.setThumbBitmap(R.mipmap.custom_switch_thumb);
+
+        mRequestProphecyTotalChiRotateAnimation = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        mRequestProphecyTotalChiRotateAnimation.setInterpolator(new LinearInterpolator());
+        mRequestProphecyTotalChiRotateAnimation.setDuration(1000l);
+        mRequestProphecyTotalChiRotateAnimation.setRepeatCount(Animation.INFINITE);
+        mRequestProphecyTotalChiRotateAnimation.setRepeatMode(Animation.RESTART);
 
         mSecureSwitch.setOnStateChange(new CustomSwitchButton.OnStateChangeListener() {
             @Override

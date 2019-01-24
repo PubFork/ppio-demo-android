@@ -45,6 +45,8 @@ public class RenewPresenterImpl implements RenewPresenter {
             showExpiredTime(mRenewModel.getExpiredTime());
             showCopies(mRenewModel.getCopies());
             showChiPrice(mRenewModel.getChiPrice());
+
+            mRenewModel.requestStorageChi();
         }
     }
 
@@ -71,7 +73,7 @@ public class RenewPresenterImpl implements RenewPresenter {
 
     @Override
     public void showChiPrice(String chiPrice) {
-        if (mRenewView != null) {
+        if (mRenewView != null && mRenewModel != null) {
             mRenewView.showChiPrice(chiPrice);
         }
     }
@@ -100,7 +102,7 @@ public class RenewPresenterImpl implements RenewPresenter {
     @Override
     public void showSetChiPrice() {
         if (mRenewView != null && mRenewModel != null) {
-            mRenewView.showSetChiPrice(mRenewModel.getChiPrice());
+            mRenewView.showSetChiPrice(mRenewModel.getChiPrice(), mRenewModel.getChunkCount(), mRenewModel.getDateInfo(), mRenewModel.getCopies());
         }
     }
 
@@ -158,6 +160,51 @@ public class RenewPresenterImpl implements RenewPresenter {
         if (mRenewView != null) {
             mRenewView.showRenewCompleteView();
         }
+    }
+
+    @Override
+    public void requestStorageChi() {
+        if (mRenewModel != null) {
+            mRenewModel.requestStorageChi();
+        }
+    }
+
+    @Override
+    public void showRequestTotalChi() {
+        if (mRenewView != null) {
+            mRenewView.showRequestTotalChiView();
+        }
+    }
+
+    @Override
+    public void showGetTotalChi(int totalChi) {
+        if (mRenewView != null) {
+            mRenewView.showGetTotalChiView(totalChi);
+        }
+    }
+
+    @Override
+    public void showGetTotalChiFailed(String errMsg) {
+        if (mRenewView != null) {
+            mRenewView.showGetTotalChiFailedView(errMsg);
+        }
+    }
+
+
+    @Override
+    public int getCopies() {
+        if (mRenewModel != null) {
+            return mRenewModel.getCopies();
+        }
+        return 0;
+    }
+
+    @Override
+    public String getChiPrice() {
+        if (mRenewModel != null) {
+            return mRenewModel.getChiPrice();
+        }
+        return "";
     }
 
     @Override

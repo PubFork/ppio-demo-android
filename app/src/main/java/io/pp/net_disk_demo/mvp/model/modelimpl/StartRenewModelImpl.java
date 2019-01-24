@@ -85,6 +85,7 @@ public class StartRenewModelImpl implements StartRenewModel {
             FileInfo fileInfo = new FileInfo(0L, objectStatus.getKeyStr(), true, true);
             fileInfo.setBucketName(objectStatus.getBucketStr());
             fileInfo.setStorageTime(objectStatus.getExpiresTime());
+            fileInfo.setLength(objectStatus.getLength());
 
             return fileInfo;
         }

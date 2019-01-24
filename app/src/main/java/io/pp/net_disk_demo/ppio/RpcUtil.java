@@ -152,8 +152,8 @@ public class RpcUtil {
 
             JSONObject storageChiJSONObject = new JSONObject(putObjectFundsResultStr);
 
-            int storageFundsChi = Integer.getInteger(storageChiJSONObject.getString("StorageFundsChi"));
-            int serviceFundsChi = Integer.getInteger(storageChiJSONObject.getString("ServiceChi"));
+            int storageFundsChi = Integer.parseInt(storageChiJSONObject.getString("StorageFundsChi"));
+            int serviceFundsChi = Integer.parseInt(storageChiJSONObject.getString("ServiceChi"));
 
             return (storageFundsChi + serviceFundsChi);
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class RpcUtil {
         }
     }
 
-    public static int getDownloadChi(int chunkSize, String chiPrice, QueryAccountListener queryAccountListener) {
+    public static int getDownloadChi(long chunkSize, String chiPrice, QueryAccountListener queryAccountListener) {
         //> curl -X POST -H 'content-type:text/json;' --data '{"id":1,"jsonrpc":"2.0","method":"DownloadChi","params":[{"chunkSize":1024,"chiPrice":"100"}]}' http://127.0.0.1:18030/rpc
         initClient();
 
@@ -188,8 +188,8 @@ public class RpcUtil {
 
             JSONObject downloadChiJSONObject = new JSONObject(putObjectFundsResultStr);
 
-            int downloadFundsChi = Integer.getInteger(downloadChiJSONObject.getString("DownloadFundsChi"));
-            int serviceFundsChi = Integer.getInteger(downloadChiJSONObject.getString("ServiceChi"));
+            int downloadFundsChi = Integer.parseInt(downloadChiJSONObject.getString("DownloadFundsChi"));
+            int serviceFundsChi = Integer.parseInt(downloadChiJSONObject.getString("ServiceChi"));
 
             return (downloadFundsChi + serviceFundsChi);
         } catch (Exception e) {

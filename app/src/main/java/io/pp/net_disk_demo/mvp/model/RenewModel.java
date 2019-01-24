@@ -13,6 +13,8 @@ public interface RenewModel {
 
     String getExpiredTime();
 
+    int getChunkCount();
+
     DateInfo getDateInfo();
 
     int getCopies();
@@ -30,6 +32,8 @@ public interface RenewModel {
 
     void renew();
 
+
+    void requestStorageChi();
 
     void onDestroy();
 }

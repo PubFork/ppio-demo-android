@@ -67,6 +67,8 @@ public class UploadPresenterImpl implements UploadPresenter {
             showExpiredTime(mUploadModel.getExpiredTime());
             showCopies(mUploadModel.getCopies());
             showChiPrice(mUploadModel.getChiPrice());
+
+            mUploadModel.requestStorageChi();
         }
     }
 
@@ -122,7 +124,7 @@ public class UploadPresenterImpl implements UploadPresenter {
     @Override
     public void showSetChiPrice() {
         if (mUploadView != null && mUploadModel != null) {
-            mUploadView.showSetChiPrice(mUploadModel.getChiPrice());
+            mUploadView.showSetChiPrice(mUploadModel.getChiPrice(), mUploadModel.getChunkCount(), mUploadModel.getDateInfo(), mUploadModel.getCopies());
         }
     }
 
@@ -181,6 +183,50 @@ public class UploadPresenterImpl implements UploadPresenter {
         if (mUploadView != null) {
             mUploadView.showUploadFailView(errMsg);
         }
+    }
+
+    @Override
+    public void requestStorageChi() {
+        if (mUploadModel != null) {
+            mUploadModel.requestStorageChi();
+        }
+    }
+
+    @Override
+    public void showRequestTotalChi() {
+        if (mUploadView != null) {
+            mUploadView.showRequestTotalChiView();
+        }
+    }
+
+    @Override
+    public void showGetTotalChi(int totalChi) {
+        if (mUploadView != null) {
+            mUploadView.showGetTotalChiView(totalChi);
+        }
+    }
+
+    @Override
+    public void showGetTotalChiFailed(String errMsg) {
+        if (mUploadView != null) {
+            mUploadView.showGetTotalChiFailedView(errMsg);
+        }
+    }
+
+    @Override
+    public int getCopies() {
+        if (mUploadModel != null) {
+            return mUploadModel.getCopies();
+        }
+        return 0;
+    }
+
+    @Override
+    public String getChiPrice() {
+        if (mUploadModel != null) {
+            return mUploadModel.getChiPrice();
+        }
+        return "";
     }
 
     @Override

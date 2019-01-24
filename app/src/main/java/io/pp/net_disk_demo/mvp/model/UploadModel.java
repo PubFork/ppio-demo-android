@@ -18,6 +18,8 @@ public interface UploadModel {
 
     String getExpiredTime();
 
+    int getChunkCount();
+
     DateInfo getDateInfo();
 
     int getCopies();
@@ -35,6 +37,8 @@ public interface UploadModel {
 
     void upload();
 
+
+    void requestStorageChi();
 
     void onDestroy();
 }

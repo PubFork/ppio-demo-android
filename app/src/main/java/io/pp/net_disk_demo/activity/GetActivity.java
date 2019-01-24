@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +46,8 @@ public class GetActivity extends BaseActivity implements GetView {
     private ExecuteTaskService mExecuteTaskService = null;
     private ExecuteTaskServiceConnection mExecuteTaskServiceConnection = null;
 
+    private long mTotal;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +63,8 @@ public class GetActivity extends BaseActivity implements GetView {
         bindService(new Intent(GetActivity.this, ExecuteTaskService.class),
                 mExecuteTaskServiceConnection,
                 BIND_AUTO_CREATE);
+
+        mTotal = 0;
     }
 
     @Override
@@ -111,7 +114,7 @@ public class GetActivity extends BaseActivity implements GetView {
             public void onDismiss(DialogInterface dialog) {
                 mSetChiPriceDialog = null;
             }
-        });
+        }, 0, mShareCodeEdit.getText().toString());
 
         mSetChiPriceDialog.show();
     }
@@ -174,7 +177,7 @@ public class GetActivity extends BaseActivity implements GetView {
 
         mToolBarLeftTv = findViewById(R.id.actionbar_left_iv);
 
-        mToolBarTitleTv  = findViewById(R.id.actionbar_title_tv);
+        mToolBarTitleTv = findViewById(R.id.actionbar_title_tv);
 
         View.OnClickListener toolBarLeftOnClickListener = new View.OnClickListener() {
             @Override

@@ -46,5 +46,20 @@ public interface RenewPresenter {
     void renewComplete();
 
 
+    void requestStorageChi();
+
+
+    void showRequestTotalChi();
+
+    void showGetTotalChi(int totalChi);
+
+    void showGetTotalChiFailed(String errMsg);
+
+
+    int getCopies();
+
+    String getChiPrice();
+
+
     void onDestroy();
 }

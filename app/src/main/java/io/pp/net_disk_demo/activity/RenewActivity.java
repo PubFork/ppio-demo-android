@@ -7,8 +7,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -16,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
 
 import io.pp.net_disk_demo.Constant;
@@ -51,23 +56,36 @@ public class RenewActivity extends BaseActivity implements RenewView {
     private TextView mCopiesValueTv = null;
     private TextView mChiPriceValueTv = null;
 
+    private TextView mProphecyTotalChiTv = null;
+    private ImageView mRequestProphecyTotalChiStatusIv = null;
+    private TextView mRequestProphecyTotalChiStatusTv = null;
+
+    private TextView mExpectedCostTv = null;
+
     private Button mIssueConfirmBtn = null;
 
     private SetCopiesDialog mSetCopiesDialog = null;
     private SetChiPriceDialog mSetChiPriceDialog = null;
     private ProgressDialog mProgressDialog = null;
 
+    private RotateAnimation mRequestProphecyTotalChiRotateAnimation = null;
+
     private RenewPresenter mRenewPresenter = null;
 
     private String mOperationAction = "";
 
-    private Calendar mOldExpiredTime = null;
+
+    private DecimalFormat mDecimalFormat = null;
+
+    private long mTotalChi;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_upload);
+
+        mDecimalFormat = new DecimalFormat("0.000000000000000000");
 
         init();
     }
@@ -157,6 +175,8 @@ public class RenewActivity extends BaseActivity implements RenewView {
 
                             if (furtherThanToday) {
                                 mRenewPresenter.setExpiredTime(new DateInfo(year, monthOfYear, dayOfMonth));
+
+                                mRenewPresenter.requestStorageChi();
                             } else {
                                 ToastUtil.showToast(RenewActivity.this, "the expired time is earlier than today", Toast.LENGTH_SHORT);
                             }
@@ -182,8 +202,9 @@ public class RenewActivity extends BaseActivity implements RenewView {
                 if (mRenewPresenter != null) {
                     mRenewPresenter.setCopies(copies);
 
-                    mSetCopiesDialog.dismiss();
+                    mRenewPresenter.requestStorageChi();
                 }
+                mSetCopiesDialog.dismiss();
             }
         }, new DialogInterface.OnDismissListener() {
             @Override
@@ -196,7 +217,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
     }
 
     @Override
-    public void showSetChiPrice(String defaultChiPrice) {
+    public void showSetChiPrice(String defaultChiPrice, int chunkCount, DateInfo expiredTime, int copies) {
         mSetChiPriceDialog = new SetChiPriceDialog(RenewActivity.this, defaultChiPrice,
                 new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
                     @Override
@@ -218,7 +239,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
                     public void onDismiss(DialogInterface dialog) {
                         mSetChiPriceDialog = null;
                     }
-                });
+                }, mTotalChi, chunkCount, expiredTime, copies);
 
         mSetChiPriceDialog.show();
     }
@@ -273,6 +294,68 @@ public class RenewActivity extends BaseActivity implements RenewView {
         });
     }
 
+    @Override
+    public void showRequestTotalChiView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestProphecyTotalChiStatusTv.setText("");
+                mRequestProphecyTotalChiStatusTv.setVisibility(View.INVISIBLE);
+
+                mRequestProphecyTotalChiStatusIv.setVisibility(View.VISIBLE);
+                mRequestProphecyTotalChiStatusIv.setBackgroundResource(R.mipmap.blue_loading);
+                mRequestProphecyTotalChiStatusIv.startAnimation(mRequestProphecyTotalChiRotateAnimation);
+            }
+        });
+    }
+
+    @Override
+    public void showGetTotalChiView(int totalChi) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestProphecyTotalChiStatusTv.setText("");
+                mRequestProphecyTotalChiStatusTv.setVisibility(View.INVISIBLE);
+
+                mRequestProphecyTotalChiStatusIv.clearAnimation();
+                mRequestProphecyTotalChiStatusIv.setVisibility(View.INVISIBLE);
+
+                if (mRenewPresenter != null) {
+                    mTotalChi = totalChi * mRenewPresenter.getCopies();
+
+                    mProphecyTotalChiTv.setText("" + mTotalChi);
+                    try {
+                        Long chiPrice = Long.parseLong(mRenewPresenter.getChiPrice());
+                        double expectedCost = (double) (chiPrice * mTotalChi) / 1000000000000000000l;
+                        mExpectedCostTv.setText(mDecimalFormat.format(expectedCost));
+                    } catch (Exception e) {
+                        Log.e(TAG, "err: " + e.getMessage());
+                        e.printStackTrace();
+
+                        mExpectedCostTv.setText("0");
+                    }
+                } else {
+                    mExpectedCostTv.setText("0");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void showGetTotalChiFailedView(String errMsg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestProphecyTotalChiStatusTv.setText("prophecy failed");
+                mRequestProphecyTotalChiStatusTv.setVisibility(View.VISIBLE);
+
+                mRequestProphecyTotalChiStatusIv.clearAnimation();
+                mRequestProphecyTotalChiStatusIv.setBackgroundResource(R.mipmap.task_error_icon);
+                mRequestProphecyTotalChiStatusIv.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
     private void init() {
         setImmersiveStatusBar();
 
@@ -308,11 +391,23 @@ public class RenewActivity extends BaseActivity implements RenewView {
         mCopiesValueTv = findViewById(R.id.copies_value_tv);
         mChiPriceValueTv = findViewById(R.id.chiprice_value_tv);
 
+        mProphecyTotalChiTv = findViewById(R.id.total_chi_value_tv);
+        mRequestProphecyTotalChiStatusIv = findViewById(R.id.request_total_chi_status_iv);
+        mRequestProphecyTotalChiStatusTv = findViewById(R.id.request_total_chi_status_tv);
+
+        mExpectedCostTv = findViewById(R.id.expected_cost_value_tv);
+
         mIssueConfirmBtn = findViewById(R.id.issue_confirm_btn);
 
         mSecureSwitch.setTrackOffBitmap(R.mipmap.custom_switch_track_off);
         mSecureSwitch.setTrackOnBitmap(R.mipmap.custom_switch_track_on);
         mSecureSwitch.setThumbBitmap(R.mipmap.custom_switch_thumb);
+
+        mRequestProphecyTotalChiRotateAnimation = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        mRequestProphecyTotalChiRotateAnimation.setInterpolator(new LinearInterpolator());
+        mRequestProphecyTotalChiRotateAnimation.setDuration(1000l);
+        mRequestProphecyTotalChiRotateAnimation.setRepeatCount(Animation.INFINITE);
+        mRequestProphecyTotalChiRotateAnimation.setRepeatMode(Animation.RESTART);
 
         mSecureSwitch.setOnStateChange(new CustomSwitchButton.OnStateChangeListener() {
             @Override

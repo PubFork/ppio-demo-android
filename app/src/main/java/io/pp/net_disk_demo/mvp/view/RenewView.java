@@ -21,7 +21,7 @@ public interface RenewView {
 
     void showSetCopies(int defaultCopies);
 
-    void showSetChiPrice(String defaultChiPrice);
+    void showSetChiPrice(String defaultChiPrice, int chunkCount, DateInfo expiredTime, int copies);
 
 
     void showRenewingView();
@@ -29,4 +29,11 @@ public interface RenewView {
     void showRenewErrorView(String errMsg);
 
     void showRenewCompleteView();
+
+
+    void showRequestTotalChiView();
+
+    void showGetTotalChiView(int totalChi);
+
+    void showGetTotalChiFailedView(String errMsg);
 }
