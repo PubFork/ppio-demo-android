@@ -28,6 +28,8 @@
 -ignorewarnings                      #Ignore warning
 -optimizationpasses 5                #Specify the compression level of the code
 
+-keepattributes SourceFile,LineNumberTable
+
 #app not confused
 -keep class io.pp.net_disk_demo.*
 -keep class io.pp.net_disk_demo.**{*;}
@@ -39,8 +41,6 @@
 #the package poss of poss.aar not confused
 -keep class poss.*
 -keep class poss.**{*;}
-
-#-libraryjars  ../poss/src/main/jniLibs/armeabi/xxxxx.so
 
 #native method not confused
 -keepclasseswithmembernames class * {

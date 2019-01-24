@@ -28,6 +28,9 @@ public interface AccountInfoPresenter {
     void showGetFundFail(String errMsg);
 
 
+    void requestOracleChiPrice();
+
+
     void showRecharge();
 
     void showRecord();

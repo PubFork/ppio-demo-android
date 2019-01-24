@@ -21,6 +21,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -454,7 +455,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mBalanceValueTv.setText(balance + " Chi");
+                mBalanceValueTv.setText(balance + " wei");
             }
         });
     }
@@ -463,6 +464,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     public void showGetBalanceFailView(String errMsg) {
         String functionStr = "get balance error: ";
         //showNetWorkingErrorView(functionStr, errMsg);
+        Log.e(TAG, "showGetBalanceFailView()");
     }
 
     @Override
@@ -470,7 +472,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFundValueTv.setText(fund + " Chi");
+                mFundValueTv.setText(fund + " wei");
             }
         });
     }
@@ -479,6 +481,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     public void showGetFundFailView(String errMsg) {
         String functionStr = "get fund error: ";
         //showNetWorkingErrorView(functionStr, errMsg);
+        Log.e(TAG, "showGetFundFailView");
     }
 
     @Override
@@ -1465,6 +1468,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
         if (mAccountInfoPresenter != null) {
             mAccountInfoPresenter.requestAddress();
+            mAccountInfoPresenter.requestUsed();
+            mAccountInfoPresenter.requestBalance();
+            mAccountInfoPresenter.requestFund();
+            mAccountInfoPresenter.requestOracleChiPrice();
         }
     }
 

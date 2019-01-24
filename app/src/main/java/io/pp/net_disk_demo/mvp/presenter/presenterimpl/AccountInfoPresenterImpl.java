@@ -98,6 +98,13 @@ public class AccountInfoPresenterImpl implements AccountInfoPresenter {
     }
 
     @Override
+    public void requestOracleChiPrice() {
+        if (mAccountInfoModel != null) {
+            mAccountInfoModel.requestOracleChiPrice();
+        }
+    }
+
+    @Override
     public void showRecharge() {
         if (mAccountInfoView != null) {
             mAccountInfoView.showRechargeView();

@@ -2,27 +2,33 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 
 import io.pp.net_disk_demo.Constant;
+import io.pp.net_disk_demo.data.OracleChiPrice;
 import io.pp.net_disk_demo.database.AccountDatabaseManager;
 import io.pp.net_disk_demo.mvp.model.AccountInfoModel;
 import io.pp.net_disk_demo.mvp.presenter.AccountInfoPresenter;
 import io.pp.net_disk_demo.ppio.KeyStoreUtil;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.ppio.RpcUtil;
+import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
 
 public class AccountInfoModelImpl implements AccountInfoModel {
 
     private static final String TAG = "AccountInfoModelImpl";
     private Context mContext;
     private AccountInfoPresenter mAccountInfoPresenter;
+    private CancelFixedThreadPool mRefreshMyFilePool;
 
     public AccountInfoModelImpl(Context context, AccountInfoPresenter accountInfoPresenter) {
         mContext = context;
 
         mAccountInfoPresenter = accountInfoPresenter;
+        mRefreshMyFilePool = new CancelFixedThreadPool(1);
     }
 
     @Override
@@ -39,19 +45,26 @@ public class AccountInfoModelImpl implements AccountInfoModel {
 
     @Override
     public void requestBalance() {
-        new RequestBalanceAsyncTask(AccountInfoModelImpl.this).execute();
+        //new RequestBalanceAsyncTask(AccountInfoModelImpl.this).execute();
+        mRefreshMyFilePool.execute(new RequestBalanceRunnable(AccountInfoModelImpl.this));
     }
 
     @Override
     public void requestFund() {
-        new RequestFundAsyncTask(AccountInfoModelImpl.this).execute();
+        //new RequestFundAsyncTask(AccountInfoModelImpl.this).execute();
+        mRefreshMyFilePool.execute(new RequestFundRunnable(AccountInfoModelImpl.this));
+    }
+
+    @Override
+    public void requestOracleChiPrice() {
+        new RequestOracleChiPriceAsyncTask(AccountInfoModelImpl.this).execute();
     }
 
     @Override
     public void logOut() {
         //
         //new LogOutTask(AccountInfoModelImpl.this).execute();
-        new DeleteKeySytoreTask(AccountInfoModelImpl.this).execute();
+        new DeleteKeyStoreTask(AccountInfoModelImpl.this).execute();
         //
     }
 
@@ -95,6 +108,12 @@ public class AccountInfoModelImpl implements AccountInfoModel {
         if (mAccountInfoPresenter != null) {
             mAccountInfoPresenter.showGetFundFail(errMsg);
         }
+    }
+
+    private void showOracleChiPrice(String used) {
+    }
+
+    private void showOracleChiPriceFail(String errMsg) {
     }
 
     private void showLogOutPrepare() {
@@ -218,7 +237,7 @@ public class AccountInfoModelImpl implements AccountInfoModel {
 
         @Override
         protected String doInBackground(String... params) {
-            return RpcUtil.getFunds(new RpcUtil.QueryAccountListener() {
+            return RpcUtil.getFund(new RpcUtil.QueryAccountListener() {
                 @Override
                 public void onQueryAccountError(String errMsg) {
                     publishProgress(errMsg);
@@ -241,6 +260,48 @@ public class AccountInfoModelImpl implements AccountInfoModel {
 
             if (mModelImplWeakReference.get() != null) {
                 mModelImplWeakReference.get().showFund(value);
+            }
+        }
+    }
+
+    static class RequestOracleChiPriceAsyncTask extends AsyncTask<String, String, OracleChiPrice> {
+
+        final WeakReference<AccountInfoModelImpl> mModelImplWeakReference;
+
+        public RequestOracleChiPriceAsyncTask(AccountInfoModelImpl modelImpl) {
+            mModelImplWeakReference = new WeakReference<>(modelImpl);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected OracleChiPrice doInBackground(String... params) {
+            return RpcUtil.oracleChiPrice(new RpcUtil.QueryAccountListener() {
+                @Override
+                public void onQueryAccountError(String errMsg) {
+                    publishProgress(errMsg);
+                    Log.e(TAG, "get oracleChiPrice failed");
+                }
+            });
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(OracleChiPrice value) {
+            super.onPostExecute(value);
+
+            if (value != null &&
+                    TextUtils.isEmpty(value.getStorageChiPrice()) &&
+                    TextUtils.isEmpty(value.getDownloadChiPrice())) {
+                PossUtil.setStorageChiPrice(value.getStorageChiPrice());
+                PossUtil.setDownloadChiPrice(value.getDownloadChiPrice());
             }
         }
     }
@@ -298,11 +359,11 @@ public class AccountInfoModelImpl implements AccountInfoModel {
         }
     }
 
-    static class DeleteKeySytoreTask extends AsyncTask<String, String, Boolean> {
+    static class DeleteKeyStoreTask extends AsyncTask<String, String, Boolean> {
 
         final WeakReference<AccountInfoModelImpl> mModelImplWeakReference;
 
-        public DeleteKeySytoreTask(AccountInfoModelImpl modelImpl) {
+        public DeleteKeyStoreTask(AccountInfoModelImpl modelImpl) {
             mModelImplWeakReference = new WeakReference<>(modelImpl);
         }
 
@@ -342,6 +403,54 @@ public class AccountInfoModelImpl implements AccountInfoModel {
 
             if (mModelImplWeakReference.get() != null) {
                 mModelImplWeakReference.get().showLogOutFinish();
+            }
+        }
+    }
+
+    static class RequestBalanceRunnable implements Runnable {
+        final WeakReference<AccountInfoModelImpl> mModelImplWeakReference;
+
+        public RequestBalanceRunnable(AccountInfoModelImpl accountInfoModelImpl) {
+            mModelImplWeakReference = new WeakReference<>(accountInfoModelImpl);
+        }
+
+        @Override
+        public void run() {
+            String balance = RpcUtil.getBalance(new RpcUtil.QueryAccountListener() {
+                @Override
+                public void onQueryAccountError(String errMsg) {
+                    if (mModelImplWeakReference.get() != null) {
+                        mModelImplWeakReference.get().showGetBalanceFail(errMsg);
+                    }
+                }
+            });
+
+            if (!TextUtils.isEmpty(balance) && mModelImplWeakReference.get() != null) {
+                mModelImplWeakReference.get().showBalance(balance);
+            }
+        }
+    }
+
+    static class RequestFundRunnable implements Runnable {
+        final WeakReference<AccountInfoModelImpl> mModelImplWeakReference;
+
+        public RequestFundRunnable(AccountInfoModelImpl accountInfoModelImpl) {
+            mModelImplWeakReference = new WeakReference<>(accountInfoModelImpl);
+        }
+
+        @Override
+        public void run() {
+            String fund = RpcUtil.getFund(new RpcUtil.QueryAccountListener() {
+                @Override
+                public void onQueryAccountError(String errMsg) {
+                    if (mModelImplWeakReference.get() != null) {
+                        mModelImplWeakReference.get().showGetFundFail(errMsg);
+                    }
+                }
+            });
+
+            if (!TextUtils.isEmpty(fund) && mModelImplWeakReference.get() != null) {
+                mModelImplWeakReference.get().showFund(fund);
             }
         }
     }

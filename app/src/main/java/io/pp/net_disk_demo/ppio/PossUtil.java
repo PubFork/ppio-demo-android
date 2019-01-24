@@ -33,6 +33,8 @@ public class PossUtil {
     private static String mPasswordStr = "";
     private static String mPrivateKeyStr = "";
     private static String mAddressStr = "";
+    private static String mStorageChiPrice = "100";
+    private static String mDownloadChiPrice = "100";
 
     static public void setMnemonicStr(String mnemonicStr) {
         mMnemonicStr = mnemonicStr;
@@ -52,6 +54,14 @@ public class PossUtil {
 
     static public void setAddressStr(String addressStr) {
         mAddressStr = addressStr;
+    }
+
+    static public void setStorageChiPrice(String storageChiPrice) {
+        mStorageChiPrice = storageChiPrice;
+    }
+
+    static public void setDownloadChiPrice(String downloadChiPrice) {
+        mDownloadChiPrice = downloadChiPrice;
     }
 
     static public String getMnemonicStr() {
@@ -74,6 +84,13 @@ public class PossUtil {
         return mAddressStr;
     }
 
+    static public String getStorageChiPrice() {
+        return mStorageChiPrice;
+    }
+
+    static public String getDownloadChiPrice() {
+        return mDownloadChiPrice;
+    }
 
     static boolean register() {
         return true;

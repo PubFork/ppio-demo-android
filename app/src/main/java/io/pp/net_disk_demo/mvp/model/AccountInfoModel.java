@@ -1,6 +1,6 @@
 package io.pp.net_disk_demo.mvp.model;
 
-public interface AccountInfoModel  {
+public interface AccountInfoModel {
 
     void requestAddress();
 
@@ -9,6 +9,8 @@ public interface AccountInfoModel  {
     void requestBalance();
 
     void requestFund();
+
+    void requestOracleChiPrice();
 
     void logOut();
 

@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import io.pp.net_disk_demo.Constant;
+import io.pp.net_disk_demo.data.OracleChiPrice;
 
 public class RpcUtil {
 
@@ -81,11 +82,11 @@ public class RpcUtil {
         return balanceStr;
     }
 
-    public static String getFunds(QueryAccountListener queryAccountListener) {
+    public static String getFund(QueryAccountListener queryAccountListener) {
         initClient();
 
         String queryAccountResultStr;
-        String fundsStr = "";
+        String fundStr = "";
 
         try {
             Log.e(TAG, "queryAccount() start...");
@@ -93,8 +94,7 @@ public class RpcUtil {
             Log.e(TAG, "queryAccount() end...");
             Log.e(TAG, "queryAccount() " + queryAccountResultStr);
             JSONObject queryAccountJSONObject = new JSONObject(queryAccountResultStr);
-            fundsStr = queryAccountJSONObject.getString("LockedBalance");
-
+            fundStr = queryAccountJSONObject.getString("LockedBalance");
         } catch (Exception e) {
             if (queryAccountListener != null) {
                 queryAccountListener.onQueryAccountError(e.getMessage());
@@ -103,25 +103,104 @@ public class RpcUtil {
             e.printStackTrace();
         }
 
-        return fundsStr;
+        return fundStr;
     }
 
-    public static String oracleChiPrice() {
+    public static OracleChiPrice oracleChiPrice(QueryAccountListener queryAccountListener) {
         initClient();
 
         try {
             Log.e(TAG, "oracleChiPrice() start...");
-            Object oracleChiPriceResult = mRpcClient.call("oracleChiPrice");
+            String oracleChiPriceResultStr = mRpcClient.callString("oracleChiPrice");
             Log.e(TAG, "oracleChiPrice() end...");
-            Log.e(TAG, "oracleChiPrice() " + oracleChiPriceResult);
+            Log.e(TAG, "oracleChiPrice() " + oracleChiPriceResultStr);
+
+            JSONObject oracleChiPriceJSONObject = new JSONObject(oracleChiPriceResultStr);
+            return new OracleChiPrice(oracleChiPriceJSONObject.getString("StorageChiPrice"),
+                    oracleChiPriceJSONObject.getString("DownloadChiPrice"));
         } catch (Exception e) {
+            if (queryAccountListener != null) {
+                queryAccountListener.onQueryAccountError(e.getMessage());
+            }
             Log.e(TAG, "oracleChiPrice() err = " + e.getMessage());
             e.printStackTrace();
 
             return null;
         }
+    }
 
-        return "";
+    public static int getStorageChi(int chunkSize, long duration, String chiPrice, QueryAccountListener queryAccountListener) {
+        //> curl -X POST -H 'content-type:text/json;' --data '{"id":1,"jsonrpc":"2.0","method":"StorageChi","params":[{"chunkSize":1024,"duration":120,"chiPrice":"100"}]}' http://127.0.0.1:18030/rpc
+        initClient();
+
+        Log.e(TAG, "chunkSize = " + chunkSize + ", duration = " + duration + ", chiPrice = " + chiPrice);
+
+        try {
+            JSONObject requestJSONObject = new JSONObject();
+            requestJSONObject.put("chunkSize", chunkSize);
+            requestJSONObject.put("duration", duration);
+            requestJSONObject.put("chiPrice", chiPrice);
+
+            Log.e(TAG, "putObjectFunds start...");
+            String putObjectFundsResultStr = mRpcClient.callString("storageChi", new JSONObject[]{
+                    requestJSONObject
+            });
+            Log.e(TAG, "putObjectFunds end...");
+            Log.e(TAG, "putObjectFunds " + putObjectFundsResultStr);
+
+            //{"StorageFundsChi":"24","ServiceChi":"10"}
+
+            JSONObject storageChiJSONObject = new JSONObject(putObjectFundsResultStr);
+
+            int storageFundsChi = Integer.getInteger(storageChiJSONObject.getString("StorageFundsChi"));
+            int serviceFundsChi = Integer.getInteger(storageChiJSONObject.getString("ServiceChi"));
+
+            return (storageFundsChi + serviceFundsChi);
+        } catch (Exception e) {
+            if (queryAccountListener != null) {
+                queryAccountListener.onQueryAccountError(e.getMessage());
+            }
+
+            Log.e(TAG, "putObjectFunds() err = " + e.getMessage());
+            e.printStackTrace();
+
+            return 0;
+        }
+    }
+
+    public static int getDownloadChi(int chunkSize, String chiPrice, QueryAccountListener queryAccountListener) {
+        //> curl -X POST -H 'content-type:text/json;' --data '{"id":1,"jsonrpc":"2.0","method":"DownloadChi","params":[{"chunkSize":1024,"chiPrice":"100"}]}' http://127.0.0.1:18030/rpc
+        initClient();
+
+        try {
+            JSONObject requestJSONObject = new JSONObject();
+            requestJSONObject.put("chunkSize", chunkSize);
+            requestJSONObject.put("chiPrice", chiPrice);
+
+            Log.e(TAG, "getObjectFunds start...");
+            String putObjectFundsResultStr = mRpcClient.callString("downloadChi", new JSONObject[]{
+                    requestJSONObject
+            });
+            Log.e(TAG, "getObjectFunds end...");
+            Log.e(TAG, "getObjectFunds " + putObjectFundsResultStr);
+
+            //{"DownloadFundsChi":"10","ServiceChi":"10"}
+
+            JSONObject downloadChiJSONObject = new JSONObject(putObjectFundsResultStr);
+
+            int downloadFundsChi = Integer.getInteger(downloadChiJSONObject.getString("DownloadFundsChi"));
+            int serviceFundsChi = Integer.getInteger(downloadChiJSONObject.getString("ServiceChi"));
+
+            return (downloadFundsChi + serviceFundsChi);
+        } catch (Exception e) {
+            if (queryAccountListener != null) {
+                queryAccountListener.onQueryAccountError(e.getMessage());
+            }
+            Log.e(TAG, "getObjectFunds() err = " + e.getMessage());
+            e.printStackTrace();
+
+            return 0;
+        }
     }
 
     public static String storageFunds() {
