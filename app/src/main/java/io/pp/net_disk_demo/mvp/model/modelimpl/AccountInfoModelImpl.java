@@ -22,13 +22,18 @@ public class AccountInfoModelImpl implements AccountInfoModel {
     private static final String TAG = "AccountInfoModelImpl";
     private Context mContext;
     private AccountInfoPresenter mAccountInfoPresenter;
-    private CancelFixedThreadPool mRefreshMyFilePool;
+    private CancelFixedThreadPool mRequestUsedPool;
+    private CancelFixedThreadPool mRequestBalancePool;
+    private CancelFixedThreadPool mRequestFundPool;
 
     public AccountInfoModelImpl(Context context, AccountInfoPresenter accountInfoPresenter) {
         mContext = context;
 
         mAccountInfoPresenter = accountInfoPresenter;
-        mRefreshMyFilePool = new CancelFixedThreadPool(1);
+
+        mRequestUsedPool = new CancelFixedThreadPool(1);
+        mRequestBalancePool = new CancelFixedThreadPool(1);
+        mRequestFundPool = new CancelFixedThreadPool(1);
     }
 
     @Override
@@ -40,19 +45,20 @@ public class AccountInfoModelImpl implements AccountInfoModel {
 
     @Override
     public void requestUsed() {
-        new RequestUsedAsyncTask(AccountInfoModelImpl.this).execute();
+        //new RequestUsedAsyncTask(AccountInfoModelImpl.this).execute();
+        mRequestUsedPool.execute(new RequestUsedRunnable(AccountInfoModelImpl.this));
     }
 
     @Override
     public void requestBalance() {
         //new RequestBalanceAsyncTask(AccountInfoModelImpl.this).execute();
-        mRefreshMyFilePool.execute(new RequestBalanceRunnable(AccountInfoModelImpl.this));
+        mRequestBalancePool.execute(new RequestBalanceRunnable(AccountInfoModelImpl.this));
     }
 
     @Override
     public void requestFund() {
         //new RequestFundAsyncTask(AccountInfoModelImpl.this).execute();
-        mRefreshMyFilePool.execute(new RequestFundRunnable(AccountInfoModelImpl.this));
+        mRequestFundPool.execute(new RequestFundRunnable(AccountInfoModelImpl.this));
     }
 
     @Override
@@ -74,6 +80,12 @@ public class AccountInfoModelImpl implements AccountInfoModel {
         mAccountInfoPresenter = null;
     }
 
+    private void showInRequestUsed() {
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.showInRequestUsed();
+        }
+    }
+
     private void showUsed(String used) {
         if (mAccountInfoPresenter != null) {
             mAccountInfoPresenter.showUsed(used);
@@ -86,6 +98,12 @@ public class AccountInfoModelImpl implements AccountInfoModel {
         }
     }
 
+    private void showInRequestBalance() {
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.showInRequestBalance();
+        }
+    }
+
     private void showBalance(String used) {
         if (mAccountInfoPresenter != null) {
             mAccountInfoPresenter.showBalance(used);
@@ -95,6 +113,12 @@ public class AccountInfoModelImpl implements AccountInfoModel {
     private void showGetBalanceFail(String errMsg) {
         if (mAccountInfoPresenter != null) {
             mAccountInfoPresenter.showGetBalanceFail(errMsg);
+        }
+    }
+
+    private void showInRequestFund() {
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.showInRequestFund();
         }
     }
 
@@ -407,6 +431,34 @@ public class AccountInfoModelImpl implements AccountInfoModel {
         }
     }
 
+    static class RequestUsedRunnable implements Runnable {
+        final WeakReference<AccountInfoModelImpl> mModelImplWeakReference;
+
+        public RequestUsedRunnable(AccountInfoModelImpl accountInfoModelImpl) {
+            mModelImplWeakReference = new WeakReference<>(accountInfoModelImpl);
+        }
+
+        @Override
+        public void run() {
+            if (mModelImplWeakReference.get() != null) {
+                mModelImplWeakReference.get().showInRequestUsed();
+            }
+
+            String used = PossUtil.getUsed(Constant.Data.DEFAULT_BUCKET, new PossUtil.GetUsedListener() {
+                @Override
+                public void onGetUsedError(String errMsg) {
+                    if (mModelImplWeakReference.get() != null) {
+                        mModelImplWeakReference.get().showGetUsedFail(errMsg);
+                    }
+                }
+            });
+
+            if (!TextUtils.isEmpty(used) && mModelImplWeakReference.get() != null) {
+                mModelImplWeakReference.get().showUsed(used);
+            }
+        }
+    }
+
     static class RequestBalanceRunnable implements Runnable {
         final WeakReference<AccountInfoModelImpl> mModelImplWeakReference;
 
@@ -416,6 +468,10 @@ public class AccountInfoModelImpl implements AccountInfoModel {
 
         @Override
         public void run() {
+            if (mModelImplWeakReference.get() != null) {
+                mModelImplWeakReference.get().showInRequestBalance();
+            }
+
             String balance = RpcUtil.getBalance(new RpcUtil.QueryAccountListener() {
                 @Override
                 public void onQueryAccountError(String errMsg) {
@@ -440,6 +496,10 @@ public class AccountInfoModelImpl implements AccountInfoModel {
 
         @Override
         public void run() {
+            if (mModelImplWeakReference.get() != null) {
+                mModelImplWeakReference.get().showInRequestFund();
+            }
+
             String fund = RpcUtil.getFund(new RpcUtil.QueryAccountListener() {
                 @Override
                 public void onQueryAccountError(String errMsg) {

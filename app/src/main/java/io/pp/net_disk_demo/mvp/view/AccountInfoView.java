@@ -4,15 +4,22 @@ public interface AccountInfoView {
 
     void showAddress(String address);
 
+
+    void showRequestUsedView();
+
     void showUsedView(String used);
 
     void showGetUsedFailView(String errMsg);
 
 
+    void showRequestBalanceView();
+
     void showBalanceView(String balance);
 
     void showGetBalanceFailView(String errMsg);
 
+
+    void showRequestFundView();
 
     void showFundView(final String fund);
 

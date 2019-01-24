@@ -68,6 +68,7 @@ public class SetChiPriceDialog extends Dialog {
         }
 
         mNameEditText.setText(mDefaultChiPrice);
+        mNameEditText.setSelection(mNameEditText.getText().length());
 
         mOkLayout.setOnClickListener(new View.OnClickListener() {
             @Override

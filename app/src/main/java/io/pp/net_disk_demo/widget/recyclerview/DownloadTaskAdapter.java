@@ -133,11 +133,19 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
             mDefaultStatusTvTextColor = mTaskStatusTv.getCurrentTextColor();
         }
 
-        public void setFileName(String fileName) {
-            mFileNameTv.setText(fileName);
+        public void setFileName(String key) {
+            if (!TextUtils.isEmpty(key)) {
+                String fileName = key;
+                if (key.startsWith("/")) {
+                    fileName = key.replaceFirst("/", "");
+                }
+
+                mFileNameTv.setText(fileName);
+            }
         }
 
         public void setStatus(String status, String error) {
+            mTaskPauseResumeLayout.setVisibility(View.INVISIBLE);
             mTaskStatusTv.setTextColor(mDefaultStatusTvTextColor);
 
             if (Constant.TaskState.PENDING.equals(status)) {
@@ -148,9 +156,11 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
             } else if (Constant.TaskState.RUNNING.equals(status)) {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mTaskStatusLayout.setVisibility(View.GONE);
+                mTaskPauseResumeLayout.setVisibility(View.VISIBLE);
             } else if (Constant.TaskState.PAUSED.equals(status)) {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mTaskStatusLayout.setVisibility(View.GONE);
+                mTaskPauseResumeLayout.setVisibility(View.VISIBLE);
             } else if (Constant.TaskState.FINISHED.equals(status)) {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mTaskStatusLayout.setVisibility(View.GONE);
@@ -169,9 +179,7 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
         }
 
         public void setPauseResume(final String taskId, final String state) {
-            if (Constant.TaskState.PENDING.equals(state) ||
-                    Constant.TaskState.RUNNING.equals(state) ||
-                    Constant.TaskState.ERROR.equals(state)) {
+            if (Constant.TaskState.RUNNING.equals(state)) {
                 mTaskPauseResumeIv.setBackgroundResource(R.mipmap.task_pause_btn);
 
                 RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mTaskPauseResumeIv.getLayoutParams();
@@ -191,8 +199,7 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
                 @Override
                 public void onClick(View v) {
                     if (mDownloadTaskItemClickListener != null) {
-                        if (Constant.TaskState.PENDING.equals(state) ||
-                                Constant.TaskState.RUNNING.equals(state)) {
+                        if (Constant.TaskState.RUNNING.equals(state)) {
                             mDownloadTaskItemClickListener.onPause(taskId);
                         } else if (Constant.TaskState.PAUSED.equals(state)) {
                             mDownloadTaskItemClickListener.onResume(taskId);

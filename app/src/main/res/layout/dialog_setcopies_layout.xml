@@ -18,13 +18,13 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="0dp"
-            android:layout_marginTop="18dp"
             android:layout_marginStart="24dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="0dp"
             android:layout_toEndOf="@id/copies_tv"
-            android:gravity="center"
             android:inputType="number|numberDecimal"
-            android:labelFor="@+id/copies_edittext"/>
+            android:labelFor="@+id/copies_edittext"
+            android:textCursorDrawable="@drawable/drawable_custom_edittext_cursor" />
 
         <TextView
             android:id="@+id/copies_tv"

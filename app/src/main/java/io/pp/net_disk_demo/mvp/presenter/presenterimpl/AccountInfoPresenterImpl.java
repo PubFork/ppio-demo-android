@@ -42,6 +42,13 @@ public class AccountInfoPresenterImpl implements AccountInfoPresenter {
     }
 
     @Override
+    public void showInRequestUsed() {
+        if (mAccountInfoView != null) {
+            //mAccountInfoView.showRequestUsedView();
+        }
+    }
+
+    @Override
     public void showUsed(String used) {
         if (mAccountInfoView != null) {
             mAccountInfoView.showUsedView(used);
@@ -63,6 +70,13 @@ public class AccountInfoPresenterImpl implements AccountInfoPresenter {
     }
 
     @Override
+    public void showInRequestBalance() {
+        if (mAccountInfoView != null) {
+            mAccountInfoView.showRequestBalanceView();
+        }
+    }
+
+    @Override
     public void showBalance(String balance) {
         if (mAccountInfoView != null) {
             mAccountInfoView.showBalanceView(balance);
@@ -80,6 +94,13 @@ public class AccountInfoPresenterImpl implements AccountInfoPresenter {
     public void requestFund() {
         if (mAccountInfoModel != null) {
             mAccountInfoModel.requestFund();
+        }
+    }
+
+    @Override
+    public void showInRequestFund() {
+        if (mAccountInfoView != null) {
+            mAccountInfoView.showRequestFundView();
         }
     }
 

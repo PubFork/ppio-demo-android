@@ -68,6 +68,7 @@ public class SetCopiesDialog extends Dialog {
         }
 
         mNameEditText.setText("" + mDefaultCopies);
+        mNameEditText.setSelection(mNameEditText.getText().length());
 
         mOkLayout.setOnClickListener(new View.OnClickListener() {
             @Override

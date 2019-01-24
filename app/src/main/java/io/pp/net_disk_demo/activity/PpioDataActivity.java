@@ -9,22 +9,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -103,12 +99,26 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private LinearLayout mAccountInfoLayout = null;
     private ImageView mAccountInfoIv = null;
     private TextView mAccountInfoTv = null;
+
     private LinearLayout mUsedLayout = null;
     private TextView mUsedValueTv = null;
+    private ImageView mRequestUsedStatusIv = null;
+    private TextView mRequestUsedStatusTv = null;
+
     private LinearLayout mBalanceLayout = null;
     private TextView mBalanceValueTv = null;
+    private ImageView mRequestBalanceStatusIv = null;
+    private TextView mRequestBalanceStatusTv = null;
+
     private LinearLayout mFundLayout = null;
     private TextView mFundValueTv = null;
+    private ImageView mRequestFundStatusIv = null;
+    private TextView mRequestFundStatusTv = null;
+
+    private RotateAnimation mRequestUsedRotateAnimation = null;
+    private RotateAnimation mRequestBalanceRotateAnimation = null;
+    private RotateAnimation mRequestFundRotateAnimation = null;
+
     private RelativeLayout mRechargeLayout = null;
     private RelativeLayout mRecordLayout = null;
     private RelativeLayout mCheckVersionLayout = null;
@@ -434,11 +444,32 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         });
     }
 
+
+    @Override
+    public void showRequestUsedView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestUsedStatusTv.setText("");
+                mRequestUsedStatusTv.setVisibility(View.INVISIBLE);
+
+                mRequestUsedStatusIv.setVisibility(View.VISIBLE);
+                mRequestUsedStatusIv.setBackgroundResource(R.mipmap.blue_loading);
+                mRequestUsedStatusIv.startAnimation(mRequestUsedRotateAnimation);
+            }
+        });
+    }
+
     @Override
     public void showUsedView(final String used) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mRequestUsedStatusTv.setText("");
+                mRequestUsedStatusTv.setVisibility(View.INVISIBLE);
+                mRequestUsedStatusIv.clearAnimation();
+                mRequestUsedStatusIv.setVisibility(View.INVISIBLE);
+
                 mUsedValueTv.setText(used + "G");
             }
         });
@@ -448,6 +479,33 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     public void showGetUsedFailView(String errMsg) {
         String functionStr = "get used error: ";
         showNetWorkingErrorView(functionStr, errMsg);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestUsedStatusTv.setVisibility(View.VISIBLE);
+                mRequestUsedStatusTv.setText("refresh fail");
+
+                mRequestUsedStatusIv.setVisibility(View.VISIBLE);
+                mRequestUsedStatusIv.setBackgroundResource(R.mipmap.task_error_icon);
+                mRequestUsedStatusIv.clearAnimation();
+            }
+        });
+    }
+
+    @Override
+    public void showRequestBalanceView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestBalanceStatusTv.setText("");
+                mRequestBalanceStatusTv.setVisibility(View.INVISIBLE);
+
+                mRequestBalanceStatusIv.setVisibility(View.VISIBLE);
+                mRequestBalanceStatusIv.setBackgroundResource(R.mipmap.blue_loading);
+                mRequestBalanceStatusIv.startAnimation(mRequestBalanceRotateAnimation);
+            }
+        });
     }
 
     @Override
@@ -455,6 +513,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mRequestBalanceStatusTv.setText("");
+                mRequestBalanceStatusTv.setVisibility(View.INVISIBLE);
+                mRequestBalanceStatusIv.clearAnimation();
+                mRequestBalanceStatusIv.setVisibility(View.INVISIBLE);
+
                 mBalanceValueTv.setText(balance + " wei");
             }
         });
@@ -465,6 +528,32 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         String functionStr = "get balance error: ";
         //showNetWorkingErrorView(functionStr, errMsg);
         Log.e(TAG, "showGetBalanceFailView()");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestBalanceStatusTv.setVisibility(View.VISIBLE);
+                mRequestBalanceStatusTv.setText("refresh fail");
+
+                mRequestBalanceStatusIv.setVisibility(View.VISIBLE);
+                mRequestBalanceStatusIv.setBackgroundResource(R.mipmap.task_error_icon);
+                mRequestBalanceStatusIv.clearAnimation();
+            }
+        });
+    }
+
+    @Override
+    public void showRequestFundView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestFundStatusTv.setText("");
+                mRequestFundStatusTv.setVisibility(View.INVISIBLE);
+
+                mRequestFundStatusIv.setVisibility(View.VISIBLE);
+                mRequestFundStatusIv.setBackgroundResource(R.mipmap.blue_loading);
+                mRequestFundStatusIv.startAnimation(mRequestFundRotateAnimation);
+            }
+        });
     }
 
     @Override
@@ -472,6 +561,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mRequestFundStatusTv.setText("");
+                mRequestFundStatusTv.setVisibility(View.INVISIBLE);
+                mRequestFundStatusIv.clearAnimation();
+                mRequestFundStatusIv.setVisibility(View.INVISIBLE);
+
                 mFundValueTv.setText(fund + " wei");
             }
         });
@@ -482,6 +576,18 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         String functionStr = "get fund error: ";
         //showNetWorkingErrorView(functionStr, errMsg);
         Log.e(TAG, "showGetFundFailView");
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRequestFundStatusTv.setVisibility(View.VISIBLE);
+                mRequestFundStatusTv.setText("refresh fail");
+
+                mRequestFundStatusIv.setVisibility(View.VISIBLE);
+                mRequestFundStatusIv.setBackgroundResource(R.mipmap.task_error_icon);
+                mRequestFundStatusIv.clearAnimation();
+            }
+        });
     }
 
     @Override
@@ -911,12 +1017,22 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mAccountInfoLayout = findViewById(R.id.account_info_layout);
         mAccountInfoIv = findViewById(R.id.user_photo_iv);
         mAccountInfoTv = findViewById(R.id.user_code_tv);
+
         mUsedLayout = findViewById(R.id.used_layout);
         mUsedValueTv = findViewById(R.id.used_value_tv);
+        mRequestUsedStatusIv = findViewById(R.id.request_used_status_iv);
+        mRequestUsedStatusTv = findViewById(R.id.request_used_status_tv);
+
         mBalanceLayout = findViewById(R.id.balance_layout);
         mBalanceValueTv = findViewById(R.id.balance_value_tv);
+        mRequestBalanceStatusIv = findViewById(R.id.request_balance_status_iv);
+        mRequestBalanceStatusTv = findViewById(R.id.request_balance_status_tv);
+
         mFundLayout = findViewById(R.id.fund_layout);
         mFundValueTv = findViewById(R.id.fund_value_tv);
+        mRequestFundStatusIv = findViewById(R.id.request_fund_status_iv);
+        mRequestFundStatusTv = findViewById(R.id.request_fund_status_tv);
+
         mRechargeLayout = findViewById(R.id.recharge_layout);
         mRecordLayout = findViewById(R.id.record_layout);
         mCheckVersionLayout = findViewById(R.id.checkversion_layout);
@@ -982,6 +1098,28 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
         mDownloadTaskAdapter = new DownloadTaskAdapter(PpioDataActivity.this, null);
         mDownloadingFileRecyclerView.setAdapter(mDownloadTaskAdapter);
+
+        final RotateAnimation mFabRotateRightAnimation = new RotateAnimation(0.0f, 45.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        mFabRotateRightAnimation.setDuration(500L);
+        mFabRotateRightAnimation.setFillAfter(true);
+
+        mRequestUsedRotateAnimation = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        mRequestUsedRotateAnimation.setInterpolator(new LinearInterpolator());
+        mRequestUsedRotateAnimation.setDuration(1000l);
+        mRequestUsedRotateAnimation.setRepeatCount(Animation.INFINITE);
+        mRequestUsedRotateAnimation.setRepeatMode(Animation.RESTART);
+
+        mRequestBalanceRotateAnimation = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        mRequestBalanceRotateAnimation.setInterpolator(new LinearInterpolator());
+        mRequestBalanceRotateAnimation.setDuration(1000l);
+        mRequestBalanceRotateAnimation.setRepeatCount(Animation.INFINITE);
+        mRequestBalanceRotateAnimation.setRepeatMode(Animation.RESTART);
+
+        mRequestFundRotateAnimation = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        mRequestFundRotateAnimation.setInterpolator(new LinearInterpolator());
+        mRequestFundRotateAnimation.setDuration(1000l);
+        mRequestFundRotateAnimation.setRepeatCount(Animation.INFINITE);
+        mRequestFundRotateAnimation.setRepeatMode(Animation.RESTART);
     }
 
     private void initListener() {
@@ -1041,6 +1179,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             public void onClick(View v) {
                 if (mAccountInfoPresenter != null) {
                     mAccountInfoPresenter.requestUsed();
+                    showRequestUsedView();
                 }
             }
         });

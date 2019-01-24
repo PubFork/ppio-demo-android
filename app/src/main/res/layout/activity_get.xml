@@ -33,7 +33,7 @@
         android:inputType="textMultiLine|text"
         android:labelFor="@+id/sharecode_edit"
         android:padding="5dp"
-        android:textCursorDrawable="@drawable/drawable_transparent_edittext_cursor" />
+        android:textCursorDrawable="@drawable/drawable_custom_edittext_cursor" />
 
     <Button
         android:id="@+id/get_confirm_btn"

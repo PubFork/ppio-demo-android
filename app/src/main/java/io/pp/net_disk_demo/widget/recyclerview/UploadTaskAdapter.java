@@ -133,6 +133,7 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
         }
 
         public void setState(String status, String error) {
+            mTaskPauseResumeLayout.setVisibility(View.INVISIBLE);
             mTaskStatusTv.setTextColor(mDefaultStatusTvTextColor);
 
             if (Constant.TaskState.PENDING.equals(status)) {
@@ -143,9 +144,11 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
             } else if (Constant.TaskState.RUNNING.equals(status)) {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mTaskStatusLayout.setVisibility(View.GONE);
+                mTaskPauseResumeLayout.setVisibility(View.VISIBLE);
             } else if (Constant.TaskState.PAUSED.equals(status)) {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mTaskStatusLayout.setVisibility(View.GONE);
+                mTaskPauseResumeLayout.setVisibility(View.VISIBLE);
             } else if (Constant.TaskState.FINISHED.equals(status)) {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mTaskStatusLayout.setVisibility(View.GONE);
@@ -164,9 +167,7 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
         }
 
         public void setPauseResume(final String taskId, final String state) {
-            if (Constant.TaskState.PENDING.equals(state) ||
-                    Constant.TaskState.RUNNING.equals(state) ||
-                    Constant.TaskState.ERROR.equals(state)) {
+            if (Constant.TaskState.RUNNING.equals(state)) {
                 mTaskPauseResumeIv.setBackgroundResource(R.mipmap.task_pause_btn);
 
                 RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mTaskPauseResumeIv.getLayoutParams();
@@ -186,9 +187,7 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
                 @Override
                 public void onClick(View v) {
                     if (mUploadTaskItemClickListener != null) {
-                        if (Constant.TaskState.PENDING.equals(state) ||
-                                Constant.TaskState.RUNNING.equals(state) ||
-                                Constant.TaskState.ERROR.equals(state)) {
+                        if (Constant.TaskState.RUNNING.equals(state)) {
                             mUploadTaskItemClickListener.onPause(taskId);
                         } else if (Constant.TaskState.PAUSED.equals(state)) {
                             mUploadTaskItemClickListener.onResume(taskId);

@@ -54,6 +54,8 @@ public class UploadModelImpl implements UploadModel,
                 , calendar.get(Calendar.MONTH)
                 , calendar.get(Calendar.DAY_OF_MONTH));
 
+        mUploadInfo.setExpiredTime(mDateInfo.getDate());
+
         if (mUploadPresenter != null) {
             mUploadPresenter.showUploadSettings();
         }

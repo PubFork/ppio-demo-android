@@ -31,10 +31,10 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="18dp"
             android:layout_marginEnd="24dp"
-            android:gravity="center"
             android:layout_toStartOf="@id/chi_unit_tv"
             android:inputType="number|numberDecimal"
-            android:labelFor="@+id/setchiprice_edittext" />
+            android:labelFor="@+id/setchiprice_edittext"
+            android:textCursorDrawable="@drawable/drawable_custom_edittext_cursor" />
 
     </RelativeLayout>
 

@@ -9,6 +9,8 @@ public interface AccountInfoPresenter {
 
     void requestUsed();
 
+    void showInRequestUsed();
+
     void showUsed(String used);
 
     void showGetUsedFail(String errMsg);
@@ -16,12 +18,16 @@ public interface AccountInfoPresenter {
 
     void requestBalance();
 
+    void showInRequestBalance();
+
     void showBalance(String balance);
 
     void showGetBalanceFail(String errMsg);
 
 
     void requestFund();
+
+    void showInRequestFund();
 
     void showFund(String fund);
 
