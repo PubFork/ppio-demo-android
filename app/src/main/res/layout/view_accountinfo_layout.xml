@@ -127,7 +127,7 @@
                 android:layout_marginStart="18dp"
                 android:layout_marginBottom="13dp"
                 android:includeFontPadding="false"
-                android:text="-- Chi"
+                android:text="0 PPCoin"
                 android:textColor="#909399"
                 android:textSize="12dp" />
 
@@ -189,7 +189,7 @@
                 android:layout_marginStart="18dp"
                 android:layout_marginBottom="13dp"
                 android:includeFontPadding="false"
-                android:text="-- Chi"
+                android:text="0 PPCoin"
                 android:textColor="#909399"
                 android:textSize="12dp" />
 

@@ -1,13 +1,20 @@
 package io.pp.net_disk_demo.ppio;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.alexd.jsonrpc.JSONRPCHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.data.OracleChiPrice;
+import io.pp.net_disk_demo.data.RecordInfo;
 
 public class RpcUtil {
 
@@ -272,27 +279,45 @@ public class RpcUtil {
         return "";
     }
 
-    public static String transferRecord() {
+    public static ArrayList<RecordInfo> transferRecord() {
         initClient();
 
+        ArrayList<RecordInfo> transferRecordList = new ArrayList<>();
+
         try {
-            JSONObject transferRecordJSONObject = new JSONObject();
-            transferRecordJSONObject.put("accountID", PossUtil.getAccount());
-            transferRecordJSONObject.put("start", 0);
-            transferRecordJSONObject.put("limit", 10);
+            JSONObject requestJSONObject = new JSONObject();
+            requestJSONObject.put("accountID", PossUtil.getAccount());
+            requestJSONObject.put("start", 0);
+            requestJSONObject.put("limit", 20);
 
             Log.e(TAG, "transferRecord() start...");
-            Object transferRecordResult = mRpcClient.call("transferRecord", new Object[]{transferRecordJSONObject});
+            String transferRecordResultStr = mRpcClient.callString("transferRecord", new Object[]{requestJSONObject});
             Log.e(TAG, "transferRecord() end...");
-            Log.e(TAG, "transferRecord() " + transferRecordResult);
+            Log.e(TAG, "transferRecord() " + transferRecordResultStr);
+
+            JSONArray transferRecordJSONOArray = new JSONArray(transferRecordResultStr);
+
+            if (transferRecordJSONOArray != null) {
+                Calendar calendar = Calendar.getInstance();
+                DateFormat format1 = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+
+                for (int i = 0; i < transferRecordJSONOArray.length(); i++) {
+                    String comment = transferRecordJSONOArray.getJSONObject(i).getString("Comment");
+                    long amountWei = Long.parseLong(transferRecordJSONOArray.getJSONObject(i).getString("Amount"));
+                    long time = Long.parseLong(transferRecordJSONOArray.getJSONObject(i).getString("Time"));
+
+                    calendar.clear();
+                    calendar.add(Calendar.SECOND, (int) time);
+
+                    transferRecordList.add(new RecordInfo(comment, format1.format(calendar.getTime()), amountWei));
+                }
+            }
         } catch (Exception e) {
             Log.e(TAG, "transferRecord() err = " + e.getMessage());
             e.printStackTrace();
-
-            return null;
         }
 
-        return "";
+        return transferRecordList;
     }
 
     public static String storageDetail() {

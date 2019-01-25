@@ -30,6 +30,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import io.pp.net_disk_demo.Constant;
@@ -167,6 +168,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private ExecuteTaskService mExecuteTaskService = null;
 
     private ExecuteTaskServiceConnection mExecuteTaskServiceConnection = null;
+
+    private DecimalFormat mDecimalFormat = null;
 
     private int mCurrentShowView = ALLFILE_VIEW;
     private boolean mShowSide = false;
@@ -518,7 +521,19 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mRequestBalanceStatusIv.clearAnimation();
                 mRequestBalanceStatusIv.setVisibility(View.INVISIBLE);
 
-                mBalanceValueTv.setText(balance + " wei");
+                try {
+                    double balanceWei = Double.parseDouble(balance);
+                    double balancePPCoin = balanceWei / 1000000000000000000l;
+                    if (balancePPCoin >= 0) {
+                        mBalanceValueTv.setText(mDecimalFormat.format(balancePPCoin) + " PPCoin");
+                    } else {
+                        mBalanceValueTv.setText("0 PPCoin");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                    mBalanceValueTv.setText("0 PPCoin");
+                }
             }
         });
     }
@@ -566,7 +581,20 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mRequestFundStatusIv.clearAnimation();
                 mRequestFundStatusIv.setVisibility(View.INVISIBLE);
 
-                mFundValueTv.setText(fund + " wei");
+                try {
+                    double fundWei = Double.parseDouble(fund);
+                    double fundPPCoin = fundWei / 1000000000000000000l;
+
+                    if (fundPPCoin >= 0) {
+                        mFundValueTv.setText(mDecimalFormat.format(fundPPCoin) + " PPCoin");
+                    } else {
+                        mFundValueTv.setText("0 PPCoin");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                    mFundValueTv.setText("0 PPCoin");
+                }
             }
         });
     }
@@ -1120,6 +1148,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mRequestFundRotateAnimation.setDuration(1000l);
         mRequestFundRotateAnimation.setRepeatCount(Animation.INFINITE);
         mRequestFundRotateAnimation.setRepeatMode(Animation.RESTART);
+
+        mDecimalFormat = new DecimalFormat("0.000000000000000000");
     }
 
     private void initListener() {

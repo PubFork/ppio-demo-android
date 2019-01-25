@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import io.pp.net_disk_demo.R;
@@ -20,19 +21,23 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordItem
 
     private ArrayList<RecordInfo> mRecordList;
 
+    private DecimalFormat mDecimalFormat = null;
+
     public RecordAdapter(Context context, ArrayList<RecordInfo> recordList) {
         mContext = context;
         mRecordList = recordList;
+
+        mDecimalFormat = new DecimalFormat("0.000000000000000000");
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecordItemHolder recordItemHolder, int i) {
         RecordInfo recordInfo = mRecordList.get(i);
         if (recordInfo != null) {
-            recordItemHolder.setFileName(recordInfo.getFileName());
+            recordItemHolder.setFileName(recordInfo.getItem());
             recordItemHolder.setRecordDate("" + recordInfo.getRecordDate());
-            recordItemHolder.setCost("" + recordInfo.getRecordCost());
-            recordItemHolder.setIsFund(recordInfo.isFund());
+            recordItemHolder.setCost(recordInfo.getRecordCost());
+            //recordItemHolder.setIsFund(recordInfo.isFund());
         }
     }
 
@@ -64,7 +69,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordItem
         private TextView mFileNameTv = null;
         private TextView mRecordDateTv = null;
         private TextView mRecordCostTv = null;
-        private TextView mIsFundTv = null;
 
         public RecordItemHolder(@NonNull View itemView) {
             super(itemView);
@@ -82,10 +86,9 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordItem
             mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     Util.dp2px(mContext, 62)));
 
-            mFileNameTv =  mItemLayout.findViewById(R.id.record_file_name_tv);
-            mRecordDateTv =  mItemLayout.findViewById(R.id.record_date_tv);
-            mRecordCostTv =  mItemLayout.findViewById(R.id.record_cost_tv);
-            mIsFundTv =  mItemLayout.findViewById(R.id.record_fund_tv);
+            mFileNameTv = mItemLayout.findViewById(R.id.record_file_name_tv);
+            mRecordDateTv = mItemLayout.findViewById(R.id.record_date_tv);
+            mRecordCostTv = mItemLayout.findViewById(R.id.record_cost_tv);
         }
 
         public void setFileName(String fileName) {
@@ -96,18 +99,9 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordItem
             mRecordDateTv.setText(modifiedDate);
         }
 
-        public void setCost(String cost) {
-            mRecordCostTv.setText(cost);
-        }
-
-        public void setIsFund(boolean isFund) {
-            if (isFund) {
-                mRecordCostTv.setTextColor(0xFFFF9E0E);
-                mIsFundTv.setText("PPCoin(Fund)");
-            } else {
-                mRecordCostTv.setTextColor(0xFF303133);
-                mIsFundTv.setText("PPCoin");
-            }
+        public void setCost(long cost) {
+            double costPPCoin = (double) cost / 1000000000000000000l;
+            mRecordCostTv.setText("cost: " + mDecimalFormat.format(costPPCoin) + " PPCoin");
         }
     }
 }

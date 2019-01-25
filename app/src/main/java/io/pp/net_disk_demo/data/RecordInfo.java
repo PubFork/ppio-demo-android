@@ -2,31 +2,37 @@ package io.pp.net_disk_demo.data;
 
 public class RecordInfo {
 
-    private String mFileName;
-    private long mRecordDate;
-    private double mRecordCost;
-    private boolean mIsFund;
+    private String mItem;
+    private String mRecordDate;
+    private long mRecordCostWei;
 
-    public RecordInfo(String fileName, long recordDate, double recordCost, boolean isFund){
-        mFileName = fileName;
+    public RecordInfo(String item, String recordDate, long recordCost) {
+        mItem = item;
         mRecordDate = recordDate;
-        mRecordCost = recordCost;
-        mIsFund = isFund;
+        mRecordCostWei = recordCost;
     }
 
-    public String getFileName() {
-        return mFileName;
+    public void setItem(String item) {
+        mItem = item;
     }
 
-    public long getRecordDate() {
+    public void setRecordDate(String recordDate) {
+        mRecordDate = recordDate;
+    }
+
+    public void setRecordCost(long costWei) {
+        mRecordCostWei = costWei;
+    }
+
+    public String getItem() {
+        return mItem;
+    }
+
+    public String getRecordDate() {
         return mRecordDate;
     }
 
-    public double getRecordCost() {
-        return mRecordCost;
-    }
-
-    public boolean isFund() {
-        return mIsFund;
+    public long getRecordCost() {
+        return mRecordCostWei;
     }
 }
