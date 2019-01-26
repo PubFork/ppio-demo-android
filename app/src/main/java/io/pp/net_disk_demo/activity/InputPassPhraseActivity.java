@@ -117,7 +117,7 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
             @Override
             public void onClick(View v) {
                 //hidePassPhraseEditKeyBoard();
-                hideSoftKeyboard();
+                hideSoftKeyboard(v);
 
                 if (mInputPassPhrasePresenter != null) {
                     mInputPassPhrasePresenter.logIn(mPassPhraseEdit.getText().toString());
@@ -129,7 +129,7 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
             @Override
             public void onClick(View v) {
                 //hidePassPhraseEditKeyBoard();
-                hideSoftKeyboard();
+                hideSoftKeyboard(v);
 
                 startActivity(new Intent(InputPassPhraseActivity.this, KeyStoreLogInActivity.class));
             }

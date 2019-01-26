@@ -38,7 +38,7 @@ public class BaseActivity extends AppCompatActivity {
         if (!(view instanceof EditText)) {
             view.setOnTouchListener(new View.OnTouchListener() {
                 public boolean onTouch(View v, MotionEvent event) {
-                    hideSoftKeyboard();
+                    hideSoftKeyboard(view);
                     return false;
                 }
             });
@@ -53,7 +53,7 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void hideSoftKeyboard() {
-        mInputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+    public void hideSoftKeyboard(View view) {
+        mInputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

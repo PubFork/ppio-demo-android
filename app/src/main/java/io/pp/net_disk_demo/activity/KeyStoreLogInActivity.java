@@ -133,7 +133,7 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
 
     public void onConfirm(View view) {
         //hidePassPhraseEditKeyBoard();
-        hideSoftKeyboard();
+        hideSoftKeyboard(view);
 
         if (mKeyStoreLogInPresenter != null) {
             mKeyStoreLogInPresenter.logIn(mKeyStoreEdit.getText().toString(), mPassPhraseEdit.getText().toString());
@@ -143,7 +143,7 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     public void onScanCode(View view) {
         hideProgressDialog();
         //hidePassPhraseEditKeyBoard();
-        hideSoftKeyboard();
+        hideSoftKeyboard(view);
 
         if (!mHasStartScanCode) {
             mHasStartScanCode = true;
