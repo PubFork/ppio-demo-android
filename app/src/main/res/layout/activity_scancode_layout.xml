@@ -42,13 +42,18 @@
         app:qrcv_topOffset="65dp"
         app:qrcv_verticalBias="-1" />
 
-    <include layout="@layout/toolbar_layout" />
+    <include
+        android:id="@+id/scancode_toolbar_layout"
+        layout="@layout/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:visibility="gone">
+        android:background="#243243"
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/scan_code_retry_iv"
@@ -57,6 +62,8 @@
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="16dp"
+            android:textColor="#FFFFFF"
             android:text="Retry" />
 
         <TextView
@@ -66,6 +73,8 @@
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="16dp"
+            android:textColor="#FFFFFF"
             android:text="Light-on" />
 
         <TextView
@@ -75,6 +84,8 @@
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="16dp"
+            android:textColor="#FFFFFF"
             android:text="Light-off" />
 
         <TextView
@@ -84,6 +95,8 @@
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="16dp"
+            android:textColor="#FFFFFF"
             android:text="Browse" />
 
     </LinearLayout>

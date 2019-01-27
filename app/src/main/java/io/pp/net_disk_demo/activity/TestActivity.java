@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,10 +20,12 @@ import android.widget.Toast;
 
 import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
 import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
+import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.dialog.VerifyPassPhraseDialog;
 import io.pp.net_disk_demo.ppio.KeyStoreUtil;
 import io.pp.net_disk_demo.ppio.PossUtil;
+import io.pp.net_disk_demo.util.BitmapUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 
@@ -177,16 +180,18 @@ public class TestActivity extends BaseActivity {
                                     public void run() {
                                         String keyStoreStr = KeyStoreUtil.exportKeyStoreStr(TestActivity.this, PossUtil.getPasswordStr(), passPhrase);
 
+                                        Bitmap bitmap= QRCodeEncoder.syncEncodeQRCode(keyStoreStr,
+                                                BGAQRCodeUtil.dp2px(TestActivity.this, Util.px2dp(TestActivity.this, mScreenWidth) - 20),
+                                                Color.parseColor("#ff000000"));
+                                        BitmapUtil.saveBitmap(bitmap, Constant.PPIO_File.DOWNLOAD_DIR+"/"+PossUtil.getAccount()+".png");
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
                                                 if (!TextUtils.isEmpty(keyStoreStr)) {
                                                     Log.e(TAG, "export keystore code, keystore = " + keyStoreStr);
 
-                                                    mKeyStoreCodeIv.setImageBitmap(QRCodeEncoder.syncEncodeQRCode(keyStoreStr,
-                                                            BGAQRCodeUtil.dp2px(TestActivity.this, Util.px2dp(TestActivity.this, mScreenWidth) - 20),
-                                                            Color.parseColor("#ff000000")));
-                                                } else {
+                                                    mKeyStoreCodeIv.setImageBitmap(bitmap);
+                                                    } else {
                                                     ToastUtil.showToast(TestActivity.this, "export keystore code failed!", Toast.LENGTH_SHORT);
                                                 }
                                             }

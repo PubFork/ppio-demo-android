@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +29,9 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
 
     private static final String TAG = "ScanCodeActivity";
 
+
+    private Toolbar mScanCodeToolBar = null;
+    private TextView mToolBarTitleTv = null;
     private ImageView mToolbarBackIv = null;
 
     private ZXingView mZXingView = null;
@@ -179,7 +183,15 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
 
         setImmersiveStatusBar();
 
+        mScanCodeToolBar = findViewById(R.id.scancode_toolbar_layout);
+        mScanCodeToolBar.setPadding(0, 0, 0, 0);
+        mScanCodeToolBar.setContentInsetsAbsolute(0, 0);
+
+        setSupportActionBar(mScanCodeToolBar);
+
         mToolbarBackIv = findViewById(R.id.actionbar_left_iv);
+        mToolBarTitleTv = findViewById(R.id.actionbar_title_tv);
+
         mZXingView = findViewById(R.id.zxingview);
         mRetryTv = findViewById(R.id.scan_code_retry_iv);
         mLightOnTv = findViewById(R.id.scan_code_light_on_iv);
@@ -187,6 +199,8 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
         mBrowseCodeBitmapTv = findViewById(R.id.scan_code_browse_iv);
 
         mScanCodePresenter = new ScanCodePresenterImpl(ScanCodeActivity.this, ScanCodeActivity.this);
+
+        mToolBarTitleTv.setText("ScanCode");
 
         mToolbarBackIv.setOnClickListener(new View.OnClickListener() {
             @Override
