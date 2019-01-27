@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -136,6 +137,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private TextView mUploadingTv = null;
     private TextView mDownloadingTv = null;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout = null;
     private RecyclerView mMyFileRecyclerView = null;
     private RecyclerView mUploadingFileRecyclerView = null;
     private RecyclerView mDownloadingFileRecyclerView = null;
@@ -398,7 +400,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     public void showRefreshAllFileListFailView(final String failStr) {
         String functionStr = "refresh all files error: ";
+
         showNetWorkingErrorView(functionStr, failStr);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     @Override
@@ -408,13 +418,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mSwipeRefreshLayout.setRefreshing(false);
+
                 mCurrentShowView = ALLFILE_VIEW;
 
                 mWActionBarTitleTv.setText("All file");
 
                 mMyFileAdapter.refreshFileList(mMyFileInfoList);
 
-                mMyFileRecyclerView.setVisibility(View.VISIBLE);
+                mSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 mUploadingFileRecyclerView.setVisibility(View.GONE);
                 mDownloadingFileRecyclerView.setVisibility(View.GONE);
 
@@ -427,7 +439,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mDownloadingTv.setTextColor(0xFF606266);
 
                 if (mMyFileAdapter.getItemCount() == 0) {
-                    mMyFileRecyclerView.setVisibility(View.INVISIBLE);
+                    mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -446,7 +458,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             }
         });
     }
-
 
     @Override
     public void showRequestUsedView() {
@@ -1079,11 +1090,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mUploadingTv = findViewById(R.id.tools_uploading_tv);
         mDownloadingTv = findViewById(R.id.tools_downloading_tv);
 
+        mSwipeRefreshLayout = findViewById(R.id.refresh_layout);
         mMyFileRecyclerView = findViewById(R.id.myfile_recyclerview);
         mUploadingFileRecyclerView = findViewById(R.id.uploadingfile_recyclerview);
         mDownloadingFileRecyclerView = findViewById(R.id.downloadingfile_recyclerview);
 
         StatusBarUtil.setColorNoTranslucentForLeftDrawerLayout(this, mLeftDrawerLayout, getResources().getColor(R.color.account_background_blue));
+
+        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.account_background_blue));
+        //mSwipeRefreshLayout.setProgressBackgroundColorSchemeColor(getResources().getColor(R.color.account_background_blue));
 
         mMyFileRecyclerView.setLayoutManager(new LinearLayoutManager(PpioDataActivity.this));
         mMyFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
@@ -1288,9 +1303,9 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             }
         });
 
-        mAllLayout.setOnClickListener(new View.OnClickListener() {
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
+            public void onRefresh() {
                 Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
                     @Override
                     public void onRunOperation() {
@@ -1299,6 +1314,13 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                         }
                     }
                 });
+            }
+        });
+
+        mAllLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAllFileView();
             }
         });
 
@@ -1319,6 +1341,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mMyFileAdapter.setOnItemListener(new MyFileAdapter.OnItemListener() {
             @Override
             public void onItemClick(final int position) {
+                if(mSwipeRefreshLayout.isRefreshing()) {
+                    return;
+                }
+
                 mBlockFileOptionsBottomDialog = null;
 
                 mBlockFileOptionsBottomDialog = new BlockFileOptionsBottomDialog(PpioDataActivity.this,
@@ -1644,6 +1670,33 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         }
     }
 
+    private void showAllFileView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mCurrentShowView = ALLFILE_VIEW;
+
+                mWActionBarTitleTv.setText("All file");
+
+                mSwipeRefreshLayout.setVisibility(View.VISIBLE);
+                mUploadingFileRecyclerView.setVisibility(View.GONE);
+                mDownloadingFileRecyclerView.setVisibility(View.GONE);
+
+                mAllFileIv.setBackgroundResource(R.mipmap.allfile_selected);
+                mUploadingIv.setBackgroundResource(R.mipmap.uploading_unselected);
+                mDownloadingIv.setBackgroundResource(R.mipmap.downloading_unselected);
+
+                mAllFileTv.setTextColor(0xFF1989FA);
+                mUploadingTv.setTextColor(0xFF606266);
+                mDownloadingTv.setTextColor(0xFF606266);
+
+                if (mMyFileAdapter.getItemCount() == 0) {
+                    mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+    }
+
     private void showUploadView() {
         runOnUiThread(new Runnable() {
             @Override
@@ -1652,7 +1705,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mWActionBarTitleTv.setText("Uploading");
 
-                mMyFileRecyclerView.setVisibility(View.GONE);
+                mSwipeRefreshLayout.setVisibility(View.GONE);
                 mUploadingFileRecyclerView.setVisibility(View.VISIBLE);
                 mDownloadingFileRecyclerView.setVisibility(View.GONE);
 
@@ -1681,7 +1734,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mWActionBarTitleTv.setText("Downloading");
 
-                mMyFileRecyclerView.setVisibility(View.GONE);
+                mSwipeRefreshLayout.setVisibility(View.GONE);
                 mUploadingFileRecyclerView.setVisibility(View.GONE);
                 mDownloadingFileRecyclerView.setVisibility(View.VISIBLE);
 
