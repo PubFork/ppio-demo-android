@@ -422,7 +422,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mCurrentShowView = ALLFILE_VIEW;
 
-                mWActionBarTitleTv.setText("All file");
+                mWActionBarTitleTv.setText("all file");
 
                 mMyFileAdapter.refreshFileList(mMyFileInfoList);
 
@@ -1183,6 +1183,12 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             @Override
             public void onDrawerOpened(View contentView, View drawerView) {
                 mShowSide = true;
+
+                if (mAccountInfoPresenter != null) {
+                    mAccountInfoPresenter.requestUsed();
+                    mAccountInfoPresenter.requestBalance();
+                    mAccountInfoPresenter.requestFund();
+                }
             }
 
             @Override
@@ -1341,7 +1347,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mMyFileAdapter.setOnItemListener(new MyFileAdapter.OnItemListener() {
             @Override
             public void onItemClick(final int position) {
-                if(mSwipeRefreshLayout.isRefreshing()) {
+                if (mSwipeRefreshLayout.isRefreshing()) {
                     return;
                 }
 
@@ -1676,7 +1682,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             public void run() {
                 mCurrentShowView = ALLFILE_VIEW;
 
-                mWActionBarTitleTv.setText("All file");
+                mWActionBarTitleTv.setText("all file");
 
                 mSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 mUploadingFileRecyclerView.setVisibility(View.GONE);
@@ -1703,7 +1709,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             public void run() {
                 mCurrentShowView = UPLOADING_VIEW;
 
-                mWActionBarTitleTv.setText("Uploading");
+                mWActionBarTitleTv.setText("uploading");
 
                 mSwipeRefreshLayout.setVisibility(View.GONE);
                 mUploadingFileRecyclerView.setVisibility(View.VISIBLE);
@@ -1732,7 +1738,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             public void run() {
                 mCurrentShowView = DOWNLOADING_VIEW;
 
-                mWActionBarTitleTv.setText("Downloading");
+                mWActionBarTitleTv.setText("downloading");
 
                 mSwipeRefreshLayout.setVisibility(View.GONE);
                 mUploadingFileRecyclerView.setVisibility(View.GONE);

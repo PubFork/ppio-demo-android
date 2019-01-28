@@ -41,7 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="#FFFFFF"
-        android:text="Share(UnShare)"
+        android:text="Get ShareCode"
         android:textAllCaps="false"
         android:textColor="#606266"
         android:textSize="16dp" />

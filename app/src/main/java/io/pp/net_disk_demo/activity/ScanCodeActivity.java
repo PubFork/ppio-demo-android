@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,8 +32,8 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
 
 
     private Toolbar mScanCodeToolBar = null;
+    private LinearLayout mToolbarBackIvLayout = null;
     private TextView mToolBarTitleTv = null;
-    private ImageView mToolbarBackIv = null;
 
     private ZXingView mZXingView = null;
 
@@ -189,7 +190,7 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
 
         setSupportActionBar(mScanCodeToolBar);
 
-        mToolbarBackIv = findViewById(R.id.actionbar_left_iv);
+        mToolbarBackIvLayout = findViewById(R.id.actionbar_left_iv_layout);
         mToolBarTitleTv = findViewById(R.id.actionbar_title_tv);
 
         mZXingView = findViewById(R.id.zxingview);
@@ -202,7 +203,7 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
 
         mToolBarTitleTv.setText("ScanCode");
 
-        mToolbarBackIv.setOnClickListener(new View.OnClickListener() {
+        mToolbarBackIvLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

@@ -29,6 +29,7 @@
         android:layout_marginRight="24dp"
         android:background="@drawable/background_custom_get_edit"
         android:cursorVisible="true"
+        android:gravity="top|left"
         android:hint="input share code"
         android:inputType="textMultiLine|text"
         android:labelFor="@+id/sharecode_edit"

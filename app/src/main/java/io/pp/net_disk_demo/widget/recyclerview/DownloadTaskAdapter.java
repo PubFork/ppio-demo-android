@@ -133,15 +133,17 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
             mDefaultStatusTvTextColor = mTaskStatusTv.getCurrentTextColor();
         }
 
-        public void setFileName(String key) {
-            if (!TextUtils.isEmpty(key)) {
-                String fileName = key;
-                if (key.startsWith("/")) {
-                    fileName = key.replaceFirst("/", "");
+        public void setFileName(String bucketKey) {
+            String fileName = "";
+            if (!TextUtils.isEmpty(bucketKey)) {
+                if (bucketKey.startsWith("/")) {
+                    fileName = bucketKey.replaceFirst("/", "");
+                } else {
+                    fileName = bucketKey;
                 }
-
-                mFileNameTv.setText(fileName);
             }
+
+            mFileNameTv.setText(fileName);
         }
 
         public void setStatus(String status, String error) {

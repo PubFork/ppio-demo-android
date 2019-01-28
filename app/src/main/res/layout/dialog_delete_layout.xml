@@ -16,12 +16,13 @@
 
     <TextView
         android:id="@+id/delete_filename_tv"
-        style="@style/get_edit_style"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="15dp"
-        android:layout_marginRight="24dp" />
+        android:layout_marginRight="24dp"
+        android:ellipsize="middle"
+        android:gravity="center" />
 
     <View
         android:layout_width="match_parent"

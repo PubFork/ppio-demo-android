@@ -52,7 +52,7 @@ public class DeleteDialog extends Dialog {
         mDeleteLayout = mLayoutView.findViewById(R.id.ok_layout);
         mCancelLayout = mLayoutView.findViewById(R.id.cancel_layout);
 
-        mFileNameTv.setText(mTitleStr);
+        mFileNameTv.setText(mTitleStr.replaceFirst("/", ""));
 
         Window window = this.getWindow();
         if (window != null) {

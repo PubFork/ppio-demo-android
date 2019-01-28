@@ -24,10 +24,11 @@
         android:layout_marginRight="24dp"
         android:enabled="true"
         android:focusable="true"
-        android:gravity="center"
+        android:gravity="left"
         android:longClickable="true"
         android:singleLine="false"
-        android:textIsSelectable="true" />
+        android:textIsSelectable="true"
+        android:textSize="16dp" />
 
     <View
         android:layout_width="match_parent"
@@ -35,8 +36,50 @@
         android:layout_marginTop="21dp"
         android:background="#DCDFE6" />
 
-    <include
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/ok_cancel_layout"
-        layout="@layout/buttons_ok_cancel_layout" />
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/center_view"
+            android:layout_width="1dp"
+            android:layout_height="48dp"
+            android:layout_centerInParent="true"
+            android:background="#DCDFE6" />
+
+        <RelativeLayout
+            android:id="@+id/cancel_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@id/center_view">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerInParent="true"
+                android:background="@mipmap/cancel"
+                android:contentDescription="@string/app_name" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/ok_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@id/center_view">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_centerInParent="true"
+                android:text="Copy"
+                android:textSize="16dp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
 
 </LinearLayout>

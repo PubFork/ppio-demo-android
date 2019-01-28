@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -128,7 +129,15 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
             mDefaultStatusTvTextColor = mTaskStatusTv.getCurrentTextColor();
         }
 
-        public void setFileName(String fileName) {
+        public void setFileName(String bucketKey) {
+            String fileName = "";
+            if (!TextUtils.isEmpty(bucketKey)) {
+                if (bucketKey.startsWith(Constant.Data.DEFAULT_BUCKET + "//")) {
+                    fileName = bucketKey.replaceFirst(Constant.Data.DEFAULT_BUCKET + "//", "");
+                } else {
+                    fileName = bucketKey;
+                }
+            }
             mFileNameTv.setText(fileName);
         }
 

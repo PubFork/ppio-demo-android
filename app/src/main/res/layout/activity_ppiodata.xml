@@ -173,8 +173,9 @@
                     android:layout_below="@id/tools_uploading_iv"
                     android:layout_alignBaseline="@id/tools_uploading_iv"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginTop="3dp"
                     android:includeFontPadding="false"
-                    android:text="Uploading"
+                    android:text="uploading"
                     android:textColor="#606266"
                     android:textSize="10dp" />
             </RelativeLayout>
@@ -213,8 +214,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tools_allfile_iv"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginTop="3dp"
                     android:includeFontPadding="false"
-                    android:text="All file"
+                    android:text="all file"
                     android:textColor="#1989FA"
                     android:textSize="10dp" />
 
@@ -243,8 +245,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tools_downloading_iv"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginTop="3dp"
                     android:includeFontPadding="false"
-                    android:text="Downloading"
+                    android:text="downloading"
                     android:textColor="#606266"
                     android:textSize="10dp" />
 

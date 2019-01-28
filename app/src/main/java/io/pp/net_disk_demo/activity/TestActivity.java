@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +35,7 @@ public class TestActivity extends BaseActivity {
     private final String TAG = "TestActivity";
 
     private Toolbar mTestToolBar = null;
-    private ImageView mToolBarLeftTv = null;
+    private LinearLayout mToolBarLeftTvLayout = null;
     private TextView mToolBarTitleTv = null;
 
     private TextView mKeyStoreTv = null;
@@ -82,7 +83,7 @@ public class TestActivity extends BaseActivity {
 
         setSupportActionBar(mTestToolBar);
 
-        mToolBarLeftTv = findViewById(R.id.actionbar_left_iv);
+        mToolBarLeftTvLayout = findViewById(R.id.actionbar_left_iv_layout);
         mToolBarTitleTv = findViewById(R.id.actionbar_title_tv);
 
         View.OnClickListener toolBarLeftOnClickListener = new View.OnClickListener() {
@@ -92,7 +93,7 @@ public class TestActivity extends BaseActivity {
             }
         };
 
-        mToolBarLeftTv.setOnClickListener(toolBarLeftOnClickListener);
+        mToolBarLeftTvLayout.setOnClickListener(toolBarLeftOnClickListener);
 
         mToolBarTitleTv.setText("Account");
 

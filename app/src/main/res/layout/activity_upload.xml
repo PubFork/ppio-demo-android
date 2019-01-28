@@ -16,15 +16,24 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize">
 
-            <ImageView
-                android:id="@+id/upload_toolbar_left_iv"
-                android:layout_width="19dp"
-                android:layout_height="12dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="19dp"
-                android:background="@mipmap/cehua_button"
-                android:contentDescription="@string/app_name" />
+            <LinearLayout
+                android:id="@+id/upload_toolbar_left_iv_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="9dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/upload_toolbar_left_iv"
+                    android:layout_width="10dp"
+                    android:layout_height="17dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@mipmap/actionbar_back"
+                    android:contentDescription="@string/app_name" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/actionbar_title_tv"

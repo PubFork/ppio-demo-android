@@ -23,6 +23,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,7 +65,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
     private final String EXPECTED_COST = "EXPECTED_COST";
 
     private Toolbar mUploadToolBar = null;
-    private ImageView mToolBarLeftTv = null;
+    private LinearLayout mToolBarLeftTvLayout = null;
     private TextView mToolBarTitleTv = null;
 
     private ImageView mFileIconIv = null;
@@ -460,7 +461,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
 
         setSupportActionBar(mUploadToolBar);
 
-        mToolBarLeftTv = findViewById(R.id.upload_toolbar_left_iv);
+        mToolBarLeftTvLayout = findViewById(R.id.upload_toolbar_left_iv_layout);
         mToolBarTitleTv = findViewById(R.id.actionbar_title_tv);
 
         View.OnClickListener toolBarLeftOnClickListener = new View.OnClickListener() {
@@ -472,7 +473,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
             }
         };
 
-        mToolBarLeftTv.setOnClickListener(toolBarLeftOnClickListener);
+        mToolBarLeftTvLayout.setOnClickListener(toolBarLeftOnClickListener);
 
         mToolBarTitleTv.setText("Upload Settings");
 

@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import io.pp.net_disk_demo.widget.recyclerview.RecordAdapter;
 public class RecordActivity extends BaseActivity {
 
     private Toolbar mRecordToolBar = null;
-    private ImageView mToolBarLeftTv = null;
+    private LinearLayout mToolBarLeftTvLayout = null;
     private TextView mToolBarTitleTv = null;
 
     private RecyclerView mRecordRecyclerView = null;
@@ -47,7 +48,7 @@ public class RecordActivity extends BaseActivity {
 
         setSupportActionBar(mRecordToolBar);
 
-        mToolBarLeftTv = findViewById(R.id.actionbar_left_iv);
+        mToolBarLeftTvLayout = findViewById(R.id.actionbar_left_iv_layout);
 
         mToolBarTitleTv = findViewById(R.id.actionbar_title_tv);
 
@@ -58,7 +59,7 @@ public class RecordActivity extends BaseActivity {
             }
         };
 
-        mToolBarLeftTv.setOnClickListener(toolBarLeftOnClickListener);
+        mToolBarLeftTvLayout.setOnClickListener(toolBarLeftOnClickListener);
 
         mToolBarTitleTv.setText("Record");
 

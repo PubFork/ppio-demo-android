@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +36,7 @@ public class GetActivity extends BaseActivity implements GetView {
     private SetChiPriceDialog mSetChiPriceDialog = null;
 
     private Toolbar mGetToolBar = null;
-    private ImageView mToolBarLeftTv = null;
+    private LinearLayout mToolBarLeftIvLayout = null;
     private TextView mToolBarTitleTv = null;
 
     private EditText mShareCodeEdit = null;
@@ -175,7 +176,7 @@ public class GetActivity extends BaseActivity implements GetView {
 
         setSupportActionBar(mGetToolBar);
 
-        mToolBarLeftTv = findViewById(R.id.actionbar_left_iv);
+        mToolBarLeftIvLayout = findViewById(R.id.actionbar_left_iv_layout);
 
         mToolBarTitleTv = findViewById(R.id.actionbar_title_tv);
 
@@ -186,7 +187,7 @@ public class GetActivity extends BaseActivity implements GetView {
             }
         };
 
-        mToolBarLeftTv.setOnClickListener(toolBarLeftOnClickListener);
+        mToolBarLeftIvLayout.setOnClickListener(toolBarLeftOnClickListener);
 
         mToolBarTitleTv.setText("Get");
 
