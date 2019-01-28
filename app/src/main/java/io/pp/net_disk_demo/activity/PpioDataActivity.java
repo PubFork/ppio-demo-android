@@ -1456,10 +1456,16 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                             public void onRenew() {
                                 mBlockFileOptionsBottomDialog.dismiss();
 
-                                if (mStartRenewPresenter != null) {
-                                    FileInfo fileInfo = mMyFileAdapter.getFileInfo(position);
-                                    mStartRenewPresenter.startRenew(fileInfo.getBucketName(), fileInfo.getName());
-                                }
+                                FileInfo fileInfo = mMyFileAdapter.getFileInfo(position);
+
+                                startActivityForResult(new Intent(PpioDataActivity.this, RenewActivity.class)
+                                        .setAction(Constant.Intent.RENEW_ACTION)
+                                        .putExtra(Constant.Data.RENEW_FILE, fileInfo), Constant.Code.REQUEST_RENEW);
+
+//                                if (mStartRenewPresenter != null) {
+//                                    FileInfo fileInfo = mMyFileAdapter.getFileInfo(position);
+//                                    mStartRenewPresenter.startRenew(fileInfo.getBucketName(), fileInfo.getName());
+//                                }
                             }
 
                             @Override

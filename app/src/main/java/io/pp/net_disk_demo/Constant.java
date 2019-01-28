@@ -47,6 +47,7 @@ public class Constant {
         public static final String ISDIR = "isdir";
         public static final String CREATED = "created";
         public static final String MODIFIED = "modified";
+        public static final String EXPIRES = "expires";
         public static final String SYNCHRONIZED = "synchronized";
     }
 

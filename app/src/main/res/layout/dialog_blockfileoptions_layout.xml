@@ -14,7 +14,8 @@
         android:text="Detail"
         android:textAllCaps="false"
         android:textColor="#606266"
-        android:textSize="16dp" />
+        android:textSize="16dp"
+        android:visibility="gone" />
 
     <View
         android:layout_width="match_parent"

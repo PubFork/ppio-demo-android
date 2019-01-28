@@ -13,6 +13,7 @@ public class FileInfo implements Serializable {
     private String mStatus = "";
     private String mCreatedTime = "";
     private String mModifiedTime = "";
+    private String mExpiredTime = "";
     private String mShareCode = "";
     private boolean mIsBucket = false;
     private boolean mIsShare = false;
@@ -72,6 +73,10 @@ public class FileInfo implements Serializable {
 
     public String getModifiedTime() {
         return mModifiedTime;
+    }
+
+    public String getExpiredTime() {
+        return mExpiredTime;
     }
 
     public String getShareCode() {
@@ -153,6 +158,10 @@ public class FileInfo implements Serializable {
 
     public void setModifiedTime(String modifiedTime) {
         mModifiedTime = modifiedTime;
+    }
+
+    public void setExpiredTime(String expiredTime) {
+        mExpiredTime = expiredTime;
     }
 
     public void setShareCode(String shareCode) {

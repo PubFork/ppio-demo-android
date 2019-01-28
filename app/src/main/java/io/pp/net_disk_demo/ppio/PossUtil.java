@@ -387,6 +387,7 @@ public class PossUtil {
                     fileInfo.setDir(jsonObject.getBoolean(Constant.ObjectKey.ISDIR));
                     fileInfo.setCreatedTime(TimeConverterUtil.GTMToLocal(jsonObject.getString(Constant.ObjectKey.CREATED)));
                     fileInfo.setModifiedTime(TimeConverterUtil.GTMToLocal(jsonObject.getString(Constant.ObjectKey.MODIFIED)));
+                    fileInfo.setExpiredTime(TimeConverterUtil.GTMToLocal(jsonObject.getString(Constant.ObjectKey.EXPIRES)));
                     jsonObject.getString((Constant.ObjectKey.SYNCHRONIZED));
 
                     fileInfos[i] = fileInfo;

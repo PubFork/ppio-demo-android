@@ -54,7 +54,7 @@ public class RenewModelImpl implements RenewModel {
         Calendar calendar = Calendar.getInstance();
         try {
             Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                    .parse(fileInfo.getStorageTime());
+                    .parse(fileInfo.getExpiredTime());
             calendar.setTime(date);
         } catch (ParseException e) {
             Log.e(TAG, "setRenewFile() error: " + e.getMessage());
