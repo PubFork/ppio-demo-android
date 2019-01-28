@@ -88,12 +88,14 @@ public class KeyStoreLogInModelImpl implements KeyStoreLogInModel {
             final String passPhrase = params[1];
             KeyStoreUtil.deleteKeyStore(mLogInModelImplWeakReference.get().getContext());
 
-            if (!KeyStoreUtil.checkKeyStoreAndPassPhrase(keyStoreStr, passPhrase)) {
-                publishProgress("the keystore or passphrase is wrong!");
+            final String address = KeyStoreUtil.checkKeyStoreAndPassPhrase(keyStoreStr, passPhrase);
+
+            if (TextUtils.isEmpty(address)) {
+                publishProgress("keystore or passphrase is wrong");
                 return false;
             }
 
-            boolean loginSucceed = PossUtil.logInFromKeyStore(keyStoreStr, passPhrase, new PossUtil.LogInListener() {
+            boolean loginSucceed = PossUtil.logInFromKeyStore(keyStoreStr, passPhrase, address, new PossUtil.LogInListener() {
                 @Override
                 public void onLogInError(String errMsg) {
                     publishProgress(errMsg);

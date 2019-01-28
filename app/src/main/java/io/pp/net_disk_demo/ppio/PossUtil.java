@@ -36,6 +36,8 @@ public class PossUtil {
     private static String mStorageChiPrice = "100";
     private static String mDownloadChiPrice = "100";
 
+    private static String mCacheDir = "";
+
     static public void setMnemonicStr(String mnemonicStr) {
         mMnemonicStr = mnemonicStr;
     }
@@ -92,6 +94,10 @@ public class PossUtil {
         return mDownloadChiPrice;
     }
 
+    static public String getCacheDir() {
+        return mCacheDir;
+    }
+
     static boolean register() {
         return true;
     }
@@ -100,7 +106,7 @@ public class PossUtil {
         return true;
     }
 
-    public static boolean logInFromKeyStore(final String keyStoreStr, final String passPhrase, LogInListener logInListener) {
+    public static boolean logInFromKeyStore(final String keyStoreStr, final String passPhrase, final String address, LogInListener logInListener) {
         try {
             Config config = Poss.createDefaultConfig();
 
@@ -110,14 +116,33 @@ public class PossUtil {
 
             config.setZone(2);
 
-            File cacheDir = new File(Constant.PPIO_File.CACHE_DIR);
             boolean directoryExist;
+
+            File appCacheDir = new File(Constant.PPIO_File.APP_CACHE_DIR);
+
+            directoryExist = appCacheDir.exists();
+            if (!directoryExist) {
+                directoryExist = appCacheDir.mkdir();
+            }
+
+            if (!directoryExist) {
+                if (logInListener != null) {
+                    logInListener.onLogInError("create directory fail");
+                }
+
+                return false;
+            }
+
+            File cacheDir = new File(Constant.PPIO_File.CACHE_DIR_PREFIX + address);
+
             directoryExist = cacheDir.exists();
             if (!directoryExist) {
                 directoryExist = cacheDir.mkdir();
             }
 
             if (directoryExist) {
+                mCacheDir = cacheDir.getAbsolutePath();
+
                 config.setDir(cacheDir.getAbsolutePath());
 
                 config.setTestNet("test");
@@ -150,13 +175,13 @@ public class PossUtil {
                     config.getQosServerConfig().setNetwork("udp");
                     config.getQosServerConfig().setAddr("192.168.50.208:9090");//if the address is incorrect, the qoslog will saved in local
                     config.getQosServerConfig().setTag("ppioqos");
-                    config.getQosServerConfig().setDir(Constant.PPIO_File.CACHE_QOS_DIR);
+                    config.getQosServerConfig().setDir(Constant.PPIO_File.CACHE_DIR_PREFIX + address + Constant.PPIO_File.CACHE_QOS_DIR_SUFFIX);
                 } else {
                     config.getQosServerConfig().setEnable(true);
                     config.getQosServerConfig().setNetwork("udp");
                     config.getQosServerConfig().setAddr("ad416ba1c124611e9a39d06111ae4d23-1840383830.us-west-2.elb.amazonaws.com:80");//if the address is incorrect, the qoslog will saved in local
                     config.getQosServerConfig().setTag("ppioqos");
-                    config.getQosServerConfig().setDir(Constant.PPIO_File.CACHE_QOS_DIR);
+                    config.getQosServerConfig().setDir(Constant.PPIO_File.CACHE_DIR_PREFIX + address + Constant.PPIO_File.CACHE_QOS_DIR_SUFFIX);
                 }
 
                 //

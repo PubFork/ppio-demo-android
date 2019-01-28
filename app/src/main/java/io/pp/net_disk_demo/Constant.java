@@ -93,17 +93,19 @@ public class Constant {
     }
 
     public static class PPIO_File {
-        public static final String CACHE_DIR = Environment.getExternalStorageDirectory().getPath() +
-                "/PPIO_Cache";//can not add '/ in end
-        public static final String CACHE_QOS_DIR = Environment.getExternalStorageDirectory().getPath() +
-                "/PPIO_Cache/qoslog/";
+        public static final String APP_CACHE_DIR = Environment.getExternalStorageDirectory().getPath() +
+                "/io.pp.net_disk_demo";
+
+        public static final String CACHE_DIR_PREFIX = APP_CACHE_DIR +
+                "/PPIO_Cache_";//can not add '/ in end
+        public static final String CACHE_QOS_DIR_SUFFIX = "/qoslog";
         public static final String DOWNLOAD_DIR = Environment.getExternalStorageDirectory().getPath() +
                 "/PPIO_Download";//can not add '/ in end
 
-        public static final String REGISTER_RECORD_PREFIX = Constant.PPIO_File.CACHE_DIR + "/Register_Record";
-        public static final String LOGIN_RECORD_FILE = Constant.PPIO_File.CACHE_DIR + "/LogIn_Record.txt";
+        public static final String REGISTER_RECORD_PREFIX = Constant.PPIO_File.CACHE_DIR_PREFIX + "/Register_Record";
+        public static final String LOGIN_RECORD_FILE = Constant.PPIO_File.CACHE_DIR_PREFIX + "/LogIn_Record.txt";
 
-        public static final String PRIVATE_KEYSOTR_FILE = "ppio_keystore.json";
+        public static final String PRIVATE_KEYSOTRE_FILE = "ppio_keystore.json";
     }
 
     public static class URL {

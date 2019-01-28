@@ -5,9 +5,12 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -18,6 +21,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
 import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
@@ -179,31 +185,49 @@ public class TestActivity extends BaseActivity {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        String keyStoreStr = KeyStoreUtil.exportKeyStoreStr(TestActivity.this, PossUtil.getPasswordStr(), passPhrase);
+                                        try {
+                                            String keyStoreStr = KeyStoreUtil.exportKeyStoreStr(TestActivity.this, PossUtil.getPasswordStr(), passPhrase);
 
-                                        Bitmap bitmap= QRCodeEncoder.syncEncodeQRCode(keyStoreStr,
-                                                BGAQRCodeUtil.dp2px(TestActivity.this, Util.px2dp(TestActivity.this, mScreenWidth) - 20),
-                                                Color.parseColor("#ff000000"));
-                                        BitmapUtil.saveBitmap(bitmap, Constant.PPIO_File.DOWNLOAD_DIR+"/"+PossUtil.getAccount()+".png");
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (!TextUtils.isEmpty(keyStoreStr)) {
-                                                    Log.e(TAG, "export keystore code, keystore = " + keyStoreStr);
+                                            Bitmap bitmap = QRCodeEncoder.syncEncodeQRCode(keyStoreStr,
+                                                    BGAQRCodeUtil.dp2px(TestActivity.this, Util.px2dp(TestActivity.this, mScreenWidth) - 20),
+                                                    Color.parseColor("#ff000000"));
 
-                                                    mKeyStoreCodeIv.setImageBitmap(bitmap);
+                                            SimpleDateFormat dateFormat = new SimpleDateFormat("'PPIO-UTC-'yyyy_MM_dd'T'HH:mm:ss.SSS'-'");
+                                            String codeFile = PossUtil.getCacheDir() + "/" +
+                                                    dateFormat.format(new Date()) +
+                                                    PossUtil.getAddressStr() +
+                                                    PossUtil.getAccount() + ".png";
+
+                                            BitmapUtil.saveBitmap(bitmap, codeFile);
+
+                                            MediaStore.Images.Media.insertImage(getContentResolver(), codeFile,
+                                                    "PPIO QR code",
+                                                    dateFormat.format(new Date()) + PossUtil.getAddressStr());
+
+                                            sendBroadcast(new Intent(
+                                                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://"
+                                                    + codeFile)));
+
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    if (!TextUtils.isEmpty(keyStoreStr)) {
+                                                        Log.e(TAG, "export keystore code, keystore = " + keyStoreStr);
+
+                                                        mKeyStoreCodeIv.setImageBitmap(bitmap);
                                                     } else {
-                                                    ToastUtil.showToast(TestActivity.this, "export keystore code failed!", Toast.LENGTH_SHORT);
+                                                        ToastUtil.showToast(TestActivity.this, "export keystore code failed!", Toast.LENGTH_SHORT);
+                                                    }
                                                 }
-                                            }
-                                        });
-
+                                            });
+                                        } catch (Exception e) {
+                                            Log.e(TAG, "generate QR code error: " + e.getMessage());
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }).start();
 
-
                                 hideProgressDialog();
-
                             }
                         }, new DialogInterface.OnDismissListener() {
                     @Override

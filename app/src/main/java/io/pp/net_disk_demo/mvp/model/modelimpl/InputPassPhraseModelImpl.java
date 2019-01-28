@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -81,12 +82,14 @@ public class InputPassPhraseModelImpl implements InputPassPhraseModel {
             final String keyStoreStr = KeyStoreUtil.autoLogInByKeyStore(mLogInModelImplWeakReference.get().getContext());
             final String passPhrase = params[0];
 
-            if (!KeyStoreUtil.checkKeyStoreAndPassPhrase(keyStoreStr, passPhrase)) {
+            final String address = KeyStoreUtil.checkKeyStoreAndPassPhrase(keyStoreStr, passPhrase);
+
+            if (TextUtils.isEmpty(address)) {
                 publishProgress("keystore or passphrase is wrong");
                 return false;
             }
 
-            if (PossUtil.logInFromKeyStore(keyStoreStr, passPhrase, new PossUtil.LogInListener() {
+            if (PossUtil.logInFromKeyStore(keyStoreStr, passPhrase, address, new PossUtil.LogInListener() {
                 @Override
                 public void onLogInError(final String errMsg) {
                     publishProgress(errMsg);
