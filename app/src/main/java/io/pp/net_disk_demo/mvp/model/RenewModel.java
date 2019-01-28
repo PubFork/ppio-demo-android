@@ -9,6 +9,8 @@ public interface RenewModel {
 
     String getFileName();
 
+    String getUIFileName();
+
     boolean isSecure();
 
     String getExpiredTime();

@@ -10,21 +10,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"
         android:layout_marginRight="50dp">
 
         <EditText
             android:id="@+id/copies_edittext"
             style="@style/get_edit_style"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="40dp"
             android:layout_centerVertical="true"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="0dp"
             android:layout_marginEnd="0dp"
             android:layout_toEndOf="@id/copies_tv"
             android:inputType="number|numberDecimal"
             android:labelFor="@+id/copies_edittext"
-            android:textCursorDrawable="@drawable/drawable_custom_edittext_cursor" />
+            android:textCursorDrawable="@drawable/drawable_custom_edittext_cursor"
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/copies_tv"
@@ -41,7 +43,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="21dp"
+        android:layout_marginTop="30dp"
         android:background="#DCDFE6" />
 
     <include

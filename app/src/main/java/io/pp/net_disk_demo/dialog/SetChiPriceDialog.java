@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -16,6 +17,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -73,6 +75,8 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
     private String mShareCodeStr;
     private long mTotalChi;
 
+    private DecimalFormat mDecimalFormat = null;
+
     public SetChiPriceDialog(Context context, String defaultChiPrice, OnSetChiPriceOnClickListener onSetChiPriceOnClickListener, OnDismissListener onDismissListener,
                              int totalChi, long fileSize) {
         super(context, R.style.MyDialog);
@@ -93,6 +97,8 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
         mType = DOWNLOAD;
 
         mHandler = new Handler();
+
+        mDecimalFormat = new DecimalFormat("0.000000000000000000");
     }
 
     public SetChiPriceDialog(Context context, String defaultChiPrice, OnSetChiPriceOnClickListener onSetChiPriceOnClickListener, OnDismissListener onDismissListener,
@@ -116,6 +122,8 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
         mType = DOWNLOAD_SHARE;
 
         mHandler = new Handler();
+
+        mDecimalFormat = new DecimalFormat("0.000000000000000000");
     }
 
     public SetChiPriceDialog(Context context, String defaultChiPrice, OnSetChiPriceOnClickListener onSetChiPriceOnClickListener, OnDismissListener onDismissListener,
@@ -140,6 +148,8 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
         mType = STORAGE;
 
         mHandler = new Handler();
+
+        mDecimalFormat = new DecimalFormat("0.000000000000000000");
     }
 
     @Override
@@ -185,8 +195,6 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
         mChiPriceEt.setText(mDefaultChiPrice);
         mChiPriceEt.setSelection(mChiPriceEt.getText().length());
 
-        DecimalFormat decimalFormat = new DecimalFormat("0.000000000000000000");
-
         TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -205,7 +213,7 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
                         long chiPrice = Long.parseLong(s.toString());
                         if (chiPrice > 0) {
                             double expectedCost = (double) (chiPrice * mTotalChi) / 1000000000000000000l;
-                            mExpectedCostTv.setText(decimalFormat.format(expectedCost));
+                            mExpectedCostTv.setText(mDecimalFormat.format(expectedCost));
                         } else {
                             mExpectedCostTv.setText("0");
                         }
@@ -289,7 +297,7 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
                     long chiPrice = Long.parseLong(mChiPriceEt.getText().toString());
                     if (chiPrice > 0) {
                         double expectedCost = (double) (chiPrice * mTotalChi) / 1000000000000000000l;
-                        mExpectedCostTv.setText(decimalFormat.format(expectedCost));
+                        mExpectedCostTv.setText(mDecimalFormat.format(expectedCost));
                     } else {
                         mExpectedCostTv.setText("0");
                     }
@@ -303,6 +311,13 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
                 mExpectedCostTv.setText("0");
             }
         }
+
+        setOnShowListener(new OnShowListener() {
+            public void onShow(DialogInterface dialog) {
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(mChiPriceEt, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
     }
 
     @Override
@@ -347,7 +362,8 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
                 if (mChiPriceEt.getText() != null && !TextUtils.isEmpty(mChiPriceEt.getText().toString())) {
                     int chiPrice = Integer.parseInt(mChiPriceEt.getText().toString());
 
-                    mExpectedCostTv.setText("" + (chiPrice * mTotalChi));
+                    double expectedCost = (double) (chiPrice * mTotalChi) / 1000000000000000000l;
+                    mExpectedCostTv.setText(mDecimalFormat.format(expectedCost));
                 } else {
                     mExpectedCostTv.setText("0");
                 }

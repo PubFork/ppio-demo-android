@@ -27,7 +27,8 @@
 
     <style name="get_edit_style">
         <item name="android:background">@drawable/background_custom_get_edit</item>
-        <item name="android:padding">5dp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
     </style>
 
     <style name="MyDialogNoShadow" parent="@android:style/Theme.Holo.Dialog">
@@ -89,7 +90,8 @@
         <item name="android:paddingBottom">12dp</item>
         <item name="android:textSize">16dp</item>
         <item name="android:textColor">#FFFFFF</item>
-        <item name="android:textCursorDrawable">@drawable/drawable_transparent_edittext_cursor</item>
+        <item name="android:textCursorDrawable">@drawable/drawable_transparent_edittext_cursor
+        </item>
     </style>
 
 </resources>

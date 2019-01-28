@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
@@ -94,6 +96,13 @@ public class VerifyPassPhraseDialog extends Dialog {
         });
 
         setOnDismissListener(mOnDismissListener);
+
+        setOnShowListener(new OnShowListener() {
+            public void onShow(DialogInterface dialog) {
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(mOriginalPassEdit, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
     }
 
     public void setMnemonic(String mnemonicStr) {

@@ -10,9 +10,10 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginLeft="24dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="30dp"
         android:layout_marginRight="24dp"
         android:gravity="left"
+        android:includeFontPadding="false"
         android:text="keystore passphrase"
         android:textColor="#303133"
         android:textSize="14dp" />
@@ -25,9 +26,10 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="24dp"
-        android:gravity="center"
+        android:gravity="left|center"
         android:inputType="textPassword"
-        android:textCursorDrawable="@drawable/drawable_custom_edittext_cursor" />
+        android:textCursorDrawable="@drawable/drawable_custom_edittext_cursor"
+        android:textSize="16dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -47,14 +49,15 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="24dp"
-        android:gravity="center"
+        android:gravity="left|center"
         android:inputType="textPassword"
-        android:textCursorDrawable="@drawable/drawable_custom_edittext_cursor" />
+        android:textCursorDrawable="@drawable/drawable_custom_edittext_cursor"
+        android:textSize="16dp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="21dp"
+        android:layout_marginTop="30dp"
         android:background="#DCDFE6" />
 
     <include

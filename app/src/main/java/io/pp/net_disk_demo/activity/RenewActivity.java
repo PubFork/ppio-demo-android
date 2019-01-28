@@ -469,7 +469,11 @@ public class RenewActivity extends BaseActivity implements RenewView {
             mOperationAction = mIntent.getAction();
             FileInfo mFileInfo = (FileInfo) mIntent.getSerializableExtra(Constant.Data.RENEW_FILE);
             if (mFileInfo != null) {
-                mFileNameTv.setText(mFileInfo.getName());
+                String fileName = mFileInfo.getName();
+                if (!TextUtils.isEmpty(fileName) && fileName.startsWith(Constant.Data.DEFAULT_BUCKET + "/")) {
+                    fileName.replaceFirst(Constant.Data.DEFAULT_BUCKET + "/", "");
+                }
+                mFileNameTv.setText(fileName);
             } else {
                 Log.e(TAG, "init() if (mFileInfo == null)");
             }

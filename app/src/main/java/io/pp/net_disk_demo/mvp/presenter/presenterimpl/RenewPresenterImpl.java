@@ -40,7 +40,7 @@ public class RenewPresenterImpl implements RenewPresenter {
     @Override
     public void showRenewSettings() {
         if (mRenewModel != null) {
-            showFileName(mRenewModel.getFileName());
+            showFileName(mRenewModel.getUIFileName());
             showSecure(mRenewModel.isSecure());
             showExpiredTime(mRenewModel.getExpiredTime());
             showCopies(mRenewModel.getCopies());

@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -111,6 +113,13 @@ public class SetCopiesDialog extends Dialog {
         });
 
         setOnDismissListener(mOnDismissListener);
+
+        setOnShowListener(new OnShowListener() {
+            public void onShow(DialogInterface dialog) {
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(mNameEditText, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
     }
 
     public interface OnSetCopiesOnClickListener {

@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
@@ -10,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.FileInfo;
 import io.pp.net_disk_demo.data.RenewInfo;
@@ -68,6 +70,16 @@ public class RenewModelImpl implements RenewModel {
     @Override
     public String getFileName() {
         return mRenewInfo.getFileName();
+    }
+
+    @Override
+    public String getUIFileName() {
+        String fileName = mRenewInfo.getFileName();
+        if (!TextUtils.isEmpty(fileName) && fileName.startsWith(Constant.Data.DEFAULT_BUCKET + "/")) {
+            fileName.replaceFirst(Constant.Data.DEFAULT_BUCKET + "/", "");
+        }
+
+        return fileName;
     }
 
     @Override
