@@ -13,7 +13,7 @@ public interface RenewModel {
 
     String getExpiredTime();
 
-    int getChunkCount();
+    long getFileSize();
 
     DateInfo getDateInfo();
 

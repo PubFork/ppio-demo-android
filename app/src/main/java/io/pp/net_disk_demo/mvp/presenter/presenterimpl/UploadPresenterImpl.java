@@ -124,7 +124,7 @@ public class UploadPresenterImpl implements UploadPresenter {
     @Override
     public void showSetChiPrice() {
         if (mUploadView != null && mUploadModel != null) {
-            mUploadView.showSetChiPrice(mUploadModel.getChiPrice(), mUploadModel.getChunkCount(), mUploadModel.getDateInfo(), mUploadModel.getCopies());
+            mUploadView.showSetChiPrice(mUploadModel.getChiPrice(), mUploadModel.getFileSize(), mUploadModel.getDateInfo(), mUploadModel.getCopies());
         }
     }
 

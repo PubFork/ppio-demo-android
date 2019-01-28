@@ -22,23 +22,23 @@ public class ProphecyPresenterImpl implements ProphecyPresenter {
     }
 
     @Override
-    public void requestStorageChi(int chunkSize, DateInfo expiredTime, String chiPrice) {
+    public void requestStorageChi(long fileSize, DateInfo expiredTime) {
         if (mProphecyModel != null) {
-            mProphecyModel.requestStorageChi(chunkSize, expiredTime, chiPrice);
+            mProphecyModel.requestStorageChi(fileSize, expiredTime);
         }
     }
 
     @Override
-    public void requestDownloadChi(long chunkSize, String chiPrice) {
+    public void requestDownloadChi(long fileSize) {
         if (mProphecyModel != null) {
-            mProphecyModel.requestDownloadChi(chunkSize, chiPrice);
+            mProphecyModel.requestDownloadChi(fileSize);
         }
     }
 
     @Override
-    public void requestDownloadShareChi(String shareCode, String chiPrice) {
+    public void requestDownloadShareChi(String shareCode) {
         if (mProphecyModel != null) {
-            mProphecyModel.requestDownloadShareChi(shareCode, chiPrice);
+            mProphecyModel.requestDownloadShareChi(shareCode);
         }
     }
 

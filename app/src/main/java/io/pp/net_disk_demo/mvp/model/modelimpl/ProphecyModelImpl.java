@@ -37,19 +37,19 @@ public class ProphecyModelImpl implements ProphecyModel {
     }
 
     @Override
-    public void requestStorageChi(int chunkSize, DateInfo dateInfo, String chiPrice) {
-        mRequestStorageChiPool.execute(new RequestStorageChiRunnable(ProphecyModelImpl.this, chunkSize, dateInfo, chiPrice));
+    public void requestStorageChi(long fileSize, DateInfo dateInfo) {
+        mRequestStorageChiPool.execute(new RequestStorageChiRunnable(ProphecyModelImpl.this, fileSize, dateInfo));
     }
 
     @Override
-    public void requestDownloadChi(long chunkSize, String chiPrice) {
-        mRequestDownloadChiPool.execute(new RequestDownloadChiRunnable(ProphecyModelImpl.this, chunkSize, chiPrice));
+    public void requestDownloadChi(long fileSize) {
+        mRequestDownloadChiPool.execute(new RequestDownloadChiRunnable(ProphecyModelImpl.this, fileSize));
     }
 
 
     @Override
-    public void requestDownloadShareChi(String shareCode, String chiPrice) {
-        mRequestDownloadShareChiPool.execute(new RequestDownloadShareChiRunnable(ProphecyModelImpl.this, shareCode, chiPrice));
+    public void requestDownloadShareChi(String shareCode) {
+        mRequestDownloadShareChiPool.execute(new RequestDownloadShareChiRunnable(ProphecyModelImpl.this, shareCode));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ProphecyModelImpl implements ProphecyModel {
         }
     }
 
-    private void showGetTotalChi(int totalChi, String chiPrice) {
+    private void showGetTotalChi(int totalChi) {
         if (mProphecyPresenter != null) {
             mProphecyPresenter.showGetTotalChi(totalChi);
         }
@@ -79,11 +79,10 @@ public class ProphecyModelImpl implements ProphecyModel {
     static class RequestStorageChiRunnable implements Runnable {
         final WeakReference<ProphecyModelImpl> mModelImplWeakReference;
 
-        private int mChunkSize;
+        private long mFileSize;
         private long mDuration;
-        private String mChiPrice;
 
-        public RequestStorageChiRunnable(ProphecyModelImpl prophecyInfoModelImpl, int chunkSize, DateInfo dateInfo, String chiPrice) {
+        public RequestStorageChiRunnable(ProphecyModelImpl prophecyInfoModelImpl, long fileSize, DateInfo dateInfo) {
             mModelImplWeakReference = new WeakReference<>(prophecyInfoModelImpl);
 
             Calendar calendar = Calendar.getInstance();
@@ -91,9 +90,8 @@ public class ProphecyModelImpl implements ProphecyModel {
             calendar.set(dateInfo.getYear(), dateInfo.getMonthOfYear(), dateInfo.getDayOfMonth(), 0, 0, 0);
             long expiredSeconds = calendar.getTimeInMillis() / 1000;
 
-            mChunkSize = chunkSize;
+            mFileSize = fileSize;
             mDuration = expiredSeconds - currentSeconds;
-            mChiPrice = chiPrice;
         }
 
         @Override
@@ -102,18 +100,52 @@ public class ProphecyModelImpl implements ProphecyModel {
                 mModelImplWeakReference.get().showInRequestTotalChi();
             }
 
-            int totalChi = RpcUtil.getStorageChi(mChunkSize, mDuration, mChiPrice, new RpcUtil.QueryAccountListener() {
-                @Override
-                public void onQueryAccountError(String errMsg) {
-                    Log.e(TAG, "getStorageChi error : " + errMsg);
-                    if (mModelImplWeakReference.get() != null) {
-                        mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+            final int chunkCount = (int) ((double) mFileSize / 1024 / 1024 / 16);
+            if (chunkCount > 1) {
+                final long chunkSize1 = 1024 * 1024 * 16;
+                final long chunkSize2 = mFileSize - chunkSize1 * (chunkCount - 1);
+
+                int chunkChi1 = RpcUtil.getStorageChi(chunkSize1, mDuration, new RpcUtil.QueryAccountListener() {
+                    @Override
+                    public void onQueryAccountError(String errMsg) {
+                        Log.e(TAG, "getStorageChi error : " + errMsg);
+                        if (mModelImplWeakReference.get() != null) {
+                            mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                        }
+                    }
+                });
+
+                if (chunkChi1 > 0) {
+                    int chunkChi2 = RpcUtil.getStorageChi(chunkSize2, mDuration, new RpcUtil.QueryAccountListener() {
+                        @Override
+                        public void onQueryAccountError(String errMsg) {
+                            Log.e(TAG, "getStorageChi error : " + errMsg);
+                            if (mModelImplWeakReference.get() != null) {
+                                mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                            }
+                        }
+                    });
+
+                    int totalChi = chunkChi1 * (chunkCount - 1) + chunkChi2;
+
+                    if (totalChi > 0 && mModelImplWeakReference.get() != null) {
+                        mModelImplWeakReference.get().showGetTotalChi(totalChi);
                     }
                 }
-            });
+            } else {
+                int totalChi = RpcUtil.getStorageChi(mFileSize, mDuration, new RpcUtil.QueryAccountListener() {
+                    @Override
+                    public void onQueryAccountError(String errMsg) {
+                        Log.e(TAG, "getStorageChi error : " + errMsg);
+                        if (mModelImplWeakReference.get() != null) {
+                            mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                        }
+                    }
+                });
 
-            if (totalChi > 0 && mModelImplWeakReference.get() != null) {
-                mModelImplWeakReference.get().showGetTotalChi(totalChi, mChiPrice);
+                if (totalChi > 0 && mModelImplWeakReference.get() != null) {
+                    mModelImplWeakReference.get().showGetTotalChi(totalChi);
+                }
             }
         }
     }
@@ -121,14 +153,12 @@ public class ProphecyModelImpl implements ProphecyModel {
     static class RequestDownloadChiRunnable implements Runnable {
         final WeakReference<ProphecyModelImpl> mModelImplWeakReference;
 
-        private long mChunkSize;
-        private String mChiPrice;
+        private long mFileSize;
 
-        public RequestDownloadChiRunnable(ProphecyModelImpl prophecyInfoModelImpl, long chunkSize, String chiPrice) {
+        public RequestDownloadChiRunnable(ProphecyModelImpl prophecyInfoModelImpl, long fileSize) {
             mModelImplWeakReference = new WeakReference<>(prophecyInfoModelImpl);
 
-            mChunkSize = chunkSize;
-            mChiPrice = chiPrice;
+            mFileSize = fileSize;
         }
 
         @Override
@@ -137,18 +167,53 @@ public class ProphecyModelImpl implements ProphecyModel {
                 mModelImplWeakReference.get().showInRequestTotalChi();
             }
 
-            int totalChi = RpcUtil.getDownloadChi(mChunkSize, mChiPrice, new RpcUtil.QueryAccountListener() {
-                @Override
-                public void onQueryAccountError(String errMsg) {
-                    Log.e(TAG, "getDownloadChi error : " + errMsg);
-                    if (mModelImplWeakReference.get() != null) {
-                        mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+            final int chunkCount = (int) ((double) mFileSize / 1024 / 1024 / 16);
+            Log.e(TAG, "chunkCount = " + chunkCount);
+            if (chunkCount > 1) {
+                final long chunkSize1 = 1024 * 1024 * 16;
+                final long chunkSize2 = mFileSize - chunkSize1 * (chunkCount - 1);
+
+                int chunkChi1 = RpcUtil.getDownloadChi(chunkSize1, new RpcUtil.QueryAccountListener() {
+                    @Override
+                    public void onQueryAccountError(String errMsg) {
+                        Log.e(TAG, "getStorageChi error : " + errMsg);
+                        if (mModelImplWeakReference.get() != null) {
+                            mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                        }
+                    }
+                });
+
+                if (chunkChi1 > 0) {
+                    int chunkChi2 = RpcUtil.getDownloadChi(chunkSize2, new RpcUtil.QueryAccountListener() {
+                        @Override
+                        public void onQueryAccountError(String errMsg) {
+                            Log.e(TAG, "getStorageChi error : " + errMsg);
+                            if (mModelImplWeakReference.get() != null) {
+                                mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                            }
+                        }
+                    });
+
+                    int totalChi = chunkChi1 * (chunkCount - 1) + chunkChi2;
+
+                    if (totalChi > 0 && mModelImplWeakReference.get() != null) {
+                        mModelImplWeakReference.get().showGetTotalChi(totalChi);
                     }
                 }
-            });
+            } else {
+                int totalChi = RpcUtil.getDownloadChi(mFileSize, new RpcUtil.QueryAccountListener() {
+                    @Override
+                    public void onQueryAccountError(String errMsg) {
+                        Log.e(TAG, "getStorageChi error : " + errMsg);
+                        if (mModelImplWeakReference.get() != null) {
+                            mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                        }
+                    }
+                });
 
-            if (totalChi > 0 && mModelImplWeakReference.get() != null) {
-                mModelImplWeakReference.get().showGetTotalChi(totalChi, mChiPrice);
+                if (totalChi > 0 && mModelImplWeakReference.get() != null) {
+                    mModelImplWeakReference.get().showGetTotalChi(totalChi);
+                }
             }
         }
     }
@@ -157,13 +222,11 @@ public class ProphecyModelImpl implements ProphecyModel {
         final WeakReference<ProphecyModelImpl> mModelImplWeakReference;
 
         private String mShareCode;
-        private String mChiPrice;
 
-        public RequestDownloadShareChiRunnable(ProphecyModelImpl prophecyInfoModelImpl, String shareCode, String chiPrice) {
+        public RequestDownloadShareChiRunnable(ProphecyModelImpl prophecyInfoModelImpl, String shareCode) {
             mModelImplWeakReference = new WeakReference<>(prophecyInfoModelImpl);
 
             mShareCode = shareCode;
-            mChiPrice = chiPrice;
         }
 
         @Override
@@ -183,21 +246,54 @@ public class ProphecyModelImpl implements ProphecyModel {
                 JSONObject jsonObject = new JSONObject(jsonStr);
                 fileSize = jsonObject.getLong("length");
 
-                int totalChi = RpcUtil.getDownloadChi(fileSize, mChiPrice, new RpcUtil.QueryAccountListener() {
-                    @Override
-                    public void onQueryAccountError(String errMsg) {
-                        Log.e(TAG, "getDownloadChi error : " + errMsg);
-                        if (mModelImplWeakReference.get() != null) {
-                            mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                final int chunkCount = (int) ((double) fileSize / 1024 / 1024 / 16);
+                if (chunkCount > 1) {
+                    final long chunkSize1 = 1024 * 1024 * 16;
+                    final long chunkSize2 = fileSize - chunkSize1 * (chunkCount - 1);
+
+                    int chunkChi1 = RpcUtil.getDownloadChi(chunkSize1, new RpcUtil.QueryAccountListener() {
+                        @Override
+                        public void onQueryAccountError(String errMsg) {
+                            Log.e(TAG, "getStorageChi error : " + errMsg);
+                            if (mModelImplWeakReference.get() != null) {
+                                mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                            }
+                        }
+                    });
+
+                    if (chunkChi1 > 0) {
+                        int chunkChi2 = RpcUtil.getDownloadChi(chunkSize2, new RpcUtil.QueryAccountListener() {
+                            @Override
+                            public void onQueryAccountError(String errMsg) {
+                                Log.e(TAG, "getStorageChi error : " + errMsg);
+                                if (mModelImplWeakReference.get() != null) {
+                                    mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                                }
+                            }
+                        });
+
+                        int totalChi = chunkChi1 * (chunkCount - 1) + chunkChi2;
+
+                        if (totalChi > 0 && mModelImplWeakReference.get() != null) {
+                            mModelImplWeakReference.get().showGetTotalChi(totalChi);
                         }
                     }
-                });
+                } else {
+                    int totalChi = RpcUtil.getDownloadChi(fileSize, new RpcUtil.QueryAccountListener() {
+                        @Override
+                        public void onQueryAccountError(String errMsg) {
+                            Log.e(TAG, "getStorageChi error : " + errMsg);
+                            if (mModelImplWeakReference.get() != null) {
+                                mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                            }
+                        }
+                    });
 
-                if (totalChi > 0 && mModelImplWeakReference.get() != null) {
-                    mModelImplWeakReference.get().showGetTotalChi(totalChi, mChiPrice);
+                    if (totalChi > 0 && mModelImplWeakReference.get() != null) {
+                        mModelImplWeakReference.get().showGetTotalChi(totalChi);
+                    }
                 }
-            } catch (JSONException e) {
-                Log.e(TAG, "" + e.getMessage());
+            } catch (Exception e) {
                 e.printStackTrace();
 
                 if (mModelImplWeakReference.get() != null) {

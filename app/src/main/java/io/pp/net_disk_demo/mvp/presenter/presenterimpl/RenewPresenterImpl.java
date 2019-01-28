@@ -102,7 +102,7 @@ public class RenewPresenterImpl implements RenewPresenter {
     @Override
     public void showSetChiPrice() {
         if (mRenewView != null && mRenewModel != null) {
-            mRenewView.showSetChiPrice(mRenewModel.getChiPrice(), mRenewModel.getChunkCount(), mRenewModel.getDateInfo(), mRenewModel.getCopies());
+            mRenewView.showSetChiPrice(mRenewModel.getChiPrice(), mRenewModel.getFileSize(), mRenewModel.getDateInfo(), mRenewModel.getCopies());
         }
     }
 

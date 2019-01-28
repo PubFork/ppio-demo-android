@@ -20,7 +20,7 @@ public interface UploadView {
 
     void showSetCopies(int defaultCopies);
 
-    void showSetChiPrice(String defaultChiPrice, int chunkCount, DateInfo expiredTime, int copies);
+    void showSetChiPrice(String defaultChiPrice, long fileSize, DateInfo expiredTime, int copies);
 
 
     void showRequestingUploadView();

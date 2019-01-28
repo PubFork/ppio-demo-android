@@ -136,17 +136,16 @@ public class RpcUtil {
         }
     }
 
-    public static int getStorageChi(int chunkSize, long duration, String chiPrice, QueryAccountListener queryAccountListener) {
+    public static int getStorageChi(long chunkSize, long duration, QueryAccountListener queryAccountListener) {
         //> curl -X POST -H 'content-type:text/json;' --data '{"id":1,"jsonrpc":"2.0","method":"StorageChi","params":[{"chunkSize":1024,"duration":120,"chiPrice":"100"}]}' http://127.0.0.1:18030/rpc
         initClient();
 
-        Log.e(TAG, "chunkSize = " + chunkSize + ", duration = " + duration + ", chiPrice = " + chiPrice);
+        Log.e(TAG, "chunkSize = " + chunkSize + ", duration = " + duration);
 
         try {
             JSONObject requestJSONObject = new JSONObject();
             requestJSONObject.put("chunkSize", chunkSize);
             requestJSONObject.put("duration", duration);
-            requestJSONObject.put("chiPrice", chiPrice);
 
             Log.e(TAG, "putObjectFunds start...");
             String putObjectFundsResultStr = mRpcClient.callString("storageChi", new JSONObject[]{
@@ -175,14 +174,13 @@ public class RpcUtil {
         }
     }
 
-    public static int getDownloadChi(long chunkSize, String chiPrice, QueryAccountListener queryAccountListener) {
+    public static int getDownloadChi(long chunkSize, QueryAccountListener queryAccountListener) {
         //> curl -X POST -H 'content-type:text/json;' --data '{"id":1,"jsonrpc":"2.0","method":"DownloadChi","params":[{"chunkSize":1024,"chiPrice":"100"}]}' http://127.0.0.1:18030/rpc
         initClient();
 
         try {
             JSONObject requestJSONObject = new JSONObject();
             requestJSONObject.put("chunkSize", chunkSize);
-            requestJSONObject.put("chiPrice", chiPrice);
 
             Log.e(TAG, "getObjectFunds start...");
             String putObjectFundsResultStr = mRpcClient.callString("downloadChi", new JSONObject[]{

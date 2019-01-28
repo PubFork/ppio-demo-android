@@ -18,7 +18,7 @@ public interface UploadModel {
 
     String getExpiredTime();
 
-    int getChunkCount();
+    int getFileSize();
 
     DateInfo getDateInfo();
 

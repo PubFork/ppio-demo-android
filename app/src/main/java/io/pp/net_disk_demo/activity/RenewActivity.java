@@ -218,7 +218,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
     }
 
     @Override
-    public void showSetChiPrice(String defaultChiPrice, int chunkCount, DateInfo expiredTime, int copies) {
+    public void showSetChiPrice(String defaultChiPrice, long fileSize, DateInfo expiredTime, int copies) {
         mSetChiPriceDialog = new SetChiPriceDialog(RenewActivity.this, defaultChiPrice,
                 new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
                     @Override
@@ -240,7 +240,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
                     public void onDismiss(DialogInterface dialog) {
                         mSetChiPriceDialog = null;
                     }
-                }, mTotalChi, chunkCount, expiredTime, copies);
+                }, mTotalChi, fileSize, expiredTime, copies);
 
         mSetChiPriceDialog.show();
     }

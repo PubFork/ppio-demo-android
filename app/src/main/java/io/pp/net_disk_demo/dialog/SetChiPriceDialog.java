@@ -66,7 +66,6 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
 
     private int mType;
 
-    private int mChunkCount;
     private DateInfo mExpiredDateInfo;
 
     private long mFileSize;
@@ -120,7 +119,7 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
     }
 
     public SetChiPriceDialog(Context context, String defaultChiPrice, OnSetChiPriceOnClickListener onSetChiPriceOnClickListener, OnDismissListener onDismissListener,
-                             long totalChi, int chunkCount, DateInfo expiredDateInfo, int copies) {
+                             long totalChi, long fileSize, DateInfo expiredDateInfo, int copies) {
         super(context, R.style.MyDialog);
 
         this.mContext = context;
@@ -134,7 +133,7 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
 
         mTotalChi = totalChi;
 
-        mChunkCount = chunkCount;
+        mFileSize = fileSize;
         mExpiredDateInfo = expiredDateInfo;
         mCopies = copies;
 
@@ -270,13 +269,13 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
             if (mProphecyPresenter != null) {
                 switch (mType) {
                     case STORAGE:
-                        mProphecyPresenter.requestStorageChi(mChunkCount, mExpiredDateInfo, "100");
+                        mProphecyPresenter.requestStorageChi(mFileSize, mExpiredDateInfo);
                         break;
                     case DOWNLOAD:
-                        mProphecyPresenter.requestDownloadChi(mFileSize, "100");
+                        mProphecyPresenter.requestDownloadChi(mFileSize);
                         break;
                     case DOWNLOAD_SHARE:
-                        mProphecyPresenter.requestDownloadShareChi(mShareCodeStr, "100");
+                        mProphecyPresenter.requestDownloadShareChi(mShareCodeStr);
                         break;
                 }
             }

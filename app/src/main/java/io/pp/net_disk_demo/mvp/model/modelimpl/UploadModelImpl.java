@@ -24,7 +24,7 @@ public class UploadModelImpl implements UploadModel,
     private UploadInfo mUploadInfo;
     private DateInfo mDateInfo;
 
-    private int mChunkCount;
+    private long mFileSize;
 
     private UploadPresenter mUploadPresenter;
 
@@ -58,11 +58,14 @@ public class UploadModelImpl implements UploadModel,
         mUploadInfo.setFileName(file.getName());
         mUploadInfo.setFile(filePath);
 
-        mChunkCount = (int) Math.ceil(((double) file.getUsableSpace()) / 1024 / 1024 / 16);
+        mFileSize = file.length();
 
         Calendar calendar = Calendar.getInstance();
         //default expired date is a month later
         calendar.add(Calendar.MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
         mDateInfo = new DateInfo(calendar.get(Calendar.YEAR)
                 , calendar.get(Calendar.MONTH)
                 , calendar.get(Calendar.DAY_OF_MONTH));
@@ -105,7 +108,7 @@ public class UploadModelImpl implements UploadModel,
     }
 
     @Override
-    public int getChunkCount() {
+    public int getFileSize() {
         return 0;
     }
 
@@ -166,7 +169,7 @@ public class UploadModelImpl implements UploadModel,
 
     @Override
     public void requestStorageChi() {
-        mRequestStorageChiPool.execute(new RequestStorageChiRunnable(UploadModelImpl.this, mChunkCount, mDateInfo, "100"));
+        mRequestStorageChiPool.execute(new RequestStorageChiRunnable(UploadModelImpl.this, mFileSize, mDateInfo, "100"));
     }
 
     @Override
@@ -218,19 +221,20 @@ public class UploadModelImpl implements UploadModel,
     static class RequestStorageChiRunnable implements Runnable {
         final WeakReference<UploadModelImpl> mModelImplWeakReference;
 
-        private int mChunkSize;
+        private long mFileSize;
         private long mDuration;
         private String mChiPrice;
 
-        public RequestStorageChiRunnable(UploadModelImpl prophecyInfoModelImpl, int chunkSize, DateInfo dateInfo, String chiPrice) {
+        public RequestStorageChiRunnable(UploadModelImpl prophecyInfoModelImpl, long fileSize, DateInfo dateInfo, String chiPrice) {
             mModelImplWeakReference = new WeakReference<>(prophecyInfoModelImpl);
 
             Calendar calendar = Calendar.getInstance();
             long currentSeconds = calendar.getTimeInMillis() / 1000;
-            calendar.set(dateInfo.getYear(), dateInfo.getMonthOfYear(), dateInfo.getDayOfMonth(), 0, 0, 0);
+            calendar.set(dateInfo.getYear(), dateInfo.getMonthOfYear(), dateInfo.getDayOfMonth(), 8, 0, 0);
+
             long expiredSeconds = calendar.getTimeInMillis() / 1000;
 
-            mChunkSize = chunkSize;
+            mFileSize = fileSize;
             mDuration = expiredSeconds - currentSeconds;
             mChiPrice = chiPrice;
         }
@@ -241,18 +245,52 @@ public class UploadModelImpl implements UploadModel,
                 mModelImplWeakReference.get().showInRequestTotalChi();
             }
 
-            int totalChi = RpcUtil.getStorageChi(mChunkSize, mDuration, mChiPrice, new RpcUtil.QueryAccountListener() {
-                @Override
-                public void onQueryAccountError(String errMsg) {
-                    Log.e(TAG, "getStorageChi error : " + errMsg);
-                    if (mModelImplWeakReference.get() != null) {
-                        mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+            final int chunkCount = (int) ((double) mFileSize / 1024 / 1024 / 16);
+            if (chunkCount > 1) {
+                final long chunkSize1 = 1024 * 1024 * 16;
+                final long chunkSize2 = mFileSize - chunkSize1 * (chunkCount - 1);
+
+                int chunkChi1 = RpcUtil.getStorageChi(chunkSize1, mDuration, new RpcUtil.QueryAccountListener() {
+                    @Override
+                    public void onQueryAccountError(String errMsg) {
+                        Log.e(TAG, "getStorageChi error : " + errMsg);
+                        if (mModelImplWeakReference.get() != null) {
+                            mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                        }
+                    }
+                });
+
+                if (chunkChi1 > 0) {
+                    int chunkChi2 = RpcUtil.getStorageChi(chunkSize2, mDuration, new RpcUtil.QueryAccountListener() {
+                        @Override
+                        public void onQueryAccountError(String errMsg) {
+                            Log.e(TAG, "getStorageChi error : " + errMsg);
+                            if (mModelImplWeakReference.get() != null) {
+                                mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                            }
+                        }
+                    });
+
+                    int totalChi = chunkChi1 * (chunkCount - 1) + chunkChi2;
+
+                    if (totalChi > 0 && mModelImplWeakReference.get() != null) {
+                        mModelImplWeakReference.get().showGetTotalChi(totalChi, mChiPrice);
                     }
                 }
-            });
+            } else {
+                int totalChi = RpcUtil.getStorageChi(mFileSize, mDuration, new RpcUtil.QueryAccountListener() {
+                    @Override
+                    public void onQueryAccountError(String errMsg) {
+                        Log.e(TAG, "getStorageChi error : " + errMsg);
+                        if (mModelImplWeakReference.get() != null) {
+                            mModelImplWeakReference.get().showGetTotalChiFailed(errMsg);
+                        }
+                    }
+                });
 
-            if (totalChi > 0 && mModelImplWeakReference.get() != null) {
-                mModelImplWeakReference.get().showGetTotalChi(totalChi, mChiPrice);
+                if (totalChi > 0 && mModelImplWeakReference.get() != null) {
+                    mModelImplWeakReference.get().showGetTotalChi(totalChi, mChiPrice);
+                }
             }
         }
     }
