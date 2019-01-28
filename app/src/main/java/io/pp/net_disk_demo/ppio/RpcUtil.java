@@ -1,6 +1,5 @@
 package io.pp.net_disk_demo.ppio;
 
-import android.os.SystemClock;
 import android.util.Log;
 
 import org.alexd.jsonrpc.JSONRPCHttpClient;
@@ -21,6 +20,11 @@ public class RpcUtil {
     private static final String TAG = "RpcUtil";
     //private static final String mRpcUrlStr = "http://ad04b30b910c311e9b71c02d26ce9aff-567092461.us-west-2.elb.amazonaws.com:18030/rpc";
     private static final String mRpcUrlStr = Constant.URL.RPC_URL;
+    private static JSONRPCHttpClient mBalanceRpcClient;
+    private static JSONRPCHttpClient mFundRpcClient;
+    private static JSONRPCHttpClient mOraclepcClient;
+    private static JSONRPCHttpClient mStorageRpcClient;
+    private static JSONRPCHttpClient mDownloadRpcClient;
     private static JSONRPCHttpClient mRpcClient;
 
     public static boolean peerAvailable() {
@@ -67,17 +71,17 @@ public class RpcUtil {
     }
 
     public static String getBalance(QueryAccountListener queryAccountListener) {
-        initClient();
+        mBalanceRpcClient = new JSONRPCHttpClient(mRpcUrlStr);
+        mBalanceRpcClient.setDebug(true);
 
         String queryAccountResultStr;
         String balanceStr = "";
 
         try {
             Log.e(TAG, "address = " + PossUtil.getAccount());
-            queryAccountResultStr = mRpcClient.callString("queryAccount", PossUtil.getAccount());
+            queryAccountResultStr = mBalanceRpcClient.callString("queryAccount", PossUtil.getAccount());
             JSONObject queryAccountJSONObject = new JSONObject(queryAccountResultStr);
             balanceStr = queryAccountJSONObject.getString("Balance");
-
         } catch (Exception e) {
             if (queryAccountListener != null) {
                 queryAccountListener.onQueryAccountError(e.getMessage());
@@ -86,18 +90,21 @@ public class RpcUtil {
             e.printStackTrace();
         }
 
+        mBalanceRpcClient = null;
+
         return balanceStr;
     }
 
     public static String getFund(QueryAccountListener queryAccountListener) {
-        initClient();
+        mFundRpcClient = new JSONRPCHttpClient(mRpcUrlStr);
+        mFundRpcClient.setDebug(true);
 
         String queryAccountResultStr;
         String fundStr = "";
 
         try {
             Log.e(TAG, "queryAccount() start...");
-            queryAccountResultStr = mRpcClient.callString("queryAccount", PossUtil.getAccount());
+            queryAccountResultStr = mFundRpcClient.callString("queryAccount", PossUtil.getAccount());
             Log.e(TAG, "queryAccount() end...");
             Log.e(TAG, "queryAccount() " + queryAccountResultStr);
             JSONObject queryAccountJSONObject = new JSONObject(queryAccountResultStr);
@@ -110,17 +117,22 @@ public class RpcUtil {
             e.printStackTrace();
         }
 
+        mFundRpcClient = null;
+
         return fundStr;
     }
 
     public static OracleChiPrice oracleChiPrice(QueryAccountListener queryAccountListener) {
-        initClient();
+        mOraclepcClient = new JSONRPCHttpClient(mRpcUrlStr);
+        mOraclepcClient.setDebug(true);
 
         try {
             Log.e(TAG, "oracleChiPrice() start...");
-            String oracleChiPriceResultStr = mRpcClient.callString("oracleChiPrice");
+            String oracleChiPriceResultStr = mOraclepcClient.callString("oracleChiPrice");
             Log.e(TAG, "oracleChiPrice() end...");
             Log.e(TAG, "oracleChiPrice() " + oracleChiPriceResultStr);
+
+            mOraclepcClient = null;
 
             JSONObject oracleChiPriceJSONObject = new JSONObject(oracleChiPriceResultStr);
             return new OracleChiPrice(oracleChiPriceJSONObject.getString("StorageChiPrice"),
@@ -132,13 +144,16 @@ public class RpcUtil {
             Log.e(TAG, "oracleChiPrice() err = " + e.getMessage());
             e.printStackTrace();
 
+            mOraclepcClient = null;
+
             return null;
         }
     }
 
     public static int getStorageChi(long chunkSize, long duration, QueryAccountListener queryAccountListener) {
         //> curl -X POST -H 'content-type:text/json;' --data '{"id":1,"jsonrpc":"2.0","method":"StorageChi","params":[{"chunkSize":1024,"duration":120,"chiPrice":"100"}]}' http://127.0.0.1:18030/rpc
-        initClient();
+        mStorageRpcClient = new JSONRPCHttpClient(mRpcUrlStr);
+        mStorageRpcClient.setDebug(true);
 
         Log.e(TAG, "chunkSize = " + chunkSize + ", duration = " + duration);
 
@@ -148,11 +163,13 @@ public class RpcUtil {
             requestJSONObject.put("duration", duration);
 
             Log.e(TAG, "putObjectFunds start...");
-            String putObjectFundsResultStr = mRpcClient.callString("storageChi", new JSONObject[]{
+            String putObjectFundsResultStr = mStorageRpcClient.callString("storageChi", new JSONObject[]{
                     requestJSONObject
             });
             Log.e(TAG, "putObjectFunds end...");
             Log.e(TAG, "putObjectFunds " + putObjectFundsResultStr);
+
+            mStorageRpcClient = null;
 
             //{"StorageFundsChi":"24","ServiceChi":"10"}
 
@@ -163,6 +180,8 @@ public class RpcUtil {
 
             return (storageFundsChi + serviceFundsChi);
         } catch (Exception e) {
+            mStorageRpcClient = null;
+
             if (queryAccountListener != null) {
                 queryAccountListener.onQueryAccountError(e.getMessage());
             }
@@ -176,18 +195,21 @@ public class RpcUtil {
 
     public static int getDownloadChi(long chunkSize, QueryAccountListener queryAccountListener) {
         //> curl -X POST -H 'content-type:text/json;' --data '{"id":1,"jsonrpc":"2.0","method":"DownloadChi","params":[{"chunkSize":1024,"chiPrice":"100"}]}' http://127.0.0.1:18030/rpc
-        initClient();
+        mDownloadRpcClient = new JSONRPCHttpClient(mRpcUrlStr);
+        mDownloadRpcClient.setDebug(true);
 
         try {
             JSONObject requestJSONObject = new JSONObject();
             requestJSONObject.put("chunkSize", chunkSize);
 
             Log.e(TAG, "getObjectFunds start...");
-            String putObjectFundsResultStr = mRpcClient.callString("downloadChi", new JSONObject[]{
+            String putObjectFundsResultStr = mDownloadRpcClient.callString("downloadChi", new JSONObject[]{
                     requestJSONObject
             });
             Log.e(TAG, "getObjectFunds end...");
             Log.e(TAG, "getObjectFunds " + putObjectFundsResultStr);
+
+            mDownloadRpcClient = null;
 
             //{"DownloadFundsChi":"10","ServiceChi":"10"}
 
@@ -198,6 +220,8 @@ public class RpcUtil {
 
             return (downloadFundsChi + serviceFundsChi);
         } catch (Exception e) {
+            mDownloadRpcClient = null;
+
             if (queryAccountListener != null) {
                 queryAccountListener.onQueryAccountError(e.getMessage());
             }
