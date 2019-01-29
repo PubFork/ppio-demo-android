@@ -79,7 +79,7 @@ public class InputPassPhraseModelImpl implements InputPassPhraseModel {
 
         @Override
         protected Boolean doInBackground(String... params) {
-            final String keyStoreStr = KeyStoreUtil.autoLogInByKeyStore(mLogInModelImplWeakReference.get().getContext());
+            final String keyStoreStr = KeyStoreUtil.getPrivateKeyStore(mLogInModelImplWeakReference.get().getContext());
             final String passPhrase = params[0];
 
             final String address = KeyStoreUtil.checkKeyStoreAndPassPhrase(keyStoreStr, passPhrase);

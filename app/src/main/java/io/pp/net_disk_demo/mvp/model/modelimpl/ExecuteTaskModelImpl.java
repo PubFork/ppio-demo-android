@@ -1,7 +1,9 @@
 package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
+import android.os.AsyncTask;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import io.pp.net_disk_demo.data.DownloadInfo;
@@ -22,9 +24,13 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     private ExecuteTaskPresenter mExecuteTasksPresenter;
     private ExecuteTaskService mExecuteTasksService;
 
+    private ArrayList<String> mTaskIdList = null;
+
     public ExecuteTaskModelImpl(Context context, ExecuteTaskPresenter executeTasksPresenter) {
         mContext = context;
         mExecuteTasksPresenter = executeTasksPresenter;
+
+        mTaskIdList = new ArrayList<>();
     }
 
     @Override
@@ -164,5 +170,68 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         mContext = null;
         mExecuteTasksPresenter = null;
         mExecuteTasksService = null;
+    }
+
+    private ArrayList<String> getTaskIdList() {
+        return mTaskIdList;
+    }
+
+    static class ShowTaskAsyncTask extends AsyncTask<String, String, Boolean> {
+
+        final WeakReference<ExecuteTaskModelImpl> mExecuteTaskModelWeakReference;
+
+        private ArrayList<TaskInfo> mUploadTaskList = null;
+        private ArrayList<TaskInfo> mDownloadTaskList = null;
+
+        public ShowTaskAsyncTask(ExecuteTaskModelImpl deleteModelImpl) {
+            mExecuteTaskModelWeakReference = new WeakReference<>(deleteModelImpl);
+            mUploadTaskList = new ArrayList<>();
+            mDownloadTaskList = new ArrayList<>();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            if (mExecuteTaskModelWeakReference.get() != null) {
+                // mExecuteTaskModelWeakReference.get().showDeletePrepare();
+            }
+        }
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            if (mExecuteTaskModelWeakReference.get() != null) {
+                ArrayList<String> taskList = mExecuteTaskModelWeakReference.get().getTaskIdList();
+
+                if (taskList == null || taskList.size() == 0) {
+                    return false;
+                }
+
+                for (int i = 0; i < taskList.size(); i++) {
+
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+
+            if (mExecuteTaskModelWeakReference.get() != null) {
+                mExecuteTaskModelWeakReference.get().showListTaskError(values[0]);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean value) {
+            super.onPostExecute(value);
+
+            if (mExecuteTaskModelWeakReference.get() != null) {
+                mExecuteTaskModelWeakReference.get().showUploadingTaskList(mUploadTaskList);
+                mExecuteTaskModelWeakReference.get().showDownloadingTaskList(mDownloadTaskList);
+            }
+        }
     }
 }

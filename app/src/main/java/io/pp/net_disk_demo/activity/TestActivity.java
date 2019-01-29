@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -48,7 +49,9 @@ public class TestActivity extends BaseActivity {
     private TextView mPassPhraseTv = null;
     private TextView mPrivateKeyTv = null;
     private TextView mAddressTv = null;
+    private LinearLayout mKeyStoreFileLayout = null;
     private TextView mKeyStoreFileTv = null;
+    private LinearLayout mKeyStoreQRCodeLayout = null;
     private ImageView mKeyStoreCodeIv = null;
 
     private Button mExportNewKeyStoreBtn = null;
@@ -110,133 +113,143 @@ public class TestActivity extends BaseActivity {
 
         mExportNewKeyStoreBtn = findViewById(R.id.export_keystore_btn);
         mExportNewKeyStoreCodeBtn = findViewById(R.id.export_keystore_code_btn);
+        mKeyStoreFileLayout = findViewById(R.id.keystore_file_layout);
         mKeyStoreFileTv = findViewById(R.id.keystore_file_tv);
+        mKeyStoreQRCodeLayout = findViewById(R.id.keystore_qrcode_layout);
         mKeyStoreCodeIv = findViewById(R.id.keystore_code_iv);
 
         mExportNewKeyStoreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideVerifyPassPhraseDialog();
+                showProgressDialog();
 
-                mVerifyPassPhraseDialog = new VerifyPassPhraseDialog(TestActivity.this,
-                        new VerifyPassPhraseDialog.OnVerifyPassPhraseClickListener() {
-                            @Override
-                            public void onCancel() {
-                                mVerifyPassPhraseDialog.dismiss();
-                            }
-
-                            @Override
-                            public void onVerify(final String passPhrase) {
-                                mVerifyPassPhraseDialog.dismiss();
-
-                                showProgressDialog();
-
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        String filePath = KeyStoreUtil.exportKeyStoreFile(TestActivity.this, PossUtil.getPasswordStr(), passPhrase);
-
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (!TextUtils.isEmpty(filePath)) {
-                                                    mKeyStoreFileTv.setText(filePath);
-                                                    ToastUtil.showToast(TestActivity.this, "exported a new keystore file!", Toast.LENGTH_SHORT);
-                                                } else {
-                                                    ToastUtil.showToast(TestActivity.this, "export keystore file failed!", Toast.LENGTH_SHORT);
-                                                }
-                                            }
-                                        });
-
-                                    }
-                                }).start();
-
-                                hideProgressDialog();
-                            }
-                        }, new DialogInterface.OnDismissListener() {
+                new Thread(new Runnable() {
                     @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        mVerifyPassPhraseDialog = null;
-                    }
-                });
+                    public void run() {
+                        String filePath = KeyStoreUtil.exportKeyStoreFile(TestActivity.this, PossUtil.getPasswordStr(), PossUtil.getPasswordStr());
 
-                mVerifyPassPhraseDialog.show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                hideProgressDialog();
+
+                                if (!TextUtils.isEmpty(filePath)) {
+                                    mKeyStoreFileLayout.setVisibility(View.VISIBLE);
+
+                                    mKeyStoreFileTv.setText(filePath);
+                                    ToastUtil.showToast(TestActivity.this, "exported a new keystore file!", Toast.LENGTH_SHORT);
+                                } else {
+                                    ToastUtil.showToast(TestActivity.this, "export keystore file failed!", Toast.LENGTH_SHORT);
+                                }
+                            }
+                        });
+
+                    }
+                }).start();
+
+
+//                hideVerifyPassPhraseDialog();
+
+//                mVerifyPassPhraseDialog = new VerifyPassPhraseDialog(TestActivity.this,
+//                        new VerifyPassPhraseDialog.OnVerifyPassPhraseClickListener() {
+//                            @Override
+//                            public void onCancel() {
+//                                mVerifyPassPhraseDialog.dismiss();
+//                            }
+//
+//                            @Override
+//                            public void onVerify(final String passPhrase) {
+//                                mVerifyPassPhraseDialog.dismiss();
+//                            }
+//                        }, new DialogInterface.OnDismissListener() {
+//                    @Override
+//                    public void onDismiss(DialogInterface dialog) {
+//                        mVerifyPassPhraseDialog = null;
+//                    }
+//                });
+//
+//                mVerifyPassPhraseDialog.show();
             }
         });
 
         mExportNewKeyStoreCodeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideVerifyPassPhraseDialog();
+                showProgressDialog();
 
-                mVerifyPassPhraseDialog = new VerifyPassPhraseDialog(TestActivity.this,
-                        new VerifyPassPhraseDialog.OnVerifyPassPhraseClickListener() {
-                            @Override
-                            public void onCancel() {
-                                mVerifyPassPhraseDialog.dismiss();
-                            }
-
-                            @Override
-                            public void onVerify(final String passPhrase) {
-                                mVerifyPassPhraseDialog.dismiss();
-
-                                showProgressDialog();
-
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            String keyStoreStr = KeyStoreUtil.exportKeyStoreStr(TestActivity.this, PossUtil.getPasswordStr(), passPhrase);
-
-                                            Bitmap bitmap = QRCodeEncoder.syncEncodeQRCode(keyStoreStr,
-                                                    BGAQRCodeUtil.dp2px(TestActivity.this, Util.px2dp(TestActivity.this, mScreenWidth) - 20),
-                                                    Color.parseColor("#ff000000"));
-
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("'PPIO-UTC-'yyyy_MM_dd'T'HH:mm:ss.SSS'-'");
-                                            String codeFile = PossUtil.getCacheDir() + "/" +
-                                                    dateFormat.format(new Date()) +
-                                                    PossUtil.getAddressStr() +
-                                                    PossUtil.getAccount() + ".png";
-
-                                            BitmapUtil.saveBitmap(bitmap, codeFile);
-
-                                            MediaStore.Images.Media.insertImage(getContentResolver(), codeFile,
-                                                    "PPIO QR code",
-                                                    dateFormat.format(new Date()) + PossUtil.getAddressStr());
-
-                                            sendBroadcast(new Intent(
-                                                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://"
-                                                    + codeFile)));
-
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    if (!TextUtils.isEmpty(keyStoreStr)) {
-                                                        Log.e(TAG, "export keystore code, keystore = " + keyStoreStr);
-
-                                                        mKeyStoreCodeIv.setImageBitmap(bitmap);
-                                                    } else {
-                                                        ToastUtil.showToast(TestActivity.this, "export keystore code failed!", Toast.LENGTH_SHORT);
-                                                    }
-                                                }
-                                            });
-                                        } catch (Exception e) {
-                                            Log.e(TAG, "generate QR code error: " + e.getMessage());
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }).start();
-
-                                hideProgressDialog();
-                            }
-                        }, new DialogInterface.OnDismissListener() {
+                new Thread(new Runnable() {
                     @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        mVerifyPassPhraseDialog = null;
-                    }
-                });
+                    public void run() {
+                        try {
+                            String keyStoreStr = KeyStoreUtil.getPrivateKeyStore(TestActivity.this);
 
-                mVerifyPassPhraseDialog.show();
+                            Bitmap bitmap = QRCodeEncoder.syncEncodeQRCode(keyStoreStr,
+                                    BGAQRCodeUtil.dp2px(TestActivity.this, Util.px2dp(TestActivity.this, mScreenWidth) - 20),
+                                    Color.parseColor("#ff000000"));
+
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("'PPIO-UTC-'yyyy_MM_dd'T'HH:mm:ss.SSS'-'");
+                            String codeFile = PossUtil.getCacheDir() + "/" +
+                                    dateFormat.format(new Date()) +
+                                    PossUtil.getAddressStr() +
+                                    PossUtil.getAccount() + ".png";
+
+                            BitmapUtil.saveBitmap(bitmap, codeFile);
+
+                            MediaStore.Images.Media.insertImage(getContentResolver(), codeFile,
+                                    "PPIO QR code",
+                                    dateFormat.format(new Date()) + PossUtil.getAddressStr());
+
+                            sendBroadcast(new Intent(
+                                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://"
+                                    + codeFile)));
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    hideProgressDialog();
+
+                                    if (bitmap != null) {
+                                        Log.e(TAG, "export keystore code, keystore = " + keyStoreStr);
+
+                                        mKeyStoreQRCodeLayout.setVisibility(View.VISIBLE);
+
+                                        //mKeyStoreCodeIv.setImageBitmap(bitmap);
+                                        mKeyStoreCodeIv.setBackground(new BitmapDrawable(TestActivity.this.getResources(), bitmap));
+
+                                        ToastUtil.showToast(TestActivity.this, "QR code image has been saved to your album!", Toast.LENGTH_SHORT);
+                                    } else {
+                                        ToastUtil.showToast(TestActivity.this, "export keystore code failed!", Toast.LENGTH_SHORT);
+                                    }
+                                }
+                            });
+                        } catch (Exception e) {
+                            Log.e(TAG, "generate QR code error: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+                //
+//                hideVerifyPassPhraseDialog();
+//                mVerifyPassPhraseDialog = new VerifyPassPhraseDialog(TestActivity.this,
+//                        new VerifyPassPhraseDialog.OnVerifyPassPhraseClickListener() {
+//                            @Override
+//                            public void onCancel() {
+//                                mVerifyPassPhraseDialog.dismiss();
+//                            }
+//
+//                            @Override
+//                            public void onVerify(final String passPhrase) {
+//                                mVerifyPassPhraseDialog.dismiss();
+//                            }
+//                        }, new DialogInterface.OnDismissListener() {
+//                    @Override
+//                    public void onDismiss(DialogInterface dialog) {
+//                        mVerifyPassPhraseDialog = null;
+//                    }
+//                });
+//
+//                mVerifyPassPhraseDialog.show();
             }
         });
 

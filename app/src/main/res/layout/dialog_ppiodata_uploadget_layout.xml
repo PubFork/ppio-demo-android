@@ -36,7 +36,7 @@
             android:gravity="center_vertical"
             android:paddingStart="19dp"
             android:paddingEnd="0dp"
-            android:text="Download"
+            android:text="Get"
             android:textColor="#FFFFFF"
             android:textSize="15dp" />
     </LinearLayout>

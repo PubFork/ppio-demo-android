@@ -43,8 +43,8 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
 
         if (taskInfo != null) {
             String destinationPath = taskInfo.getTo();
-            if (!TextUtils.isEmpty(destinationPath)) {
-                downloadTaskItemHolder.setFileName(destinationPath.replace(Environment.getExternalStorageDirectory().getPath(), ""));
+            if (!TextUtils.isEmpty(destinationPath) && destinationPath.startsWith(Constant.PPIO_File.DOWNLOAD_DIR + "/")) {
+                downloadTaskItemHolder.setFileName(destinationPath.replace(Constant.PPIO_File.DOWNLOAD_DIR + "/", ""));
             }
 
             downloadTaskItemHolder.setStatus(taskInfo.getState(), taskInfo.getError());

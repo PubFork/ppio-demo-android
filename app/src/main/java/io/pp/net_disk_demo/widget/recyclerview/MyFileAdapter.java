@@ -42,7 +42,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         FileInfo fileInfo = mMyFileList.get(i);
         if (fileInfo != null) {
             myFileItemHolder.setFileName(fileInfo.getName());
-            myFileItemHolder.setFileModifiedDate("expire :" + fileInfo.getExpiredTime() + " " + fileInfo.getStatus());
+            myFileItemHolder.setFileModifiedDate("expire: " + fileInfo.getExpiredTime() + " " + fileInfo.getStatus());
 
             if (fileInfo.isSecure()) {
                 myFileItemHolder.setEncrypt();

@@ -121,7 +121,7 @@ public class KeyStoreUtil {
     }
 
     //return keyStore data
-    public static String autoLogInByKeyStore(Context context) {
+    public static String getPrivateKeyStore(Context context) {
         try {
             String[] files = context.fileList();
             if (files != null) {

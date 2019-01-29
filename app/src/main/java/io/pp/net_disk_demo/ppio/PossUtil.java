@@ -646,6 +646,8 @@ public class PossUtil {
                     taskInfo.setError(jsonObject.getString(Constant.TaskKey.ERROR));
 
                     taskInfos[i] = taskInfo;
+
+                    Log.e(TAG, "getTask = " + mUser.getTask(taskInfo.getId()));
                 }
 
                 for (int i = 0; i < length - 1; i++) {
@@ -682,6 +684,16 @@ public class PossUtil {
         return taskInfoMap;
     }
 
+
+    public static TaskInfo getTaskInfo(String taskId) {
+        try {
+            mUser.getTask(taskId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     public static boolean deleteTask(String taskId, DeleteTaskListener deleteTaskListener) {
         if (mUser != null) {
