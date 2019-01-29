@@ -13,10 +13,12 @@ import io.pp.net_disk_demo.mvp.model.UploadModel;
 import io.pp.net_disk_demo.mvp.presenter.UploadPresenter;
 import io.pp.net_disk_demo.ppio.RpcUtil;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
+import io.pp.net_disk_demo.service.UploadService;
 import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
 
 public class UploadModelImpl implements UploadModel,
-        ExecuteTaskService.UploadListener {
+        //ExecuteTaskService.UploadListener,
+        UploadService.UploadListener {
 
     private static final String TAG = "UploadModelImpl";
 
@@ -29,6 +31,8 @@ public class UploadModelImpl implements UploadModel,
     private UploadPresenter mUploadPresenter;
 
     private ExecuteTaskService mExecuteTaskService;
+
+    private UploadService mUploadService;
 
     private CancelFixedThreadPool mRequestStorageChiPool;
 
@@ -46,8 +50,17 @@ public class UploadModelImpl implements UploadModel,
     @Override
     public void bindService(ExecuteTaskService executeTaskService) {
         mExecuteTaskService = executeTaskService;
-        if (mExecuteTaskService != null) {
-            mExecuteTaskService.setUploadListener(UploadModelImpl.this);
+//        if (mExecuteTaskService != null) {
+//            mExecuteTaskService.setUploadListener(UploadModelImpl.this);
+//        }
+    }
+
+    @Override
+    public void bindUploadService(UploadService uploadService) {
+        mUploadService = uploadService;
+
+        if (mUploadService != null) {
+            mUploadService.setUploadListener(UploadModelImpl.this);
         }
     }
 
@@ -162,8 +175,12 @@ public class UploadModelImpl implements UploadModel,
 
     @Override
     public void upload() {
-        if (mExecuteTaskService != null) {
-            mExecuteTaskService.startUpload(mUploadInfo);
+//        if (mExecuteTaskService != null) {
+//            mExecuteTaskService.startUpload(mUploadInfo);
+//        }
+
+        if (mUploadService != null) {
+            mUploadService.upload(mUploadInfo);
         }
     }
 
@@ -177,6 +194,7 @@ public class UploadModelImpl implements UploadModel,
         mContext = null;
         mUploadPresenter = null;
         mExecuteTaskService = null;
+        mUploadService = null;
     }
 
     @Override

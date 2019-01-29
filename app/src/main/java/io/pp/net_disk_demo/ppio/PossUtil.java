@@ -18,6 +18,7 @@ import io.pp.net_disk_demo.util.StringUtil;
 import io.pp.net_disk_demo.util.TimeConverterUtil;
 import poss.Config;
 import poss.Poss;
+import poss.Progress;
 import poss.User;
 
 public class PossUtil {
@@ -281,12 +282,14 @@ public class PossUtil {
         return true;
     }
 
-    public static boolean putObject(String bucket, String key, String file, String meta, String chiPrice, long copies, String expires, boolean encrypt, String fileCode, PutObjectListener putObjectListener) {
+    public static String putObject(String bucket, String key, String file, String meta, String chiPrice, long copies, String expires, boolean encrypt, String fileCode, PutObjectListener putObjectListener) {
         Log.e(TAG, "putObject() chiPrice = " + chiPrice);
+
+        String taskId;
 
         if (mUser != null) {
             try {
-                mUser.putObject(bucket, key, file, meta, chiPrice, copies, expires, encrypt);
+                taskId = mUser.putObject(bucket, key, file, meta, chiPrice, copies, expires, encrypt);
             } catch (Exception e) {
                 if (putObjectListener != null) {
                     putObjectListener.onPutObjectError(fileCode, e.getMessage());
@@ -294,13 +297,13 @@ public class PossUtil {
 
                 Log.e(TAG, "putObject() error: " + e.getMessage());
 
-                return false;
+                taskId = null;
             }
         } else {
-
+            taskId = null;
         }
 
-        return true;
+        return taskId;
     }
 
     public static boolean putObjectSync(String bucket, String key, String file, String meta, String chiprice, long copies, String expires, boolean encrypt, String fileCode, PutObjectListener putObjectListener) {
@@ -684,6 +687,21 @@ public class PossUtil {
         return taskInfoMap;
     }
 
+    public static Progress getTaskProgress(String taskId) {
+        Progress progress = new Progress();
+        progress.setTotalSubJobs(0l);
+        progress.setTotalBytes(0l);
+        progress.setFinishedSubJobs(0l);
+        progress.setFinishedBytes(0l);
+
+        try {
+            progress = mUser.getJobProgress(taskId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return progress;
+    }
 
     public static TaskInfo getTaskInfo(String taskId) {
         try {

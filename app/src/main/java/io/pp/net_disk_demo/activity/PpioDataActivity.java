@@ -68,7 +68,9 @@ import io.pp.net_disk_demo.mvp.view.PpioDataView;
 import io.pp.net_disk_demo.mvp.view.ShareCodeView;
 import io.pp.net_disk_demo.mvp.view.StartRenewView;
 import io.pp.net_disk_demo.mvp.view.StatusView;
+import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
+import io.pp.net_disk_demo.service.UploadService;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.util.XPermissionUtils;
@@ -168,8 +170,12 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private DeletePresenter mDeletePresenter = null;
 
     private ExecuteTaskService mExecuteTaskService = null;
+    private UploadService mUploadService = null;
+    private DownloadService mDownloadService = null;
 
     private ExecuteTaskServiceConnection mExecuteTaskServiceConnection = null;
+    private UploadServiceConnection mUploadServiceConnection = null;
+    private DownloadServiceConnection mDownloadServiceConnection = null;
 
     private DecimalFormat mDecimalFormat = null;
 
@@ -204,11 +210,23 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mDeletePresenter = new DeletePresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
 
         mExecuteTaskServiceConnection = new ExecuteTaskServiceConnection(PpioDataActivity.this);
+        mUploadServiceConnection = new UploadServiceConnection(PpioDataActivity.this);
+        mDownloadServiceConnection = new DownloadServiceConnection(PpioDataActivity.this);
 
         startService(new Intent(PpioDataActivity.this, ExecuteTaskService.class));
+        startService(new Intent(PpioDataActivity.this, UploadService.class));
+        startService(new Intent(PpioDataActivity.this, DownloadService.class));
 
         bindService(new Intent(PpioDataActivity.this, ExecuteTaskService.class),
                 mExecuteTaskServiceConnection,
+                BIND_AUTO_CREATE);
+
+        bindService(new Intent(PpioDataActivity.this, UploadService.class),
+                mUploadServiceConnection,
+                BIND_AUTO_CREATE);
+
+        bindService(new Intent(PpioDataActivity.this, DownloadService.class),
+                mDownloadServiceConnection,
                 BIND_AUTO_CREATE);
 
         setContentView(R.layout.activity_ppiodata);
@@ -282,8 +300,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
         //dialog
         if (mBlockFileOptionsBottomDialog != null) {
             mBlockFileOptionsBottomDialog.dismiss();
@@ -361,8 +377,14 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
         //service
         unbindService(mExecuteTaskServiceConnection);
+        unbindService(mUploadServiceConnection);
+        unbindService(mDownloadServiceConnection);
 
         mExecuteTaskService = null;
+        mUploadService = null;
+        mDownloadService = null;
+
+        super.onDestroy();
     }
 
     /**
@@ -1779,6 +1801,30 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         }
     }
 
+    public void bindUploadService(IBinder service) {
+
+        mUploadService = ((UploadService.UploadServiceBinder) service).getUploadService();
+
+        if (mExecuteTaskPresenter != null) {
+
+            mExecuteTaskPresenter.bindUploadService(mUploadService);
+
+            //mExecuteTaskPresenter.startRefreshTasks();
+        }
+    }
+
+    public void bindDownloadService(IBinder service) {
+
+        mDownloadService = ((DownloadService.DownloadServiceBinder) service).getDownloadService();
+
+        if (mExecuteTaskPresenter != null) {
+
+            mExecuteTaskPresenter.bindDownloadService(mDownloadService);
+
+            mExecuteTaskPresenter.startRefreshTasks();
+        }
+    }
+
     static class ExecuteTaskServiceConnection implements ServiceConnection {
 
         final WeakReference<PpioDataActivity> PpioDataActivityWeakReference;
@@ -1791,6 +1837,48 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         public void onServiceConnected(ComponentName name, IBinder service) {
             if (PpioDataActivityWeakReference.get() != null) {
                 PpioDataActivityWeakReference.get().bindExecuteTaskService(service);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    }
+
+    static class UploadServiceConnection implements ServiceConnection {
+
+        final WeakReference<PpioDataActivity> PpioDataActivityWeakReference;
+
+        public UploadServiceConnection(PpioDataActivity ppioDataActivity) {
+            PpioDataActivityWeakReference = new WeakReference<>(ppioDataActivity);
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            if (PpioDataActivityWeakReference.get() != null) {
+                PpioDataActivityWeakReference.get().bindUploadService(service);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    }
+
+    static class DownloadServiceConnection implements ServiceConnection {
+
+        final WeakReference<PpioDataActivity> PpioDataActivityWeakReference;
+
+        public DownloadServiceConnection(PpioDataActivity ppioDataActivity) {
+            PpioDataActivityWeakReference = new WeakReference<>(ppioDataActivity);
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            if (PpioDataActivityWeakReference.get() != null) {
+                PpioDataActivityWeakReference.get().bindDownloadService(service);
             }
         }
 

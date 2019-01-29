@@ -6,6 +6,7 @@ import io.pp.net_disk_demo.mvp.presenter.GetPresenter;
 import io.pp.net_disk_demo.mvp.view.GetView;
 import io.pp.net_disk_demo.mvp.model.GetModel;
 import io.pp.net_disk_demo.mvp.model.modelimpl.GetModelImpl;
+import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
 
 public class GetPresenterImpl implements GetPresenter {
@@ -35,6 +36,12 @@ public class GetPresenterImpl implements GetPresenter {
         }
     }
 
+    @Override
+    public void bindDownloadService(DownloadService downloadService) {
+        if (mGetModel != null) {
+            mGetModel.bindDownloadService(downloadService);
+        }
+    }
 
     @Override
     public void setShareCode(String shareCode) {
@@ -70,7 +77,7 @@ public class GetPresenterImpl implements GetPresenter {
     @Override
     public void showRequestingGet() {
         if (mGetView != null) {
-            mGetView.showRequestGetFinishedView();
+            mGetView.showRequestingGetView();
         }
     }
 
@@ -84,7 +91,7 @@ public class GetPresenterImpl implements GetPresenter {
     @Override
     public void showStartGetSucceed() {
         if (mGetView != null) {
-            mGetView.showRequestingGetView();
+            mGetView.showRequestGetFinishedView();
         }
     }
 

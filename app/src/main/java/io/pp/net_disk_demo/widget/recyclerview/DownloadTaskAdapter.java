@@ -164,8 +164,11 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
                 mTaskStatusLayout.setVisibility(View.GONE);
                 mTaskPauseResumeLayout.setVisibility(View.VISIBLE);
             } else if (Constant.TaskState.FINISHED.equals(status)) {
-                mProgressBar.setVisibility(View.VISIBLE);
-                mTaskStatusLayout.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.GONE);
+                mTaskStatusLayout.setVisibility(View.VISIBLE);
+                mTaskErrorIv.setVisibility(View.GONE);
+                mTaskStatusTv.setText(status);
+                mTaskStatusTv.setTextColor(Color.BLUE);
             } else if (Constant.TaskState.ERROR.equals(status)) {
                 mProgressBar.setVisibility(View.GONE);
                 mTaskStatusLayout.setVisibility(View.VISIBLE);

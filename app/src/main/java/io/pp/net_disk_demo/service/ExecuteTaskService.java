@@ -755,7 +755,7 @@ public class ExecuteTaskService extends Service {
              * storageTime, should be 2018-01-01, the month of year should be 1~12, should be 01 if it is 1,
              * day of month should 01 if it is 1
              */
-            return PossUtil.putObject(Constant.Data.DEFAULT_BUCKET,
+            String taskId = PossUtil.putObject(Constant.Data.DEFAULT_BUCKET,
                     key,
                     filePath,
                     meta,
@@ -775,6 +775,8 @@ public class ExecuteTaskService extends Service {
 
                         }
                     });
+
+            return !TextUtils.isEmpty(taskId);
         }
 
         @Override

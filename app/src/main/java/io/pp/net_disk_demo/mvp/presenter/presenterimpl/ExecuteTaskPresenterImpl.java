@@ -1,6 +1,7 @@
 package io.pp.net_disk_demo.mvp.presenter.presenterimpl;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -11,7 +12,9 @@ import io.pp.net_disk_demo.mvp.model.ExecuteTasksModel;
 import io.pp.net_disk_demo.mvp.model.modelimpl.ExecuteTaskModelImpl;
 import io.pp.net_disk_demo.mvp.presenter.ExecuteTaskPresenter;
 import io.pp.net_disk_demo.mvp.view.ExecuteTaskView;
+import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
+import io.pp.net_disk_demo.service.UploadService;
 
 public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
 
@@ -31,6 +34,20 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     public void bindExecuteTaskService(ExecuteTaskService executeTasksService) {
         if (mExecuteTaskModel != null) {
             mExecuteTaskModel.bindExecuteTaskService(executeTasksService);
+        }
+    }
+
+    @Override
+    public void bindUploadService(UploadService uploadService) {
+        if (mExecuteTaskModel != null) {
+            mExecuteTaskModel.bindUploadService(uploadService);
+        }
+    }
+
+    @Override
+    public void bindDownloadService(DownloadService downloadService) {
+        if (mExecuteTaskModel != null) {
+            mExecuteTaskModel.bindDownloadService(downloadService);
         }
     }
 
@@ -127,7 +144,15 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
 
     @Override
     public void startDownload(DownloadInfo downloadInfo) {
+        //
+        Log.e(TAG, "download startDownload()");
+        //
+
         if (mExecuteTaskModel != null) {
+            //
+            Log.e(TAG, "download startDownload() if (mExecuteTaskModel != null) ");
+            //
+
             mExecuteTaskModel.startDownload(downloadInfo);
         }
     }
@@ -158,6 +183,20 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     public void stopAllTask() {
         if (mExecuteTaskModel != null) {
             mExecuteTaskModel.stopAllTask();
+        }
+    }
+
+    @Override
+    public void showUploadTaskList(ArrayList<TaskInfo> uploadTaskList) {
+        if (mExecuteTaskView != null) {
+            mExecuteTaskView.showUploadingTasks(uploadTaskList);
+        }
+    }
+
+    @Override
+    public void showDownloadTaskList(ArrayList<TaskInfo> downloadTaskList) {
+        if (mExecuteTaskView != null) {
+            mExecuteTaskView.showDownloadingTasks(downloadTaskList);
         }
     }
 

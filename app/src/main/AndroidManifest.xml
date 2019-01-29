@@ -189,6 +189,10 @@
 
         <service android:name=".service.ExecuteTaskService" />
 
+        <service android:name=".service.UploadService" />
+
+        <service android:name=".service.DownloadService" />
+
         <!--Configure APP ID-->
         <meta-data
             android:name="BUGLY_APPID"

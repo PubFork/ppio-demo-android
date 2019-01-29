@@ -1,5 +1,6 @@
 package io.pp.net_disk_demo.mvp.presenter;
 
+import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
 
 public interface GetPresenter {
@@ -8,6 +9,8 @@ public interface GetPresenter {
 
 
     void bindGetService(ExecuteTaskService executeTaskService);
+
+    void bindDownloadService(DownloadService downloadService);
 
     void setShareCode(String shareCode);
 

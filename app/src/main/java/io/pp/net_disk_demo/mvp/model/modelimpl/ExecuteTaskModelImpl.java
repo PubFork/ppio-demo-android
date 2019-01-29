@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -11,18 +12,23 @@ import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.data.UploadInfo;
 import io.pp.net_disk_demo.mvp.model.ExecuteTasksModel;
 import io.pp.net_disk_demo.mvp.presenter.ExecuteTaskPresenter;
+import io.pp.net_disk_demo.ppio.PossUtil;
+import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
+import io.pp.net_disk_demo.service.UploadService;
 
 public class ExecuteTaskModelImpl implements ExecuteTasksModel,
-        ExecuteTaskService.TaskListListener,
-        ExecuteTaskService.DownloadListener,
-        ExecuteTaskService.ShowOperateTaskListener {
+        UploadService.ShowUploadTaskListListener,
+        DownloadService.ShowDownloadTaskListListener {
 
     private static final String TAG = "ExecuteTaskModelImpl";
 
     private Context mContext;
     private ExecuteTaskPresenter mExecuteTasksPresenter;
     private ExecuteTaskService mExecuteTasksService;
+
+    private UploadService mUploadService = null;
+    private DownloadService mDownloadService = null;
 
     private ArrayList<String> mTaskIdList = null;
 
@@ -34,126 +40,61 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
-    public void showTaskList(ArrayList<TaskInfo> taskInfoList) {
-//        if (mExecuteTasksPresenter != null) {
-//            mExecuteTasksPresenter.showDownloadingTasks(taskInfoList);
-//        }
-    }
-
-    @Override
-    public void showUploadingTaskList(ArrayList<TaskInfo> taskInfoList) {
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showUploadingTasks(taskInfoList);
-        }
-    }
-
-    @Override
-    public void showDownloadingTaskList(ArrayList<TaskInfo> taskInfoList) {
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showDownloadingTasks(taskInfoList);
-        }
-    }
-
-    @Override
-    public void showListTaskError(String errMsg) {
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showRefreshTasksError(errMsg);
-        }
-    }
-
-    @Override
-    public void onTaskFinished(String taskId) {
-        if (mExecuteTasksService != null) {
-            mExecuteTasksService.deleteTask(taskId);
-        }
-
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.refreshFileList();
-        }
-    }
-
-    @Override
-    public void onDownloadStartSucceed() {
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showRequestDownloadFinished();
-        }
-    }
-
-    @Override
-    public void onDownloadStartFailed(String errMsg) {
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showRequestDownloadError(errMsg);
-        }
-    }
-
-    @Override
-    public void onOperatePrepare() {
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showOperateTaskPrepare();
-        }
-    }
-
-    @Override
-    public void onOperateFinished() {
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showOperateFinished();
-        }
-    }
-
-    @Override
-    public void onOperateError(String errMsg) {
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showOperateError(errMsg);
-        }
-    }
-
-    @Override
     public void bindExecuteTaskService(ExecuteTaskService executeTasksService) {
         mExecuteTasksService = executeTasksService;
+    }
 
-        mExecuteTasksService.setShowTaskListListener(ExecuteTaskModelImpl.this);
-        mExecuteTasksService.setShowOperateTaskListener(ExecuteTaskModelImpl.this);
+    @Override
+    public void bindUploadService(UploadService uploadService) {
+        mUploadService = uploadService;
+
+        mUploadService.setShowUploadTaskListListener(ExecuteTaskModelImpl.this);
+    }
+
+    @Override
+    public void bindDownloadService(DownloadService downloadService) {
+        mDownloadService = downloadService;
+
+        mDownloadService.setShowDownloadTaskListListener(ExecuteTaskModelImpl.this);
     }
 
     @Override
     public void startRefreshTasks() {
-        if (mExecuteTasksService != null) {
-            mExecuteTasksService.startRefreshTask();
+        if (mUploadService != null) {
+            mUploadService.startShowUploadTaskList();
+        }
+
+        if (mDownloadService != null) {
+            mDownloadService.startShowDownloadTaskList();
         }
     }
 
     @Override
     public void deleteTask(String taskId) {
-        if (mExecuteTasksService != null) {
-            mExecuteTasksService.deleteTask(taskId);
-        }
+        new DeleteTaskAsyncTask(ExecuteTaskModelImpl.this).execute(taskId);
     }
 
     @Override
     public void pauseTask(String taskId) {
-        if (mExecuteTasksService != null) {
-            mExecuteTasksService.pauseTask(taskId);
-        }
+        new PauseTaskAsyncTask(ExecuteTaskModelImpl.this).execute(taskId);
     }
 
     @Override
     public void resumeTask(String taskId) {
-        if (mExecuteTasksService != null) {
-            mExecuteTasksService.resumeTask(taskId);
-        }
+        new ResumeTaskAsyncTask(ExecuteTaskModelImpl.this).execute(taskId);
     }
 
     @Override
     public void startUpload(UploadInfo uploadInfo) {
-        if (mExecuteTasksService != null) {
-            mExecuteTasksService.startUpload(uploadInfo);
+        if (mUploadService != null) {
+            mUploadService.upload(uploadInfo);
         }
     }
 
     @Override
     public void startDownload(DownloadInfo downloadInfo) {
-        if (mExecuteTasksService != null) {
-            mExecuteTasksService.startDownload(downloadInfo);
+        if (mDownloadService != null) {
+            mDownloadService.download(downloadInfo);
         }
     }
 
@@ -166,71 +107,180 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
+    public void showUploadTaskList(ArrayList<TaskInfo> taskInfoList) {
+        if (mExecuteTasksPresenter != null) {
+            mExecuteTasksPresenter.showUploadTaskList(taskInfoList);
+        }
+    }
+
+    @Override
+    public void showDownloadTaskList(ArrayList<TaskInfo> taskInfoList) {
+        if (mExecuteTasksPresenter != null) {
+            mExecuteTasksPresenter.showDownloadTaskList(taskInfoList);
+        }
+    }
+
+    @Override
     public void onDestroy() {
         mContext = null;
         mExecuteTasksPresenter = null;
         mExecuteTasksService = null;
+        mUploadService = null;
+        mDownloadService = null;
     }
 
-    private ArrayList<String> getTaskIdList() {
-        return mTaskIdList;
+    public void showPrepareOperateTask() {
+        if (mExecuteTasksPresenter != null) {
+            mExecuteTasksPresenter.showOperateTaskPrepare();
+        }
     }
 
-    static class ShowTaskAsyncTask extends AsyncTask<String, String, Boolean> {
+    public void showOperateTaskFinished() {
+        if (mExecuteTasksPresenter != null) {
+            mExecuteTasksPresenter.showOperateFinished();
+        }
+    }
 
-        final WeakReference<ExecuteTaskModelImpl> mExecuteTaskModelWeakReference;
+    public void showOperateTaskError(String errMsg) {
+        if (mExecuteTasksPresenter != null) {
+            mExecuteTasksPresenter.showOperateError(errMsg);
+        }
+    }
 
-        private ArrayList<TaskInfo> mUploadTaskList = null;
-        private ArrayList<TaskInfo> mDownloadTaskList = null;
+    static class DeleteTaskAsyncTask extends AsyncTask<String, String, Boolean> {
 
-        public ShowTaskAsyncTask(ExecuteTaskModelImpl deleteModelImpl) {
-            mExecuteTaskModelWeakReference = new WeakReference<>(deleteModelImpl);
-            mUploadTaskList = new ArrayList<>();
-            mDownloadTaskList = new ArrayList<>();
+        final WeakReference<ExecuteTaskModelImpl> mExecuteTaskModelImplWeakReference;
+
+        public DeleteTaskAsyncTask(ExecuteTaskModelImpl executeTaskModelImpl) {
+            mExecuteTaskModelImplWeakReference = new WeakReference<>(executeTaskModelImpl);
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
-            if (mExecuteTaskModelWeakReference.get() != null) {
-                // mExecuteTaskModelWeakReference.get().showDeletePrepare();
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask();
             }
         }
 
         @Override
-        protected Boolean doInBackground(String... strings) {
-            if (mExecuteTaskModelWeakReference.get() != null) {
-                ArrayList<String> taskList = mExecuteTaskModelWeakReference.get().getTaskIdList();
-
-                if (taskList == null || taskList.size() == 0) {
-                    return false;
+        protected Boolean doInBackground(String[] values) {
+            return PossUtil.deleteTask(values[0], new PossUtil.DeleteTaskListener() {
+                @Override
+                public void onDeleteTaskError(String errMsg) {
+                    publishProgress(errMsg);
                 }
-
-                for (int i = 0; i < taskList.size(); i++) {
-
-                }
-            }
-
-            return true;
+            });
         }
 
         @Override
-        protected void onProgressUpdate(String... values) {
+        protected void onProgressUpdate(String[] values) {
             super.onProgressUpdate(values);
 
-            if (mExecuteTaskModelWeakReference.get() != null) {
-                mExecuteTaskModelWeakReference.get().showListTaskError(values[0]);
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showOperateTaskError(values[0]);
             }
         }
 
         @Override
-        protected void onPostExecute(Boolean value) {
-            super.onPostExecute(value);
+        protected void onPostExecute(Boolean succeed) {
+            super.onPostExecute(succeed);
 
-            if (mExecuteTaskModelWeakReference.get() != null) {
-                mExecuteTaskModelWeakReference.get().showUploadingTaskList(mUploadTaskList);
-                mExecuteTaskModelWeakReference.get().showDownloadingTaskList(mDownloadTaskList);
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showOperateTaskFinished();
+            }
+        }
+    }
+
+    static class PauseTaskAsyncTask extends AsyncTask<String, String, Boolean> {
+
+        final WeakReference<ExecuteTaskModelImpl> mExecuteTaskModelImplWeakReference;
+
+        public PauseTaskAsyncTask(ExecuteTaskModelImpl executeTaskModelImpl) {
+            mExecuteTaskModelImplWeakReference = new WeakReference<>(executeTaskModelImpl);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask();
+            }
+        }
+
+        @Override
+        protected Boolean doInBackground(String[] values) {
+            return PossUtil.pauseTask(values[0], new PossUtil.PauseTaskListener() {
+                @Override
+                public void onPauseTaskError(String errMsg) {
+                    publishProgress(errMsg);
+                }
+            });
+        }
+
+        @Override
+        protected void onProgressUpdate(String[] values) {
+            super.onProgressUpdate(values);
+
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showOperateTaskError(values[0]);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean succeed) {
+            super.onPostExecute(succeed);
+
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showOperateTaskFinished();
+            }
+        }
+    }
+
+    static class ResumeTaskAsyncTask extends AsyncTask<String, String, Boolean> {
+
+        final WeakReference<ExecuteTaskModelImpl> mExecuteTaskModelImplWeakReference;
+
+        public ResumeTaskAsyncTask(ExecuteTaskModelImpl executeTaskModelImpl) {
+            mExecuteTaskModelImplWeakReference = new WeakReference<>(executeTaskModelImpl);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask();
+            }
+        }
+
+        @Override
+        protected Boolean doInBackground(String[] values) {
+            return PossUtil.resumeTask(values[0], new PossUtil.ResumeTaskListener() {
+                @Override
+                public void onResumeTaskError(String errMsg) {
+                    publishProgress(errMsg);
+                }
+            });
+        }
+
+        @Override
+        protected void onProgressUpdate(String[] values) {
+            super.onProgressUpdate(values);
+
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showOperateTaskError(values[0]);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean succeed) {
+            super.onPostExecute(succeed);
+
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showOperateTaskFinished();
             }
         }
     }

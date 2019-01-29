@@ -12,7 +12,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +24,7 @@ import io.pp.net_disk_demo.dialog.SetChiPriceDialog;
 import io.pp.net_disk_demo.mvp.presenter.GetPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.GetPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.GetView;
+import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.util.ToastUtil;
 
@@ -47,6 +47,9 @@ public class GetActivity extends BaseActivity implements GetView {
     private ExecuteTaskService mExecuteTaskService = null;
     private ExecuteTaskServiceConnection mExecuteTaskServiceConnection = null;
 
+    private DownloadService mDownloadService = null;
+    private DownloadServiceConnection mDownloadServiceConnection = null;
+
     private long mTotal;
 
     @Override
@@ -58,11 +61,17 @@ public class GetActivity extends BaseActivity implements GetView {
         init();
 
         mExecuteTaskServiceConnection = new ExecuteTaskServiceConnection(GetActivity.this);
+        mDownloadServiceConnection = new DownloadServiceConnection(GetActivity.this);
 
         startService(new Intent(GetActivity.this, ExecuteTaskService.class));
+        startService(new Intent(GetActivity.this, DownloadService.class));
 
         bindService(new Intent(GetActivity.this, ExecuteTaskService.class),
                 mExecuteTaskServiceConnection,
+                BIND_AUTO_CREATE);
+
+        bindService(new Intent(GetActivity.this, DownloadService.class),
+                mDownloadServiceConnection,
                 BIND_AUTO_CREATE);
 
         mTotal = 0;
@@ -70,17 +79,21 @@ public class GetActivity extends BaseActivity implements GetView {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
         unbindService(mExecuteTaskServiceConnection);
+        unbindService(mDownloadServiceConnection);
 
         mExecuteTaskService = null;
         mExecuteTaskServiceConnection = null;
+
+        mDownloadService = null;
+        mDownloadServiceConnection = null;
 
         if (mGetPresenter != null) {
             mGetPresenter.onDestroy();
             mGetPresenter = null;
         }
+
+        super.onDestroy();
     }
 
     @Override
@@ -147,7 +160,7 @@ public class GetActivity extends BaseActivity implements GetView {
                     mProgressDialog = null;
                 }
 
-                ToastUtil.showToast(GetActivity.this, "download shred file error: " + errMsg, Toast.LENGTH_SHORT);
+                ToastUtil.showToast(GetActivity.this, "download shared file error: " + errMsg, Toast.LENGTH_SHORT);
             }
         });
     }
@@ -214,6 +227,14 @@ public class GetActivity extends BaseActivity implements GetView {
         }
     }
 
+    private void bindDownloadService(IBinder service) {
+        mDownloadService = ((DownloadService.DownloadServiceBinder) service).getDownloadService();
+
+        if (mGetPresenter != null) {
+            mGetPresenter.bindDownloadService(mDownloadService);
+        }
+    }
+
     static class ExecuteTaskServiceConnection implements ServiceConnection {
 
         final WeakReference<GetActivity> getActivityWeakReference;
@@ -231,6 +252,27 @@ public class GetActivity extends BaseActivity implements GetView {
         public void onServiceConnected(ComponentName name, IBinder service) {
             if (getActivityWeakReference.get() != null) {
                 getActivityWeakReference.get().bindExecuteTaskService(service);
+            }
+        }
+    }
+
+    static class DownloadServiceConnection implements ServiceConnection {
+
+        final WeakReference<GetActivity> getActivityWeakReference;
+
+        public DownloadServiceConnection(GetActivity getActivity) {
+            getActivityWeakReference = new WeakReference<>(getActivity);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            if (getActivityWeakReference.get() != null) {
+                getActivityWeakReference.get().bindDownloadService(service);
             }
         }
     }

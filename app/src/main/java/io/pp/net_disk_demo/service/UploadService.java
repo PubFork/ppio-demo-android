@@ -9,18 +9,27 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.data.UploadInfo;
 import io.pp.net_disk_demo.ppio.PossUtil;
+import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
+import poss.Progress;
 
 public class UploadService extends Service {
 
@@ -30,6 +39,11 @@ public class UploadService extends Service {
 
     private NotificationManager mNotificationManager;
 
+    private CancelFixedThreadPool mRefreshTaskPool = null;
+
+    private Handler mRefreshTaskListHandler = null;
+
+    private ShowUploadTaskListListener mShowUploadTaskListListener = null;
     private UploadListener mUploadListener = null;
 
     private int mUploadingNotificationId;
@@ -41,6 +55,9 @@ public class UploadService extends Service {
 
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         mUploadingNotificationId = android.os.Process.myPid() + 100;
+
+        mRefreshTaskPool = new CancelFixedThreadPool(1);
+        mRefreshTaskListHandler = new Handler();
     }
 
     @Override
@@ -64,7 +81,12 @@ public class UploadService extends Service {
     }
 
     private Notification getUploadingNotification(int uploadingCount, double progress) {
-        double progress2digits = new BigDecimal(progress * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        double progress2digits;
+        if (progress != 0) {
+            progress2digits = new BigDecimal(progress * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        } else {
+            progress2digits = 0d;
+        }
 
         Notification notification;
 
@@ -102,13 +124,13 @@ public class UploadService extends Service {
 
     public void upload(UploadInfo uploadInfo) {
         if (uploadInfo != null) {
-            new UploadAsyncTask(UploadService.this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uploadInfo);
+            new UploadAsyncTask(UploadService.this).execute(uploadInfo);
         } else {
             showUploadFail(null, "dealInfo is null!");
         }
     }
 
-    public void updateNotification(int uploadingCount, double progress) {
+    private void updateNotification(int uploadingCount, double progress) {
         if (uploadingCount > 0) {
             Notification notification = getUploadingNotification(uploadingCount, progress);
             mNotificationManager.notify(mUploadingNotificationId, notification);
@@ -117,6 +139,7 @@ public class UploadService extends Service {
                 startForeground(mUploadingNotificationId, notification);
             }
         } else {
+            stopForeground(true);
             mNotificationManager.cancel(mUploadingNotificationId);
         }
 
@@ -144,6 +167,31 @@ public class UploadService extends Service {
         if (mUploadListener != null) {
             mUploadListener.onUploadStartFailed(errMsg);
         }
+    }
+
+    public void startShowUploadTaskList() {
+        mRefreshTaskPool.execute(new RefreshUploadTaskRunnable(UploadService.this));
+    }
+
+    private void showUploadTaskList(ArrayList<TaskInfo> taskInfList) {
+        if (mShowUploadTaskListListener != null) {
+            mShowUploadTaskListListener.showUploadTaskList(taskInfList);
+        }
+
+        mRefreshTaskListHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mRefreshTaskPool.execute(new RefreshUploadTaskRunnable(UploadService.this));
+            }
+        }, 1000l);
+    }
+
+    private void showUploadListTaskError(String error) {
+
+    }
+
+    public void setShowUploadTaskListListener(ShowUploadTaskListListener showUploadTaskListListener) {
+        mShowUploadTaskListListener = showUploadTaskListListener;
     }
 
     public void setUploadListener(UploadListener uploadListener) {
@@ -222,7 +270,7 @@ public class UploadService extends Service {
              * storageTime, should be 2018-01-01, the month of year should be 1~12, should be 01 if it is 1,
              * day of month should 01 if it is 1
              */
-            return PossUtil.putObject(Constant.Data.DEFAULT_BUCKET,
+            final String taskId = PossUtil.putObject(Constant.Data.DEFAULT_BUCKET,
                     key,
                     filePath,
                     meta,
@@ -242,6 +290,37 @@ public class UploadService extends Service {
 
                         }
                     });
+
+            if (!TextUtils.isEmpty(taskId)) {
+
+                boolean hasTaskId = false;
+
+                while (!hasTaskId) {
+                    try {
+                        HashMap<String, TaskInfo> taskInfoHashMap = PossUtil.listTaskForHashMap(new PossUtil.ListTaskListener() {
+                            @Override
+                            public void onListTaskError(String errMsg) {
+
+                            }
+                        });
+
+                        if (taskInfoHashMap != null) {
+                            hasTaskId = taskInfoHashMap.containsKey(taskId);
+                        } else {
+                            hasTaskId = false;
+                        }
+
+                        Thread.sleep(1000l);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                        hasTaskId = true;
+                    }
+                }
+                return hasTaskId;
+            } else {
+                return false;
+            }
         }
 
         @Override
@@ -263,11 +342,77 @@ public class UploadService extends Service {
         }
     }
 
+    static class RefreshUploadTaskRunnable implements Runnable {
+        final WeakReference<UploadService> mUploadServiceWeakReference;
+
+        public RefreshUploadTaskRunnable(UploadService uploadService) {
+            mUploadServiceWeakReference = new WeakReference<>(uploadService);
+        }
+
+        @Override
+        public void run() {
+            LinkedHashMap<String, TaskInfo> taskInfoHashMap = PossUtil.listTaskForHashMap(new PossUtil.ListTaskListener() {
+                @Override
+                public void onListTaskError(String errMsg) {
+                    if (mUploadServiceWeakReference.get() != null) {
+                        mUploadServiceWeakReference.get().showUploadListTaskError(errMsg);
+                    }
+                }
+            });
+
+            int uploadingCount = 0;
+            double finishedUpload = 0;
+            double totalUpload = 0;
+
+            ArrayList<TaskInfo> uploadTaskList = new ArrayList<>();
+
+            for (Map.Entry entry : taskInfoHashMap.entrySet()) {
+                TaskInfo taskInfo = (TaskInfo) entry.getValue();
+
+                if (Constant.TaskType.PUT.equals(taskInfo.getType())) {
+                    if (Constant.TaskState.PENDING.equals(taskInfo.getState()) ||
+                            Constant.TaskState.RUNNING.equals(taskInfo.getState()) ||
+                            Constant.TaskState.PAUSED.equals(taskInfo.getState())) {
+                        uploadingCount++;
+                    }
+
+                    Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
+                    if (progress.getTotalBytes() != 0l) {
+                        taskInfo.setFinished(progress.getFinishedBytes());
+                        finishedUpload = finishedUpload + taskInfo.getFinished();
+                        totalUpload = totalUpload + taskInfo.getTotal();
+
+                        Log.e(TAG, "total: " + taskInfo.getTotal() + ", totalBytes: " + progress.getTotalBytes() + ", finished: " + taskInfo.getFinished());
+                    }
+
+                    uploadTaskList.add(taskInfo);
+                    Log.e(TAG, "RefreshUploadTaskRunnable() taskId == " + taskInfo.getId());
+
+                }
+            }
+
+            if (mUploadServiceWeakReference.get() != null) {
+                double progress;
+                if (totalUpload == 0) {
+                    progress = 0;
+                } else {
+                    progress = (double) finishedUpload / totalUpload;
+                }
+
+                mUploadServiceWeakReference.get().updateNotification(uploadingCount, progress);
+                mUploadServiceWeakReference.get().showUploadTaskList(uploadTaskList);
+            }
+        }
+    }
 
     public class UploadServiceBinder extends Binder {
-        public UploadService getExecuteTaskService() {
+        public UploadService getUploadService() {
             return UploadService.this;
         }
+    }
+
+    public interface ShowUploadTaskListListener {
+        void showUploadTaskList(ArrayList<TaskInfo> taskInfoList);
     }
 
     public interface UploadListener {

@@ -43,6 +43,7 @@ import io.pp.net_disk_demo.mvp.presenter.UploadPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.UploadPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.UploadView;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
+import io.pp.net_disk_demo.service.UploadService;
 import io.pp.net_disk_demo.util.FileUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
@@ -98,7 +99,10 @@ public class UploadActivity extends BaseActivity implements UploadView {
     private UploadPresenter mUploadPresenter = null;
 
     private ExecuteTaskService mExecuteTaskService = null;
+    private UploadService mUploadService = null;
+
     private ExecuteTaskServiceConnection mExecuteTaskServiceConnection = null;
+    private UploadServiceConnection mUploadServiceConnection = null;
 
     private String mOperationAction = "";
 
@@ -146,11 +150,17 @@ public class UploadActivity extends BaseActivity implements UploadView {
         init();
 
         mExecuteTaskServiceConnection = new ExecuteTaskServiceConnection(UploadActivity.this);
+        mUploadServiceConnection = new UploadServiceConnection(UploadActivity.this);
 
         startService(new Intent(UploadActivity.this, ExecuteTaskService.class));
+        startService(new Intent(UploadActivity.this, UploadService.class));
 
         bindService(new Intent(UploadActivity.this, ExecuteTaskService.class),
                 mExecuteTaskServiceConnection,
+                BIND_AUTO_CREATE);
+
+        bindService(new Intent(UploadActivity.this, UploadService.class),
+                mUploadServiceConnection,
                 BIND_AUTO_CREATE);
 
         mTotalChi = 0;
@@ -175,8 +185,6 @@ public class UploadActivity extends BaseActivity implements UploadView {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
             mProgressDialog = null;
@@ -193,11 +201,17 @@ public class UploadActivity extends BaseActivity implements UploadView {
         }
 
         unbindService(mExecuteTaskServiceConnection);
+        unbindService(mUploadServiceConnection);
+
+        mExecuteTaskService = null;
+        mUploadService = null;
 
         if (mUploadPresenter != null) {
             mUploadPresenter.onDestroy();
             mUploadPresenter = null;
         }
+
+        super.onDestroy();
     }
 
     @Override
@@ -643,6 +657,15 @@ public class UploadActivity extends BaseActivity implements UploadView {
 
         if (mUploadPresenter != null) {
             mUploadPresenter.bindService(mExecuteTaskService);
+
+        }
+    }
+
+    private void bindUploadService(IBinder service) {
+        mUploadService = ((UploadService.UploadServiceBinder) service).getUploadService();
+
+        if (mUploadPresenter != null) {
+            mUploadPresenter.bindUploadService(mUploadService);
         }
     }
 
@@ -663,6 +686,27 @@ public class UploadActivity extends BaseActivity implements UploadView {
         public void onServiceConnected(ComponentName name, IBinder service) {
             if (uploadActivityWeakReference.get() != null) {
                 uploadActivityWeakReference.get().bindExecuteTaskService(service);
+            }
+        }
+    }
+
+    static class UploadServiceConnection implements ServiceConnection {
+
+        final WeakReference<UploadActivity> uploadActivityWeakReference;
+
+        public UploadServiceConnection(UploadActivity uploadActivity) {
+            uploadActivityWeakReference = new WeakReference<>(uploadActivity);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            if (uploadActivityWeakReference.get() != null) {
+                uploadActivityWeakReference.get().bindUploadService(service);
             }
         }
     }
