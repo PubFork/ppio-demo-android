@@ -2,65 +2,81 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingLeft="10dp"
-    android:paddingTop="16dp"
-    android:paddingRight="10dp"
-    android:paddingBottom="16dp">
-
-    <RelativeLayout
-        android:layout_width="35dp"
-        android:layout_height="42dp"
-        android:layout_marginEnd="15dp">
-
-        <ImageView
-            android:id="@+id/file_iv"
-            android:layout_width="35dp"
-            android:layout_height="42dp"
-            android:layout_centerInParent="true"
-            android:background="@mipmap/wangpan_wenjian"
-            android:contentDescription="@string/app_name"/>
-
-        <ImageView
-            android:id="@+id/file_status_iv"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:background="@mipmap/jiami"
-            android:contentDescription="@string/app_name"/>
-
-    </RelativeLayout>
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="22dp"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="74dp"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
-        <TextView
-            android:id="@+id/file_name_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:ellipsize="middle"
-            android:singleLine="true"
-            android:text="Innovation Framework"
-            android:textColor="#4C4C4C"
-            android:textSize="16dp" />
+        <RelativeLayout
+            android:layout_width="35dp"
+            android:layout_height="42dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="15dp">
 
-        <TextView
-            android:id="@+id/file_modifieddate_tv"
+            <ImageView
+                android:id="@+id/file_iv"
+                android:layout_width="35dp"
+                android:layout_height="42dp"
+                android:layout_centerInParent="true"
+                android:background="@mipmap/wangpan_wenjian"
+                android:contentDescription="@string/app_name" />
+
+            <ImageView
+                android:id="@+id/file_status_iv"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:background="@mipmap/jiami"
+                android:contentDescription="@string/app_name" />
+
+        </RelativeLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="Modified: Jun 26, 2013 Modified: Jun 26, 2013"
-            android:textColor="#757575"
-            android:textSize="14dp" />
+            android:layout_height="match_parent"
+            android:layout_marginEnd="22dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/file_name_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:ellipsize="middle"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:text="Innovation Framework"
+                android:textColor="#4C4C4C"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/file_modifieddate_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="Modified: Jun 26, 2013 Modified: Jun 26, 2013"
+                android:textColor="#757575"
+                android:textSize="14dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/footer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="77dp"
+        android:orientation="vertical"
+        android:visibility="gone" />
 </LinearLayout>

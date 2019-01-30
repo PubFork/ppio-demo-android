@@ -8,12 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.data.FileInfo;
+import io.pp.net_disk_demo.util.FileUtil;
+import io.pp.net_disk_demo.util.Util;
 
 public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItemHolder> {
 
@@ -42,6 +45,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         FileInfo fileInfo = mMyFileList.get(i);
         if (fileInfo != null) {
             myFileItemHolder.setFileName(fileInfo.getName());
+            myFileItemHolder.setFileIcon(fileInfo.getName());
             myFileItemHolder.setFileModifiedDate("expire: " + fileInfo.getExpiredTime() + " " + fileInfo.getStatus());
 
             if (fileInfo.isSecure()) {
@@ -54,6 +58,8 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
 
             myFileItemHolder.setClickListener(mOnItemListener, i);
         }
+
+        myFileItemHolder.setFooterItem(i == (getItemCount() - 1));
     }
 
     @Override
@@ -94,6 +100,8 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
     public class MyFileItemHolder extends RecyclerView.ViewHolder {
 
         private View mItemLayout = null;
+
+        private LinearLayout mFooterLayout = null;
         private ImageView mFileIv = null;
         private ImageView mFileStatusIv = null;
         private TextView mFileNameTv = null;
@@ -107,9 +115,11 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
             super(LayoutInflater.from(context).inflate(R.layout.item_myfilelist_layout, viewGroup, false));
 
             mItemLayout = itemView;
-
             mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
+                    Util.dp2px(context, 74)));
+
+            mFooterLayout = mItemLayout.findViewById(R.id.footer_layout);
+            mFooterLayout.setVisibility(View.GONE);
 
             mFileIv = mItemLayout.findViewById(R.id.file_iv);
             mFileStatusIv = mItemLayout.findViewById(R.id.file_status_iv);
@@ -128,6 +138,56 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
             }
 
             mFileNameTv.setText(fileName);
+        }
+
+        public void setFileIcon(String fileName) {
+            int fileType = FileUtil.checkFileTypeBySuffix(fileName);
+
+            switch (fileType) {
+                case FileUtil.TXT_NO_SUFFIX_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file);
+                    break;
+
+                case FileUtil.DOC_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file_doc);
+                    break;
+
+                case FileUtil.IMAGE_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file_image);
+                    break;
+
+                case FileUtil.PDF_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file_pdf);
+                    break;
+
+                case FileUtil.PPT_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file_ppt);
+                    break;
+
+                case FileUtil.AUDIO_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file_audio);
+                    break;
+
+                case FileUtil.VIDEO_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file_video);
+                    break;
+
+                case FileUtil.XLS_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file_xls);
+                    break;
+
+                case FileUtil.ZIP_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file_zip);
+                    break;
+
+                case FileUtil.UNKNOWN_FILE:
+                    mFileIv.setBackgroundResource(R.mipmap.file_unknown);
+                    break;
+
+                default:
+                    mFileIv.setBackgroundResource(R.mipmap.file_unknown);
+                    break;
+            }
         }
 
         public void setFileModifiedDate(String modifiedDate) {
@@ -157,6 +217,18 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
                     }
                 }
             });
+        }
+
+        public void setFooterItem(boolean isFooter) {
+            if (isFooter) {
+                mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        Util.dp2px(mContext, 151)));
+                mFooterLayout.setVisibility(View.VISIBLE);
+            } else {
+                mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        Util.dp2px(mContext, 74)));
+                mFooterLayout.setVisibility(View.GONE);
+            }
         }
     }
 

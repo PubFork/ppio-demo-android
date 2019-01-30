@@ -9,6 +9,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.util.Log;
 
 import io.pp.net_disk_demo.Constant;
 
@@ -17,6 +19,17 @@ import java.util.Calendar;
 public class FileUtil {
 
     private static final String TAG = "FileUtil";
+
+    public static final int UNKNOWN_FILE = 0x00;
+    public static final int TXT_NO_SUFFIX_FILE = 0x01;
+    public static final int DOC_FILE = 0x02;
+    public static final int IMAGE_FILE = 0x03;
+    public static final int PDF_FILE = 0x04;
+    public static final int PPT_FILE = 0x05;
+    public static final int AUDIO_FILE = 0x06;
+    public static final int VIDEO_FILE = 0x07;
+    public static final int XLS_FILE = 0x08;
+    public static final int ZIP_FILE = 0x09;
 
     public static String getRealPathFromURI(Context context, Uri contentUri) {
         String res = null;
@@ -213,5 +226,72 @@ public class FileUtil {
                 ":" + minuteStr +
                 ":" + secondStr +
                 ":" + millSecondStr;
+    }
+
+    public static int checkFileTypeBySuffix(String fileName) {
+        if (!TextUtils.isEmpty(fileName)) {
+            fileName = fileName.toLowerCase();
+
+            if (fileName.endsWith(".txt") || !fileName.contains(".")) {
+                return TXT_NO_SUFFIX_FILE;
+            }
+
+            if (fileName.endsWith(".doc") ||
+                    fileName.endsWith(".docx")) {
+                return DOC_FILE;
+            }
+
+            //1 Webp//2 BMP//3 PCX//4 TIF//5 GIF
+            //6 JPEG//7 TGA//8 EXIF//9 FPX//10 SVG
+            //11 PSD//12 CDR//13 PCD//14 DXF//15 UFO
+            //16 EPS//17 AI//18 PNG//19 HDRI//20 RAW
+            //21 WMF//22 FLIC//23 EMF//24 ICO
+            //BMP、JPG、JPEG、PNG、GIF、TIF、PSD
+            if (fileName.endsWith(".webp") || fileName.endsWith(".bmp") || fileName.endsWith(".pcx") || fileName.endsWith(".tif") || fileName.endsWith(".gif") ||
+                    fileName.endsWith(".jpeg") || fileName.endsWith(".tga") || fileName.endsWith(".exif") || fileName.endsWith(".fpx") || fileName.endsWith(".svg") ||
+                    fileName.endsWith(".psd") || fileName.endsWith(".cdr") || fileName.endsWith(".pcd") || fileName.endsWith(".dxf") || fileName.endsWith(".ufo") ||
+                    fileName.endsWith(".eps") || fileName.endsWith(".ai") || fileName.endsWith(".png") || fileName.endsWith(".hdri") || fileName.endsWith(".raw") ||
+                    fileName.endsWith(".wmf") || fileName.endsWith(".flic") || fileName.endsWith(".emf") || fileName.endsWith(".ico") || fileName.endsWith(".jpg")) {
+                return IMAGE_FILE;
+            }
+
+            if (fileName.endsWith(".pdf")) {
+                return PDF_FILE;
+            }
+
+            if (fileName.endsWith(".ppt") || fileName.endsWith(".pptx")) {
+                return PPT_FILE;
+            }
+
+            // wav, mp3, ogg, midi, aac,
+            //ape, flac, wma, amr
+            if (fileName.endsWith(".wav") || fileName.endsWith(".mp3") || fileName.endsWith(".ogg") || fileName.endsWith(".midi") || fileName.endsWith(".aac") ||
+                    fileName.endsWith(".ape") || fileName.endsWith(".flac") || fileName.endsWith(".wma") || fileName.endsWith(".amr")) {
+                return AUDIO_FILE;
+            }
+
+            //avi, rmvb, rm, asf, divx,
+            //mpg, mpeg, mpe, wmv, mp4,
+            //mkv, vob
+            if (fileName.endsWith(".avi") || fileName.endsWith(".rmvb") || fileName.endsWith(".rm") || fileName.endsWith(".asf") || fileName.endsWith(".divx") ||
+                    fileName.endsWith(".mpg") || fileName.endsWith(".mpeg") || fileName.endsWith(".mpe") || fileName.endsWith(".wmv") || fileName.endsWith(".mp4") ||
+                    fileName.endsWith(".mkv") || fileName.endsWith(".vob")) {
+                return VIDEO_FILE;
+            }
+
+            //xls  xlsx
+            if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
+                return XLS_FILE;
+            }
+
+            //RAR, ZIP, 7Z, GZ, BZ,
+            //ACE, UHA, UDA, ZPAQ
+            if (fileName.endsWith(".rar") || fileName.endsWith(".zip") || fileName.endsWith(".7z") || fileName.endsWith(".gz") || fileName.endsWith(".bz") ||
+                    fileName.endsWith(".ace") || fileName.endsWith(".uha") || fileName.endsWith(".uda") || fileName.endsWith(".zpaq")) {
+                return ZIP_FILE;
+            }
+        }
+
+        return UNKNOWN_FILE;
     }
 }

@@ -54,6 +54,8 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
             uploadTaskItemHolder.setPauseResume(taskInfo.getId(), taskInfo.getState());
             uploadTaskItemHolder.setDelete(taskInfo.getId());
         }
+
+        uploadTaskItemHolder.setFooterItem(i == (getItemCount() - 1));
     }
 
     @NonNull
@@ -83,7 +85,10 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
 
     public class UploadTaskItemHolder extends RecyclerView.ViewHolder {
 
+        private Context mContext = null;
+
         private View mItemLayout = null;
+        private LinearLayout mFooterLayout = null;
 
         private ImageView mUploadingIv = null;
         private TextView mFileNameTv = null;
@@ -108,10 +113,14 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
         public UploadTaskItemHolder(Context context, ViewGroup viewGroup) {
             super(LayoutInflater.from(context).inflate(R.layout.item_uploading_downloading_layout, viewGroup, false));
 
-            mItemLayout = itemView;
+            mContext = context;
 
+            mItemLayout = itemView;
             mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
+                    Util.dp2px(context, 74)));
+
+            mFooterLayout = mItemLayout.findViewById(R.id.footer_layout);
+            mFooterLayout.setVisibility(View.GONE);
 
             mUploadingIv = mItemLayout.findViewById(R.id.uploading_downloading_iv);
             mFileNameTv = mItemLayout.findViewById(R.id.uploading_downloading_tv);
@@ -163,7 +172,7 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
                 mTaskStatusLayout.setVisibility(View.VISIBLE);
                 mTaskErrorIv.setVisibility(View.GONE);
                 mTaskStatusTv.setText(status);
-                mTaskStatusTv.setTextColor(Color.BLUE);
+                mTaskStatusTv.setTextColor(mContext.getResources().getColor(R.color.account_background_blue));
             } else if (Constant.TaskState.ERROR.equals(status)) {
                 mProgressBar.setVisibility(View.GONE);
                 mTaskStatusLayout.setVisibility(View.VISIBLE);
@@ -224,6 +233,18 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
 
             mTaskDeleteLayout.setOnClickListener(deleteOnClickListener);
             mDeleteIv.setOnClickListener(deleteOnClickListener);
+        }
+
+        public void setFooterItem(boolean isFooter) {
+            if (isFooter) {
+                mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        Util.dp2px(mContext, 151)));
+                mFooterLayout.setVisibility(View.VISIBLE);
+            } else {
+                mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        Util.dp2px(mContext, 74)));
+                mFooterLayout.setVisibility(View.GONE);
+            }
         }
     }
 
