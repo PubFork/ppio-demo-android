@@ -222,6 +222,22 @@ public class UploadPresenterImpl implements UploadPresenter {
     }
 
     @Override
+    public String getFilePath() {
+        if (mUploadModel != null) {
+            return mUploadModel.getFilePath();
+        }
+        return "";
+    }
+
+    @Override
+    public String getExpiredTime() {
+        if (mUploadModel != null) {
+            return mUploadModel.getExpiredTime();
+        }
+        return "";
+    }
+
+    @Override
     public int getCopies() {
         if (mUploadModel != null) {
             return mUploadModel.getCopies();

@@ -56,10 +56,19 @@ public class RenewModelImpl implements RenewModel {
             Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                     .parse(fileInfo.getExpiredTime());
             calendar.setTime(date);
-        } catch (ParseException e) {
-            Log.e(TAG, "setRenewFile() error: " + e.getMessage());
+        } catch (ParseException e1) {
+            Log.e(TAG, "setRenewFile() error: " + e1.getMessage());
 
-            e.printStackTrace();
+            e1.printStackTrace();
+            try {
+                Date date = new SimpleDateFormat("yyyy-MM-dd")
+                        .parse(fileInfo.getExpiredTime());
+                calendar.setTime(date);
+            } catch (ParseException e2) {
+                Log.e(TAG, "setRenewFile() error: " + e2.getMessage());
+
+                e2.printStackTrace();
+            }
         }
 
         mDateInfo = new DateInfo(calendar.get(Calendar.YEAR),
@@ -76,7 +85,7 @@ public class RenewModelImpl implements RenewModel {
     public String getUIFileName() {
         String fileName = mRenewInfo.getFileName();
         if (!TextUtils.isEmpty(fileName) && fileName.startsWith(Constant.Data.DEFAULT_BUCKET + "/")) {
-            fileName.replaceFirst(Constant.Data.DEFAULT_BUCKET + "/", "");
+            fileName = fileName.replaceFirst(Constant.Data.DEFAULT_BUCKET + "/", "");
         }
 
         return fileName;

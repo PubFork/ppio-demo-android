@@ -66,6 +66,10 @@ public interface UploadPresenter {
     void showGetTotalChiFailed(String errMsg);
 
 
+    String getFilePath();
+
+    String getExpiredTime();
+
     int getCopies();
 
     String getChiPrice();

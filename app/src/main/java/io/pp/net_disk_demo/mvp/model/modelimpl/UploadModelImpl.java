@@ -1,11 +1,15 @@
 package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.UploadInfo;
@@ -17,7 +21,6 @@ import io.pp.net_disk_demo.service.UploadService;
 import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
 
 public class UploadModelImpl implements UploadModel,
-        //ExecuteTaskService.UploadListener,
         UploadService.UploadListener {
 
     private static final String TAG = "UploadModelImpl";
@@ -50,9 +53,6 @@ public class UploadModelImpl implements UploadModel,
     @Override
     public void bindService(ExecuteTaskService executeTaskService) {
         mExecuteTaskService = executeTaskService;
-//        if (mExecuteTaskService != null) {
-//            mExecuteTaskService.setUploadListener(UploadModelImpl.this);
-//        }
     }
 
     @Override
@@ -93,7 +93,43 @@ public class UploadModelImpl implements UploadModel,
     @Override
     public void setUploadInfo(UploadInfo uploadInfo) {
         if (uploadInfo != null) {
-            mUploadInfo = uploadInfo;
+            String filePath = uploadInfo.getFile();
+            if (!TextUtils.isEmpty(filePath)) {
+                File file = new File(filePath);
+
+                mUploadInfo.setFileName(file.getName());
+                mUploadInfo.setFile(filePath);
+
+                mFileSize = file.length();
+            }
+
+            Calendar calendar = Calendar.getInstance();
+            try {
+                Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                        .parse(uploadInfo.getExpiredTime());
+                calendar.setTime(date);
+            } catch (ParseException e1) {
+                Log.e(TAG, "setRenewFile() error: " + e1.getMessage());
+
+                e1.printStackTrace();
+                try {
+                    Date date = new SimpleDateFormat("yyyy-MM-dd")
+                            .parse(uploadInfo.getExpiredTime());
+                    calendar.setTime(date);
+                } catch (ParseException e2) {
+                    Log.e(TAG, "setRenewFile() error: " + e2.getMessage());
+
+                    e2.printStackTrace();
+                }
+            }
+
+            mDateInfo = new DateInfo(calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH));
+
+            mUploadInfo.setExpiredTime(uploadInfo.getExpiredTime());
+            mUploadInfo.setCopiesCount(uploadInfo.getCopiesCount());
+            mUploadInfo.setChiPrice(uploadInfo.getChiPrice());
 
             if (mUploadPresenter != null) {
                 mUploadPresenter.showUploadSettings();
@@ -106,6 +142,7 @@ public class UploadModelImpl implements UploadModel,
         return mUploadInfo.getFileName();
     }
 
+    @Override
     public String getFilePath() {
         return mUploadInfo.getFile();
     }

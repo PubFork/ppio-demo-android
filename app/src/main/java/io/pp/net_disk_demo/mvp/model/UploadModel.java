@@ -15,6 +15,8 @@ public interface UploadModel {
 
     void setUploadInfo(UploadInfo uploadInfo);
 
+    String getFilePath();
+
     String getFileName();
 
     boolean isSecure();

@@ -20,8 +20,8 @@ public class FileInfo implements Serializable {
     private boolean mIsSecure = false;
     private boolean mIsDir = false;
     private String mStorageTime = "";
-    private int mCopiedCount = 0;
-    private String mGasPrice = "";
+    private int mCopiesCount = 0;
+    private String mChiPrice = "";
     private int mGasLimit = 0;
     private int mModifiedDate = 0;
 
@@ -103,12 +103,12 @@ public class FileInfo implements Serializable {
         return mStorageTime;
     }
 
-    public int getCopiedCount() {
-        return mCopiedCount;
+    public int getCopiesCount() {
+        return mCopiesCount;
     }
 
-    public String getGasPrice() {
-        return mGasPrice;
+    public String getChiPrice() {
+        return mChiPrice;
     }
 
     public double getGasLimit() {
@@ -188,12 +188,12 @@ public class FileInfo implements Serializable {
         mStorageTime = storageTime;
     }
 
-    public void setCopiedCount(int copiedCount) {
-        mCopiedCount = copiedCount;
+    public void setCopiesCount(int copiedCount) {
+        mCopiesCount = copiedCount;
     }
 
-    public void setGasPrice(int gasPrice) {
-        mGasPrice = "" + gasPrice;
+    public void setChiPrice(String chiPrice) {
+        mChiPrice = chiPrice;
     }
 
     public void setGasLimit(int gasLimit) {

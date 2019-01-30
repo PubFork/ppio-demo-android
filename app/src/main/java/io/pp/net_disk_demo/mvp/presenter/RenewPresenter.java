@@ -56,6 +56,12 @@ public interface RenewPresenter {
     void showGetTotalChiFailed(String errMsg);
 
 
+    String getFileName();
+
+    long getFileSize();
+
+    String getExpiredTime();
+
     int getCopies();
 
     String getChiPrice();

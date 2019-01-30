@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -56,14 +55,9 @@ public class UploadActivity extends BaseActivity implements UploadView {
 
     private final String HAS_CREATED = " HAS_CREATED";
     private final String FILE_PATH = "FILE_PATH";
-    private final String FILE_NAME = "FILE_NAME";
-    private final String FILE_SIZE = "FILE_SIZE";
-    private final String IS_SECURE = "IS_SECURE";
-    private final String STORAGE_TIME = "EXPIRED_TIME";
+    private final String EXPIRED_TIME = "EXPIRED_TIME";
     private final String COPIES = "COPIES";
-    private final String GAS_PRICE = "CHI_PRICE";
-    private final String TOTAL_GAS = "TOTAL_GAS";
-    private final String EXPECTED_COST = "EXPECTED_COST";
+    private final String CHI_PRICE = "CHI_PRICE";
 
     private Toolbar mUploadToolBar = null;
     private LinearLayout mToolBarLeftTvLayout = null;
@@ -125,27 +119,17 @@ public class UploadActivity extends BaseActivity implements UploadView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_upload);
-
         if (savedInstanceState != null) {
-            mHasCreated = savedInstanceState.getBoolean(HAS_CREATED);
-            mFilePath = savedInstanceState.getString(FILE_PATH);
-            mFileName = savedInstanceState.getString(FILE_NAME);
-            mFileSize = savedInstanceState.getLong(FILE_SIZE);
-            mIsSecure = savedInstanceState.getBoolean(IS_SECURE);
-            mExpiredTime = savedInstanceState.getString(STORAGE_TIME);
-            mCopies = savedInstanceState.getInt(COPIES);
-            mChiPrice = savedInstanceState.getInt(GAS_PRICE);
+            Log.e(TAG, "onCreate(@Nullable Bundle savedInstanceState) if (savedInstanceState != null)");
 
             mUploadInfo = new UploadInfo();
-            mUploadInfo.setFile(mFilePath);
-            mUploadInfo.setFileName(mFileName);
-            mUploadInfo.setFileSize(mFileSize);
-            mUploadInfo.setSecure(mIsSecure);
-            mUploadInfo.setExpiredTime(mExpiredTime);
-            mUploadInfo.setCopiesCount(mCopies);
-            mUploadInfo.setChiPrice("" + mChiPrice);
+            mUploadInfo.setFile(savedInstanceState.getString(FILE_PATH));
+            mUploadInfo.setExpiredTime(savedInstanceState.getString(EXPIRED_TIME));
+            mUploadInfo.setCopiesCount(savedInstanceState.getInt(COPIES));
+            mUploadInfo.setChiPrice(savedInstanceState.getString(CHI_PRICE));
         }
+
+        setContentView(R.layout.activity_upload);
 
         init();
 
@@ -169,16 +153,20 @@ public class UploadActivity extends BaseActivity implements UploadView {
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(HAS_CREATED, true);
 
-        outState.putString(FILE_PATH, mFilePath);
-        outState.putString(FILE_NAME, mFileName);
-        outState.putLong(FILE_SIZE, mFileSize);
-        outState.putBoolean(IS_SECURE, mIsSecure);
-        outState.putString(STORAGE_TIME, mExpiredTime);
-        outState.putInt(COPIES, mCopies);
-        outState.putDouble(GAS_PRICE, mChiPrice);
+        if (mUploadPresenter != null) {
+            outState.putString(FILE_PATH, mUploadPresenter.getFilePath());
+            outState.putString(EXPIRED_TIME, mUploadPresenter.getExpiredTime());
+            outState.putInt(COPIES, mUploadPresenter.getCopies());
+            outState.putString(CHI_PRICE, mUploadPresenter.getChiPrice());
+        }
 
         super.onSaveInstanceState(outState);
     }
@@ -573,17 +561,15 @@ public class UploadActivity extends BaseActivity implements UploadView {
         mUploadPresenter = new UploadPresenterImpl(UploadActivity.this, UploadActivity.this);
 
         Intent mIntent = getIntent();
+
         if (mIntent != null) {
             mOperationAction = mIntent.getAction();
 
             if (Constant.Intent.LOCAL_UPLOAD_ACTION.equals(mOperationAction)) {
-                if (mHasCreated) {
-                    mSecureSwitch.setState(mIsSecure);
-                    mExpiredTimeValueTv.setText(mExpiredTime);
-                    mChiPriceValueTv.setText("" + mChiPrice);
-
+                if (mUploadInfo != null) {
                     if (mUploadPresenter != null) {
                         mUploadPresenter.generateUploadModel();
+                        mUploadPresenter.setLocalFile(mUploadInfo.getFile());
                         mUploadPresenter.setUploadInfo(mUploadInfo);
                     }
                 } else {

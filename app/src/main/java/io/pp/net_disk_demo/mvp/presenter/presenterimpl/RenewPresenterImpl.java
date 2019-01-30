@@ -190,6 +190,29 @@ public class RenewPresenterImpl implements RenewPresenter {
         }
     }
 
+    @Override
+    public String getFileName() {
+        if (mRenewModel != null) {
+            return mRenewModel.getFileName();
+        }
+        return "";
+    }
+
+    @Override
+    public long getFileSize() {
+        if (mRenewModel != null) {
+            return mRenewModel.getFileSize();
+        }
+        return 0l;
+    }
+
+    @Override
+    public String getExpiredTime() {
+        if (mRenewModel != null) {
+            return mRenewModel.getExpiredTime();
+        }
+        return "";
+    }
 
     @Override
     public int getCopies() {

@@ -41,6 +41,10 @@ public class RenewActivity extends BaseActivity implements RenewView {
 
     private final String TAG = "RenewActivity";
 
+    private final String EXPIRED_TIME = "EXPIRED_TIME";
+    private final String COPIES = "COPIES";
+    private final String CHI_PRICE = "CHI_PRICE";
+
     private Toolbar mRenewToolBar = null;
     private LinearLayout mToolBarLeftTvLayout = null;
     private TextView mToolBarTitleTv = null;
@@ -73,8 +77,9 @@ public class RenewActivity extends BaseActivity implements RenewView {
 
     private RenewPresenter mRenewPresenter = null;
 
-    private String mOperationAction = "";
+    private FileInfo mFileInfo = null;
 
+    private String mOperationAction = "";
 
     private DecimalFormat mDecimalFormat = null;
 
@@ -84,11 +89,31 @@ public class RenewActivity extends BaseActivity implements RenewView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            Log.e(TAG, "onCreate(@Nullable Bundle savedInstanceState) if (savedInstanceState != null)");
+
+            mFileInfo = new FileInfo("");
+            mFileInfo.setExpiredTime(savedInstanceState.getString(EXPIRED_TIME));
+            mFileInfo.setCopiesCount(savedInstanceState.getInt(COPIES));
+            mFileInfo.setChiPrice(savedInstanceState.getString(CHI_PRICE));
+        }
+
         setContentView(R.layout.activity_upload);
 
         mDecimalFormat = new DecimalFormat("0.000000000000000000");
 
         init();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mRenewPresenter != null) {
+            outState.putString(EXPIRED_TIME, mRenewPresenter.getExpiredTime());
+            outState.putInt(COPIES, mRenewPresenter.getCopies());
+            outState.putString(CHI_PRICE, mRenewPresenter.getChiPrice());
+        }
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -122,6 +147,12 @@ public class RenewActivity extends BaseActivity implements RenewView {
 
     @Override
     public void showFileName(String fileName) {
+        Log.e(TAG, "fileName = *" + fileName);
+        if (!TextUtils.isEmpty(fileName) && fileName.startsWith("bucket1/")) {
+            Log.e(TAG, "if (!TextUtils.isEmpty(fileName) && fileName.startsWith(\"bucket1/\"))");
+            fileName = fileName.replaceFirst("bucket1/", "");
+        }
+        Log.e(TAG, "fileName = *" + fileName);
         mFileNameTv.setText(fileName);
     }
 
@@ -464,26 +495,32 @@ public class RenewActivity extends BaseActivity implements RenewView {
 
         mRenewPresenter = new RenewPresenterImpl(RenewActivity.this, RenewActivity.this);
 
-        Intent mIntent = getIntent();
-        if (mIntent != null) {
-            mOperationAction = mIntent.getAction();
-            FileInfo mFileInfo = (FileInfo) mIntent.getSerializableExtra(Constant.Data.RENEW_FILE);
-            if (mFileInfo != null) {
-                String fileName = mFileInfo.getName();
-                if (!TextUtils.isEmpty(fileName) && fileName.startsWith(Constant.Data.DEFAULT_BUCKET + "/")) {
-                    fileName.replaceFirst(Constant.Data.DEFAULT_BUCKET + "/", "");
-                }
-                mFileNameTv.setText(fileName);
-            } else {
-                Log.e(TAG, "init() if (mFileInfo == null)");
-            }
 
-            if (Constant.Intent.RENEW_ACTION.equals(mOperationAction) &&
-                    mFileInfo != null) {
+        Intent mIntent = getIntent();
+        FileInfo fileInfo = null;
+        if (mIntent != null) {
+            fileInfo = (FileInfo) mIntent.getSerializableExtra(Constant.Data.RENEW_FILE);
+            if (mFileInfo != null) {
+                fileInfo.setExpiredTime(mFileInfo.getExpiredTime());
+                fileInfo.setCopiesCount(mFileInfo.getCopiesCount());
+                fileInfo.setChiPrice(mFileInfo.getChiPrice());
+            }
+        }
+
+        mOperationAction = mIntent.getAction();
+
+        if (fileInfo != null) {
+            String fileName = fileInfo.getName();
+            Log.e(TAG, "fileName = " + fileName);
+            mFileNameTv.setText(fileName);
+
+            if (Constant.Intent.RENEW_ACTION.equals(mOperationAction)) {
                 if (mRenewPresenter != null) {
-                    mRenewPresenter.setRenewFile(mFileInfo);
+                    mRenewPresenter.setRenewFile(fileInfo);
                 }
             }
+        } else {
+            Log.e(TAG, "init() if (mFileInfo == null)");
         }
     }
 }

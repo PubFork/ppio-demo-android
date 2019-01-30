@@ -68,6 +68,7 @@ import io.pp.net_disk_demo.mvp.view.PpioDataView;
 import io.pp.net_disk_demo.mvp.view.ShareCodeView;
 import io.pp.net_disk_demo.mvp.view.StartRenewView;
 import io.pp.net_disk_demo.mvp.view.StatusView;
+import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.service.UploadService;
@@ -196,6 +197,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //
+        Log.e(TAG, "onCreate(@Nullable Bundle savedInstanceState)");
+        //
+
         if (savedInstanceState != null) {
             mCurrentShowView = savedInstanceState.getInt(CURRENT_SHOW_VIEW);
             mShowSide = savedInstanceState.getBoolean(SHOW_SIDE);
@@ -237,13 +242,21 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     protected void onStart() {
         super.onStart();
+
+        //
+        Log.e(TAG, "onStart()");
+        //
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        if (mPpioDataPresenter != null) {
+        //
+        Log.e(TAG, "onRestoreInstanceState(Bundle savedInstanceState)");
+        //
+
+        if (mPpioDataPresenter != null && PossUtil.getUser() == null) {
             mPpioDataPresenter.link();
         }
     }
@@ -251,6 +264,9 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     protected void onResume() {
         super.onResume();
+        //
+        Log.e(TAG, "onResume()");
+        //
     }
 
     @Override
@@ -283,6 +299,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     protected void onPause() {
         super.onPause();
+
+        //
+        Log.e(TAG, "onPause()");
+        //
     }
 
     @Override
@@ -291,15 +311,27 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         outState.putBoolean(SHOW_SIDE, mShowSide);
 
         super.onSaveInstanceState(outState);
+
+        //
+        Log.e(TAG, "onSaveInstanceState(Bundle outState)");
+        //
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
+        //
+        Log.e(TAG, "onStop()");
+        //
     }
 
     @Override
     protected void onDestroy() {
+        //
+        Log.e(TAG, "onDestroy()");
+        //
+
         //dialog
         if (mBlockFileOptionsBottomDialog != null) {
             mBlockFileOptionsBottomDialog.dismiss();
@@ -409,8 +441,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     public void showNotLogInView() {
         Toast.makeText(PpioDataActivity.this, "not login!", Toast.LENGTH_SHORT).show();
 
-        //startActivity(new Intent(PpioDataActivity.this, LogInOrRegisterActivity.class));
-        startActivity(new Intent(PpioDataActivity.this, KeyStoreLogInActivity.class));
+        startActivity(new Intent(PpioDataActivity.this, CheckHasKeyStoreActivity.class));
         finish();
     }
 
@@ -700,7 +731,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         }
         //
 
-        Toast.makeText(PpioDataActivity.this, "not login!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(PpioDataActivity.this, "log out!", Toast.LENGTH_SHORT).show();
 
         //startActivity(new Intent(PpioDataActivity.this, LogInOrRegisterActivity.class));
         startActivity(new Intent(PpioDataActivity.this, KeyStoreLogInActivity.class));
@@ -1042,6 +1073,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     private void init() {
+        //
+        Log.e(TAG, "init()");
+        //
+
         initView();
 
         initListener();
@@ -1349,6 +1384,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             @Override
             public void onClick(View v) {
                 showAllFileView();
+
+                if (mPpioDataPresenter != null) {
+                    mPpioDataPresenter.refreshAllFileList();
+                }
             }
         });
 
@@ -1687,7 +1726,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     private void initData() {
-        if (mCurrentShowView == ALLFILE_VIEW && mPpioDataPresenter != null && !mBackFromUpload && !mBackFromDownload) {
+//        if (mCurrentShowView == ALLFILE_VIEW && mPpioDataPresenter != null && !mBackFromUpload && !mBackFromDownload) {
+//            mPpioDataPresenter.refreshAllFileList();
+//        }
+
+        if (mPpioDataPresenter != null) {
             mPpioDataPresenter.refreshAllFileList();
         }
 
