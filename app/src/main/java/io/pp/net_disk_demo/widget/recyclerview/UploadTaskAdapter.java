@@ -46,7 +46,8 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
             uploadTaskItemHolder.setState(taskInfo.getState(), taskInfo.getError());
             double progress2digits = 0;
             if (taskInfo.getTotal() != 0) {
-                progress2digits = new BigDecimal((double) taskInfo.getFinished() / taskInfo.getTotal()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                //progress2digits = new BigDecimal((double) taskInfo.getFinished() / taskInfo.getTotal()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                progress2digits = new BigDecimal(taskInfo.getProgress()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
             }
 
             uploadTaskItemHolder.setProgress(progress2digits);

@@ -1,11 +1,17 @@
 package io.pp.net_disk_demo.widget.recyclerview;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
@@ -51,12 +58,18 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
 
             double progress2digits = 0;
             if (taskInfo.getTotal() != 0) {
-                progress2digits = new BigDecimal((double) taskInfo.getFinished() / taskInfo.getTotal()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                //progress2digits = new BigDecimal((double) taskInfo.getFinished() / taskInfo.getTotal()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                progress2digits = new BigDecimal(taskInfo.getProgress()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
             }
             downloadTaskItemHolder.setProgress(progress2digits);
 
             downloadTaskItemHolder.setPauseResume(taskInfo.getId(), taskInfo.getState());
             downloadTaskItemHolder.setDelete(taskInfo.getId());
+
+            if (Constant.TaskType.GET.equals(taskInfo.getType()) &&
+                    Constant.TaskState.FINISHED.equals(taskInfo.getState())) {
+                downloadTaskItemHolder.setOnEnterDownloadedDirectoryListener(taskInfo.getTo());
+            }
         }
 
         downloadTaskItemHolder.setFooterItem(i == (getItemCount() - 1));
@@ -240,6 +253,36 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
 
             mDeleteIv.setOnClickListener(deleteClickListener);
             mTaskDeleteLayout.setOnClickListener(deleteClickListener);
+        }
+
+        public void setOnEnterDownloadedDirectoryListener(String downloadedPath) {
+            mItemLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    try {
+                        File downloadedFile = new File(downloadedPath);
+                        File parentFile = downloadedFile.getParentFile();
+
+                        if (Build.VERSION.SDK_INT >= 24) {
+                            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                            StrictMode.setVmPolicy(builder.build());
+                        }
+                        Uri uri = Uri.fromFile(parentFile);
+
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setDataAndType(uri, "*/*");
+                        mContext.startActivity(intent);
+
+                        Log.e(TAG, "uri = " + uri);
+                    } catch (Exception e) {
+                        Log.e(TAG, "start Activity for scan file failed!:" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
 
         public void setFooterItem(boolean isFooter) {

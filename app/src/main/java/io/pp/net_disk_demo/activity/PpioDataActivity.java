@@ -475,7 +475,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mCurrentShowView = ALLFILE_VIEW;
 
-                mWActionBarTitleTv.setText("all file");
+                mWActionBarTitleTv.setText("Files");
 
                 mMyFileAdapter.refreshFileList(mMyFileInfoList);
 
@@ -1753,7 +1753,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             public void run() {
                 mCurrentShowView = ALLFILE_VIEW;
 
-                mWActionBarTitleTv.setText("all file");
+                mWActionBarTitleTv.setText("Files");
 
                 mSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 mUploadingFileRecyclerView.setVisibility(View.GONE);
@@ -1780,7 +1780,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             public void run() {
                 mCurrentShowView = UPLOADING_VIEW;
 
-                mWActionBarTitleTv.setText("uploading");
+                mWActionBarTitleTv.setText("Uploading");
 
                 mSwipeRefreshLayout.setVisibility(View.GONE);
                 mUploadingFileRecyclerView.setVisibility(View.VISIBLE);
@@ -1809,7 +1809,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             public void run() {
                 mCurrentShowView = DOWNLOADING_VIEW;
 
-                mWActionBarTitleTv.setText("downloading");
+                mWActionBarTitleTv.setText("Downloading");
 
                 mSwipeRefreshLayout.setVisibility(View.GONE);
                 mUploadingFileRecyclerView.setVisibility(View.GONE);

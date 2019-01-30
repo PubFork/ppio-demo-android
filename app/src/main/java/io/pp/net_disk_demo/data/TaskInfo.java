@@ -11,6 +11,7 @@ public class TaskInfo {
     private long mTotal = 0L;
     private long mFinished = 0L;
     private String mError = "";
+    private double mProgress;
 
     public void setId(String id) {
         mId = id;
@@ -48,6 +49,9 @@ public class TaskInfo {
         mError = error;
     }
 
+    public void setProgress(double progress) {
+        mProgress = progress;
+    }
 
     public String getId() {
         return mId;
@@ -83,5 +87,9 @@ public class TaskInfo {
 
     public String getError() {
         return mError;
+    }
+
+    public double getProgress() {
+        return mProgress;
     }
 }

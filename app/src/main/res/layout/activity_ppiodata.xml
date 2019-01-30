@@ -87,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/ppio_actionbar_layout"
-            android:layout_marginBottom="49dp"
+            android:layout_marginBottom="47dp"
             android:orientation="horizontal">
 
             <android.support.v4.widget.SwipeRefreshLayout
@@ -141,70 +141,28 @@
             android:layout_above="@+id/bottom_button_layout"
             android:background="#DCDFE6" />
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/bottom_button_layout"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="46dp"
             android:layout_alignParentBottom="true"
             android:background="#FFF5F7FA"
-            android:gravity="center_vertical">
-
-            <RelativeLayout
-                android:id="@+id/tools_upload_layout"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true">
-
-                <ImageView
-                    android:id="@+id/tools_uploading_iv"
-                    android:layout_width="22dp"
-                    android:layout_height="19dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginBottom="0dp"
-                    android:background="@mipmap/uploading_unselected"
-                    android:contentDescription="@string/app_name" />
-
-                <TextView
-                    android:id="@+id/tools_uploading_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tools_uploading_iv"
-                    android:layout_alignBaseline="@id/tools_uploading_iv"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="2dp"
-                    android:includeFontPadding="false"
-                    android:text="uploading"
-                    android:textColor="#606266"
-                    android:textSize="10dp" />
-            </RelativeLayout>
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <RelativeLayout
                 android:id="@+id/tools_allfile_layout"
-                android:layout_width="80dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="56dp">
-
-                <!--<ImageView-->
-                <!--android:id="@+id/tools_allfile_iv"-->
-                <!--android:layout_width="17dp"-->
-                <!--android:layout_height="21dp"-->
-                <!--android:layout_centerHorizontal="true"-->
-                <!--android:layout_marginTop="13dp"-->
-                <!--android:layout_marginBottom="0dp"-->
-                <!--android:background="@mipmap/allfile_selected"-->
-                <!--android:contentDescription="@string/app_name" />-->
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1">
 
                 <ImageView
                     android:id="@+id/tools_allfile_iv"
                     android:layout_width="15.4dp"
                     android:layout_height="19dp"
+                    android:layout_above="@id/tools_allfile_tv"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginBottom="0dp"
                     android:background="@mipmap/allfile_selected"
                     android:contentDescription="@string/app_name" />
 
@@ -212,30 +170,60 @@
                     android:id="@+id/tools_allfile_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tools_allfile_iv"
+                    android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="4dp"
+
                     android:includeFontPadding="false"
-                    android:text="all file"
+                    android:text="Files"
                     android:textColor="#1989FA"
                     android:textSize="10dp" />
 
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/tools_download_layout"
-                android:layout_width="80dp"
+                android:id="@+id/tools_upload_layout"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="44dp">
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/tools_uploading_iv"
+                    android:layout_width="22dp"
+                    android:layout_height="19dp"
+                    android:layout_above="@id/tools_uploading_tv"
+                    android:layout_centerHorizontal="true"
+                    android:background="@mipmap/uploading_unselected"
+                    android:contentDescription="@string/app_name" />
+
+                <TextView
+                    android:id="@+id/tools_uploading_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="4dp"
+                    android:includeFontPadding="false"
+                    android:text="Uploading"
+                    android:textColor="#606266"
+                    android:textSize="10dp" />
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/tools_download_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1">
 
                 <ImageView
                     android:id="@+id/tools_downloading_iv"
                     android:layout_width="22dp"
                     android:layout_height="19dp"
+                    android:layout_above="@id/tools_downloading_tv"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="0dp"
                     android:background="@mipmap/downloading_unselected"
                     android:contentDescription="@string/app_name" />
 
@@ -243,16 +231,16 @@
                     android:id="@+id/tools_downloading_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tools_downloading_iv"
+                    android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="4dp"
                     android:includeFontPadding="false"
-                    android:text="downloading"
+                    android:text="Downloading"
                     android:textColor="#606266"
                     android:textSize="10dp" />
 
             </RelativeLayout>
-        </RelativeLayout>
+        </LinearLayout>
 
     </RelativeLayout>
 

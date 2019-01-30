@@ -382,7 +382,7 @@ public class UploadService extends Service {
                         finishedUpload = finishedUpload + taskInfo.getFinished();
                         totalUpload = totalUpload + taskInfo.getTotal();
 
-                        Log.e(TAG, "total: " + taskInfo.getTotal() + ", totalBytes: " + progress.getTotalBytes() + ", finished: " + taskInfo.getFinished());
+                        taskInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
                     }
 
                     uploadTaskList.add(taskInfo);

@@ -393,7 +393,7 @@ public class DownloadService extends Service {
                         finishedDownload = finishedDownload + taskInfo.getFinished();
                         totalDownload = totalDownload + taskInfo.getTotal();
 
-                        Log.e(TAG, "total: " + taskInfo.getTotal() + ", totalBytes: " + progress.getTotalBytes() + ", finished: " + taskInfo.getFinished());
+                        taskInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
                     }
 
                     uploadTaskList.add(taskInfo);
