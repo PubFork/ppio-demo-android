@@ -53,7 +53,8 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
             uploadTaskItemHolder.setProgress(progress2digits);
 
             uploadTaskItemHolder.setPauseResume(taskInfo.getId(), taskInfo.getState());
-            uploadTaskItemHolder.setDelete(taskInfo.getId());
+
+            uploadTaskItemHolder.setDelete(taskInfo);
         }
 
         uploadTaskItemHolder.setFooterItem(i == (getItemCount() - 1));
@@ -222,12 +223,12 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
             mTaskPauseResumeIv.setOnClickListener(taskPauseResumeOnClickListener);
         }
 
-        public void setDelete(final String taskId) {
+        public void setDelete(final TaskInfo taskInfo) {
             View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mUploadTaskItemClickListener != null) {
-                        mUploadTaskItemClickListener.onDelete(taskId);
+                        mUploadTaskItemClickListener.onDelete(taskInfo);
                     }
                 }
             };
@@ -250,7 +251,7 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
     }
 
     public interface UploadTaskItemClickListener {
-        void onDelete(String taskId);
+        void onDelete(final TaskInfo taskInfo);
 
         void onPause(String taskId);
 

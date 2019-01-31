@@ -75,6 +75,11 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
+    public void deleteUploadingTask(String bucket, String key, String taskId) {
+        new DeleteUploadingTaskAsyncTask(bucket, key, ExecuteTaskModelImpl.this).execute(taskId);
+    }
+
+    @Override
     public void pauseTask(String taskId) {
         new PauseTaskAsyncTask(ExecuteTaskModelImpl.this).execute(taskId);
     }
@@ -141,6 +146,12 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         }
     }
 
+    public void showDeleteUploadingTaskFinished(String bucket, String key) {
+        if (mExecuteTasksPresenter != null) {
+            mExecuteTasksPresenter.showDeleteUploadingTaskFinished(bucket, key);
+        }
+    }
+
     public void showOperateTaskError(String errMsg) {
         if (mExecuteTasksPresenter != null) {
             mExecuteTasksPresenter.showOperateError(errMsg);
@@ -192,6 +203,57 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
             }
         }
     }
+
+    static class DeleteUploadingTaskAsyncTask extends AsyncTask<String, String, Boolean> {
+
+        final String mBucket;
+        final String mKey;
+        final WeakReference<ExecuteTaskModelImpl> mExecuteTaskModelImplWeakReference;
+
+        public DeleteUploadingTaskAsyncTask(String bucket, String key, ExecuteTaskModelImpl executeTaskModelImpl) {
+            mBucket = bucket;
+            mKey = key;
+            mExecuteTaskModelImplWeakReference = new WeakReference<>(executeTaskModelImpl);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask();
+            }
+        }
+
+        @Override
+        protected Boolean doInBackground(String[] values) {
+            return PossUtil.deleteTask(values[0], new PossUtil.DeleteTaskListener() {
+                @Override
+                public void onDeleteTaskError(String errMsg) {
+                    publishProgress(errMsg);
+                }
+            });
+        }
+
+        @Override
+        protected void onProgressUpdate(String[] values) {
+            super.onProgressUpdate(values);
+
+            if (mExecuteTaskModelImplWeakReference.get() != null) {
+                mExecuteTaskModelImplWeakReference.get().showOperateTaskError(values[0]);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean succeed) {
+            super.onPostExecute(succeed);
+
+            if (mExecuteTaskModelImplWeakReference.get() != null && succeed) {
+                mExecuteTaskModelImplWeakReference.get().showDeleteUploadingTaskFinished(mBucket, mKey);
+            }
+        }
+    }
+
 
     static class PauseTaskAsyncTask extends AsyncTask<String, String, Boolean> {
 

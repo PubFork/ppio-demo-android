@@ -66,6 +66,13 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     }
 
     @Override
+    public void deleteUploadingTask(String bucket, String key, String taskId) {
+        if (mExecuteTaskModel != null) {
+            mExecuteTaskModel.deleteUploadingTask(bucket, key, taskId);
+        }
+    }
+
+    @Override
     public void pauseTask(String taskId) {
         if (mExecuteTaskModel != null) {
             mExecuteTaskModel.pauseTask(taskId);
@@ -97,6 +104,13 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     public void showOperateError(String errMsg) {
         if (mExecuteTaskView != null) {
             mExecuteTaskView.showOperateTaskErrorView(errMsg);
+        }
+    }
+
+    @Override
+    public void showDeleteUploadingTaskFinished(String bucket, String key) {
+        if (mExecuteTaskView != null) {
+            mExecuteTaskView.showDeleteUploadingTaskFinishedView(bucket, key);
         }
     }
 

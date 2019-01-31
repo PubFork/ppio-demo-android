@@ -34,6 +34,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
     private OnItemListener mOnItemListener = null;
 
     private HashMap<String, DeletingInfo> mDeletingInfoHashMap = null;
+    private HashMap<String, String> mUploadFailedInfoHashMap = null;
     private HashMap<String, TaskInfo> mUploadingTaskHashMap = null;
     private ArrayList<FileInfo> mMyFileList = null;
 
@@ -56,7 +57,8 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         FileInfo fileInfo = mMyFileList.get(i);
         if (fileInfo != null) {
 
-            if (mUploadingTaskHashMap != null && mUploadingTaskHashMap.containsKey(fileInfo.getBucketName() + "/" + fileInfo.getName())) {
+            if ((mUploadingTaskHashMap != null && mUploadingTaskHashMap.containsKey(fileInfo.getBucketName() + "/" + fileInfo.getName())) ||
+                    mUploadFailedInfoHashMap != null && mUploadFailedInfoHashMap.containsKey(fileInfo.getBucketName() + fileInfo.getName())) {
                 myFileItemHolder.setInVisible(true);
             } else {
                 myFileItemHolder.setInVisible(false);
@@ -102,6 +104,10 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         }
 
         return 0;
+    }
+
+    public void refreshUploadFailedHashMap(HashMap<String, String> uploadFailedInfoHashMap) {
+        mUploadFailedInfoHashMap = uploadFailedInfoHashMap;
     }
 
     public void refreshDeletingInfoHashMap(HashMap<String, DeletingInfo> deletingInfoHashMap) {

@@ -6,6 +6,7 @@ public interface DeletePresenter {
 
     void delete(String bucket, String key);
 
+    void deleteSilently(String bucket, String key);
 
     void onDeletePrepare();
 
@@ -13,6 +14,7 @@ public interface DeletePresenter {
 
     void onDeleteFinish(DeletingInfo deletingInfo);
 
+    void onDeleteSilentlyFinish(String bucket, String key);
 
     void onDestroy();
 }

@@ -9,4 +9,6 @@ public interface DeleteView {
     void onDeleteError(String errMsg);
 
     void onDeleteFinish(DeletingInfo deletingInfo);
+
+    void onDeleteSilentlyFinish(String bucket, String key);
 }

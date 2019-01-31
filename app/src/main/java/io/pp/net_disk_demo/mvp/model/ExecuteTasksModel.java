@@ -19,6 +19,8 @@ public interface ExecuteTasksModel {
 
     void deleteTask(String taskId);
 
+    void deleteUploadingTask(String bucket, String key, String taskId);
+
     void pauseTask(String taskId);
 
     void resumeTask(String taskId);

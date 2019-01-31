@@ -31,4 +31,6 @@ public interface ExecuteTaskView {
     void showOperateTaskErrorView(String errMsg);
 
     void showOperateTaskFinishedView();
+
+    void showDeleteUploadingTaskFinishedView(String bucket, String key);
 }

@@ -94,6 +94,7 @@ public class Constant {
     }
 
     public static class ProgressState {
+        public static final String RUNNING = "Running";
         public static final String FINISHED = "Finished";
         public static final String ERROR = "Error";
     }
@@ -124,5 +125,11 @@ public class Constant {
     public static class DEFAULT {
         public static final int COPIES = 5;
         public static final String CHI_PRICE = "100";
+    }
+
+    public static class Cache {
+        public static class Table {
+            public static String UPLOAD_FAILED_OBJECT = "upload_failed_object";
+        }
     }
 }

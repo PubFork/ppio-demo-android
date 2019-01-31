@@ -25,6 +25,8 @@ public interface ExecuteTaskPresenter {
 
     void deleteTask(String taskId);
 
+    void deleteUploadingTask(String bucket, String key, String taskId);
+
     void pauseTask(String taskId);
 
     void resumeTask(String taskId);
@@ -34,6 +36,8 @@ public interface ExecuteTaskPresenter {
     void showOperateFinished();
 
     void showOperateError(String errMsg);
+
+    void showDeleteUploadingTaskFinished(String bucket, String key);
 
 
     void startUpload(UploadInfo uploadInfo);

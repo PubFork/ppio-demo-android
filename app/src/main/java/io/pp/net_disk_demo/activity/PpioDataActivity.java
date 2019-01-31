@@ -184,6 +184,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private DecimalFormat mDecimalFormat = null;
 
     private HashMap<String, DeletingInfo> mDeletingInfoHashMap = null;
+    private HashMap<String, String> mUploadFailedInfoHashMap = null;
 
     private Handler mHandler = null;
 
@@ -203,10 +204,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //
-        Log.e(TAG, "onCreate(@Nullable Bundle savedInstanceState)");
-        //
 
         if (savedInstanceState != null) {
             mCurrentShowView = savedInstanceState.getInt(CURRENT_SHOW_VIEW);
@@ -244,6 +241,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         setContentView(R.layout.activity_ppiodata);
 
         mDeletingInfoHashMap = new HashMap<>();
+        mUploadFailedInfoHashMap = new HashMap<>();
 
         mHandler = new Handler();
 
@@ -253,19 +251,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     protected void onStart() {
         super.onStart();
-
-        //
-        Log.e(TAG, "onStart()");
-        //
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
-        //
-        Log.e(TAG, "onRestoreInstanceState(Bundle savedInstanceState)");
-        //
 
         if (mPpioDataPresenter != null && PossUtil.getUser() == null) {
             mPpioDataPresenter.link();
@@ -501,6 +491,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mWActionBarTitleTv.setText("Files");
 
+                mMyFileAdapter.refreshUploadFailedHashMap(mUploadFailedInfoHashMap);
                 mMyFileAdapter.refreshDeletingInfoHashMap(mDeletingInfoHashMap);
                 mMyFileAdapter.refreshUploadingTaskHashMap(uploadingTaskHashMap);
                 mMyFileAdapter.refreshFileList(mMyFileInfoList);
@@ -869,6 +860,23 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         }
     }
 
+    @Override
+    public void showDeleteUploadingTaskFinishedView(String bucket, String key) {
+        stopShowNetWorkingView();
+
+        if (mDeletePresenter != null) {
+            //
+            Log.e(TAG, "++++++ mUploadFailedInfoHashMap.put() " + bucket + key);
+            //
+            mUploadFailedInfoHashMap.put(bucket + key, bucket + key);
+            mDeletePresenter.deleteSilently(bucket, key);
+        }
+
+        if (mExecuteTaskPresenter != null) {
+            mExecuteTaskPresenter.startRefreshTasks();
+        }
+    }
+
     /**
      * DetailView
      */
@@ -979,8 +987,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 mDeletingInfoHashMap.put(deletingInfo.getName(), deletingInfo);
+
                 if (mPpioDataPresenter != null) {
                     mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap);
                 }
@@ -992,6 +1000,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 }
             }
         });
+    }
+
+    @Override
+    public void onDeleteSilentlyFinish(String bucket, String key) {
+        mUploadFailedInfoHashMap.remove(bucket + key);
     }
 
     public void showNetWorkingView() {
@@ -1624,43 +1637,60 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
         mUploadTaskAdapter.setUploadTaskItemClickListener(new UploadTaskAdapter.UploadTaskItemClickListener() {
             @Override
-            public void onDelete(final String taskId) {
+            public void onDelete(final TaskInfo taskInfo) {
                 if (mDeleteDialog != null) {
                     mDeleteDialog.dismiss();
                     mDeleteDialog = null;
                 }
 
-                mDeleteDialog = new DeleteDialog(PpioDataActivity.this,
-                        "delete task " + taskId,
-                        new DeleteDialog.OnDeleteOnClickListener() {
-                            @Override
-                            public void onCancel() {
-                                mDeleteDialog.dismiss();
-                            }
+                if (Constant.TaskState.RUNNING.equals(taskInfo.getState())) {
+                    ToastUtil.showToast(PpioDataActivity.this, "the task is running!", Toast.LENGTH_SHORT);
+                } else {
+                    final boolean isUploading = Constant.TaskType.PUT.equals(taskInfo.getType()) && !Constant.TaskState.FINISHED.equals(taskInfo.getState());
+                    final String taskId = taskInfo.getId();
+                    final String bucket = Constant.Data.DEFAULT_BUCKET;
+                    String str = taskInfo.getTo().replaceFirst(bucket, "");
+                    if (str.startsWith("//")) {
+                        str = str.replaceFirst("/", "");
+                    }
+                    final String key = str;
 
-                            @Override
-                            public void onDelete() {
+                    mDeleteDialog = new DeleteDialog(PpioDataActivity.this,
+                            "delete task " + taskId,
+                            new DeleteDialog.OnDeleteOnClickListener() {
+                                @Override
+                                public void onCancel() {
+                                    mDeleteDialog.dismiss();
+                                }
 
-                                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                    @Override
-                                    public void onRunOperation() {
-                                        if (mExecuteTaskPresenter != null) {
-                                            mExecuteTaskPresenter.deleteTask(taskId);
+                                @Override
+                                public void onDelete() {
+
+                                    Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
+                                        @Override
+                                        public void onRunOperation() {
+                                            if (mExecuteTaskPresenter != null) {
+                                                if (isUploading) {
+                                                    mExecuteTaskPresenter.deleteUploadingTask(bucket, key, taskId);
+                                                } else {
+                                                    mExecuteTaskPresenter.deleteTask(taskId);
+                                                }
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
-                                mDeleteDialog.dismiss();
-                            }
-                        },
-                        new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
+                                    mDeleteDialog.dismiss();
+                                }
+                            },
+                            new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    mDeleteDialog = null;
+                                }
+                            });
 
-                            }
-                        });
-
-                mDeleteDialog.show();
+                    mDeleteDialog.show();
+                }
             }
 
             @Override

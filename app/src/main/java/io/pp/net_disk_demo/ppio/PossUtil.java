@@ -420,7 +420,7 @@ public class PossUtil {
         }
 
         //
-        //Log.e(TAG, "listObject() listObjectStr = " + listObjectStr);
+        Log.e(TAG, "listObject() ++++++ listObjectStr = " + listObjectStr);
         //
 
         return fileInfoList;
