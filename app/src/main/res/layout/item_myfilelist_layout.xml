@@ -5,6 +5,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="74dp"
         android:background="@android:color/white"
@@ -73,10 +74,15 @@
 
     </LinearLayout>
 
+    <View
+        android:id="@+id/bottom_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+
     <LinearLayout
         android:id="@+id/footer_layout"
         android:layout_width="match_parent"
-        android:layout_height="77dp"
+        android:layout_height="75dp"
         android:orientation="vertical"
         android:visibility="gone" />
 </LinearLayout>

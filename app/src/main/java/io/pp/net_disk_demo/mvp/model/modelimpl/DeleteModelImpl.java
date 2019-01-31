@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -67,12 +68,12 @@ public class DeleteModelImpl implements DeleteModel {
 
         @Override
         protected Boolean doInBackground(String... strings) {
-            return PossUtil.deleteObject(strings[0], strings[1], new PossUtil.DeleteObjectListener() {
+            return !TextUtils.isEmpty(PossUtil.deleteObject(strings[0], strings[1], new PossUtil.DeleteObjectListener() {
                 @Override
                 public void onDeleteObjectError(String errMsg) {
                     publishProgress(errMsg);
                 }
-            });
+            }));
         }
 
         @Override

@@ -4,13 +4,13 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.data.FileInfo;
+import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.database.AccountDatabaseManager;
 import io.pp.net_disk_demo.mvp.model.PpioDataModel;
 import io.pp.net_disk_demo.mvp.presenter.PpioDataPresenter;
@@ -45,19 +45,27 @@ public class PpioDataModelImpl implements PpioDataModel {
     }
 
     private void showLinking() {
-        mPpioDataPresenter.showLinking();
+        if (mPpioDataPresenter != null) {
+            mPpioDataPresenter.showLinking();
+        }
     }
 
     private void showLinkFail(String failMessage) {
-        mPpioDataPresenter.showLinkFail(failMessage);
+        if (mPpioDataPresenter != null) {
+            mPpioDataPresenter.showLinkFail(failMessage);
+        }
     }
 
     private void stopShowLinking() {
-        mPpioDataPresenter.stopShowLinking();
+        if (mPpioDataPresenter != null) {
+            mPpioDataPresenter.stopShowLinking();
+        }
     }
 
     private void showNotLogIn() {
-        mPpioDataPresenter.showNotLogIn();
+        if (mPpioDataPresenter != null) {
+            mPpioDataPresenter.showNotLogIn();
+        }
     }
 
     @Override
@@ -68,15 +76,21 @@ public class PpioDataModelImpl implements PpioDataModel {
     }
 
     private void showRefreshingMyFileList() {
-        mPpioDataPresenter.showRefreshingMyFileList();
+        if (mPpioDataPresenter != null) {
+            mPpioDataPresenter.showRefreshingMyFileList();
+        }
     }
 
     private void showRefreshMyFileListFail(String failStr) {
-        mPpioDataPresenter.showRefreshAllFileListFail(failStr);
+        if (mPpioDataPresenter != null) {
+            mPpioDataPresenter.showRefreshAllFileListFail(failStr);
+        }
     }
 
-    public void showRefreshMyFilListSucceed(ArrayList<FileInfo> fileInfoList) {
-        mPpioDataPresenter.showAllFileList(fileInfoList);
+    public void showRefreshMyFilListSucceed(HashMap<String, TaskInfo> uploadedTaskHashMap, ArrayList<FileInfo> fileInfoList) {
+        if (mPpioDataPresenter != null) {
+            mPpioDataPresenter.showAllFileList(uploadedTaskHashMap, fileInfoList);
+        }
     }
 
     @Override
@@ -198,8 +212,17 @@ public class PpioDataModelImpl implements PpioDataModel {
                     }
                 });
 
+                HashMap<String, TaskInfo> uploadingTaskHashMap = PossUtil.listUploadingTask(new PossUtil.ListTaskListener() {
+                    @Override
+                    public void onListTaskError(String errMsg) {
+                        if (mModelImplWeakReference.get() != null) {
+                            mModelImplWeakReference.get().showRefreshMyFileListFail(errMsg);
+                        }
+                    }
+                });
+
                 if (mModelImplWeakReference.get() != null) {
-                    mModelImplWeakReference.get().showRefreshMyFilListSucceed(myFileList);
+                    mModelImplWeakReference.get().showRefreshMyFilListSucceed(uploadingTaskHashMap, myFileList);
                 }
             }
         }

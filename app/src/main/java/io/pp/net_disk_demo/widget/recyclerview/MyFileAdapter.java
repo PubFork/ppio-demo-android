@@ -3,7 +3,10 @@ package io.pp.net_disk_demo.widget.recyclerview;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +15,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.data.FileInfo;
+import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.util.FileUtil;
 import io.pp.net_disk_demo.util.Util;
 
@@ -26,6 +32,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
 
     private OnItemListener mOnItemListener = null;
 
+    private HashMap<String, TaskInfo> mUploadingTaskHashMap = null;
     private ArrayList<FileInfo> mMyFileList = null;
 
     public MyFileAdapter(Context context) {
@@ -44,19 +51,33 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
     public void onBindViewHolder(@NonNull MyFileItemHolder myFileItemHolder, int i) {
         FileInfo fileInfo = mMyFileList.get(i);
         if (fileInfo != null) {
-            myFileItemHolder.setFileName(fileInfo.getName());
-            myFileItemHolder.setFileIcon(fileInfo.getName());
-            myFileItemHolder.setFileModifiedDate("expire: " + fileInfo.getExpiredTime() + " " + fileInfo.getStatus());
 
-            if (fileInfo.isSecure()) {
-                myFileItemHolder.setEncrypt();
-            } else if (fileInfo.isShare()) {
-                myFileItemHolder.setShared();
+            if (mUploadingTaskHashMap != null && mUploadingTaskHashMap.containsKey(fileInfo.getBucketName() + "/" + fileInfo.getName())) {
+                myFileItemHolder.setInVisible(true);
             } else {
-                myFileItemHolder.setNormal();
-            }
+                myFileItemHolder.setInVisible(false);
 
-            myFileItemHolder.setClickListener(mOnItemListener, i);
+                myFileItemHolder.setFileName(fileInfo.getName());
+                myFileItemHolder.setFileIcon(fileInfo.getName());
+
+                String stateStr = "expire: " + fileInfo.getExpiredTime().substring(0, 10);
+                if (Constant.ObjectState.BID.equals(fileInfo.getStatus())) {
+                    stateStr = stateStr + " <font color='#FF0000'>Bid</font>";
+                }
+
+                //myFileItemHolder.setFileModifiedDate("expire: " + fileInfo.getExpiredTime() + " " + fileInfo.getStatus());
+                myFileItemHolder.setFileModifiedDate(Html.fromHtml(stateStr));
+
+                if (fileInfo.isSecure()) {
+                    myFileItemHolder.setEncrypt();
+                } else if (fileInfo.isShare()) {
+                    myFileItemHolder.setShared();
+                } else {
+                    myFileItemHolder.setNormal();
+                }
+
+                myFileItemHolder.setClickListener(mOnItemListener, i);
+            }
         }
 
         myFileItemHolder.setFooterItem(i == (getItemCount() - 1));
@@ -69,6 +90,10 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         }
 
         return 0;
+    }
+
+    public void refreshUploadingTaskHashMap(HashMap<String, TaskInfo> uploadingTaskHashMap) {
+        mUploadingTaskHashMap = uploadingTaskHashMap;
     }
 
     public void refreshFileList(ArrayList<FileInfo> myFileList) {
@@ -101,6 +126,8 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
 
         private View mItemLayout = null;
 
+        private LinearLayout mContentLayout = null;
+        private View mBottomLine = null;
         private LinearLayout mFooterLayout = null;
         private ImageView mFileIv = null;
         private ImageView mFileStatusIv = null;
@@ -117,6 +144,9 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
             mItemLayout = itemView;
             mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     Util.dp2px(context, 74)));
+
+            mContentLayout = mItemLayout.findViewById(R.id.content_layout);
+            mBottomLine = mItemLayout.findViewById(R.id.bottom_line);
 
             mFooterLayout = mItemLayout.findViewById(R.id.footer_layout);
             mFooterLayout.setVisibility(View.GONE);
@@ -190,7 +220,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
             }
         }
 
-        public void setFileModifiedDate(String modifiedDate) {
+        public void setFileModifiedDate(Spanned modifiedDate) {
             mFileModifiedDateTv.setText(modifiedDate);
         }
 
@@ -228,6 +258,16 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
                 mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         Util.dp2px(mContext, 74)));
                 mFooterLayout.setVisibility(View.GONE);
+            }
+        }
+
+        public void setInVisible(boolean inVisible) {
+            if (inVisible) {
+                mContentLayout.setVisibility(View.GONE);
+                mBottomLine.setVisibility(View.GONE);
+            } else {
+                mContentLayout.setVisibility(View.VISIBLE);
+                mBottomLine.setVisibility(View.GONE);
             }
         }
     }

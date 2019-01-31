@@ -124,13 +124,13 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/upload_get_btn"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignEnd="@id/list_layout"
             android:layout_alignBottom="@id/list_layout"
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="15dp"
-            android:layout_marginBottom="21dp"
+            android:layout_marginBottom="20dp"
             android:src="@mipmap/fab_icon"
             app:backgroundTint="#4285F4"
             app:elevation="4dp" />

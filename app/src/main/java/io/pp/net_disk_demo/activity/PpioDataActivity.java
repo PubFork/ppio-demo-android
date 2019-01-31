@@ -33,6 +33,7 @@ import android.widget.Toast;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
@@ -465,18 +466,20 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showAllFileList(final ArrayList<FileInfo> mMyFileInfoList) {
+    public void showAllFileList(HashMap<String, TaskInfo> uploadingTaskHashMap, final ArrayList<FileInfo> mMyFileInfoList) {
         stopShowNetWorkingView();
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
                 mSwipeRefreshLayout.setRefreshing(false);
 
                 mCurrentShowView = ALLFILE_VIEW;
 
                 mWActionBarTitleTv.setText("Files");
 
+                mMyFileAdapter.refreshUploadingTaskHashMap(uploadingTaskHashMap);
                 mMyFileAdapter.refreshFileList(mMyFileInfoList);
 
                 mSwipeRefreshLayout.setVisibility(View.VISIBLE);
@@ -1172,15 +1175,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mMyFileRecyclerView.setAdapter(mMyFileAdapter);
 
         mUploadingFileRecyclerView.setLayoutManager(new LinearLayoutManager(PpioDataActivity.this));
-        mUploadingFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-                super.getItemOffsets(outRect, view, parent, state);
-                if (parent.getChildAdapterPosition(view) != 0) {
-                    outRect.top = Util.dp2px(PpioDataActivity.this, 1);
-                }
-            }
-        });
+//        mUploadingFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+//            @Override
+//            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+//                super.getItemOffsets(outRect, view, parent, state);
+//                if (parent.getChildAdapterPosition(view) != 0) {
+//                    outRect.top = Util.dp2px(PpioDataActivity.this, 1);
+//                }
+//            }
+//        });
 
         mUploadTaskAdapter = new UploadTaskAdapter(PpioDataActivity.this, null);
         mUploadingFileRecyclerView.setAdapter(mUploadTaskAdapter);

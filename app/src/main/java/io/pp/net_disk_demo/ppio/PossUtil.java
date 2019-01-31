@@ -420,7 +420,7 @@ public class PossUtil {
         }
 
         //
-        Log.e(TAG, "listObject() listObjectStr = " + listObjectStr);
+        //Log.e(TAG, "listObject() listObjectStr = " + listObjectStr);
         //
 
         return fileInfoList;
@@ -551,18 +551,18 @@ public class PossUtil {
         return true;
     }
 
-    public static boolean deleteObject(String bucket, String key, DeleteObjectListener deleteObjectListener) {
+    public static String deleteObject(String bucket, String key, DeleteObjectListener deleteObjectListener) {
+        String deleteTaskId = "";
+
         try {
-            mUser.deleteObject(bucket, key);
+            deleteTaskId = mUser.deleteObject(bucket, key);
         } catch (Exception e) {
             if (deleteObjectListener != null) {
                 deleteObjectListener.onDeleteObjectError(e.getMessage());
             }
-
-            return false;
         }
 
-        return true;
+        return deleteTaskId;
     }
 
     public static ArrayList<TaskInfo> listTask(ListTaskListener listTaskListener) {
@@ -683,6 +683,51 @@ public class PossUtil {
         }
 
         //Log.e(TAG, "listTask() taskStr = " + taskStr);
+
+        return taskInfoMap;
+    }
+
+    //get the uploading task list
+    public static LinkedHashMap<String, TaskInfo> listUploadingTask(ListTaskListener listTaskListener) {
+        LinkedHashMap<String, TaskInfo> taskInfoMap = new LinkedHashMap<>();
+        String taskStr = "";
+
+        if (mUser != null) {
+            try {
+                taskStr = mUser.listTasks();
+
+                JSONArray jsonArray = new JSONArray(taskStr);
+                int length = jsonArray.length();
+                for (int i = 0; i < length; i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    TaskInfo taskInfo = new TaskInfo();
+                    if (Constant.TaskType.PUT.equals(jsonObject.getString(Constant.TaskKey.TYPE)) &&
+                            !Constant.TaskState.FINISHED.equals(jsonObject.getString(Constant.TaskKey.STATE))) {
+                        taskInfo.setId(jsonObject.getString(Constant.TaskKey.ID));
+                        taskInfo.setType(jsonObject.getString(Constant.TaskKey.TYPE));
+                        taskInfo.setState(jsonObject.getString(Constant.TaskKey.STATE));
+                        taskInfo.setFrom(jsonObject.getString(Constant.TaskKey.FROM));
+                        taskInfo.setTo(jsonObject.getString(Constant.TaskKey.TO));
+                        taskInfo.setTotal(jsonObject.getLong(Constant.TaskKey.TOTAL));
+                        taskInfo.setFinished(jsonObject.getLong(Constant.TaskKey.FINISHED));
+                        taskInfo.setCreated(jsonObject.getString(Constant.TaskKey.CREATE));
+                        taskInfo.setError(jsonObject.getString(Constant.TaskKey.ERROR));
+
+                        taskInfoMap.put(taskInfo.getTo(), taskInfo);
+                    }
+                }
+            } catch (Exception e) {
+                if (listTaskListener != null) {
+                    listTaskListener.onListTaskError(e.getMessage());
+                }
+
+                Log.e(TAG, "listUploadingTask error: " + e.getMessage());
+
+                e.printStackTrace();
+            }
+        } else {
+
+        }
 
         return taskInfoMap;
     }

@@ -1,8 +1,10 @@
 package io.pp.net_disk_demo.mvp.view;
 
 import io.pp.net_disk_demo.data.FileInfo;
+import io.pp.net_disk_demo.data.TaskInfo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public interface PpioDataView {
 
@@ -19,8 +21,7 @@ public interface PpioDataView {
 
     void showRefreshAllFileListFailView(String failStr);
 
-    void showAllFileList(ArrayList<FileInfo> mMyFileList);
-
+    void showAllFileList(HashMap<String, TaskInfo> uploadingTaskHashMap, ArrayList<FileInfo> mMyFileList);
 
     void showUploadGet();
 
