@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.mvp.presenter.presenterimpl;
 
 import android.content.Context;
 
+import io.pp.net_disk_demo.data.DeletingInfo;
 import io.pp.net_disk_demo.mvp.model.DeleteModel;
 import io.pp.net_disk_demo.mvp.model.modelimpl.DeleteModelImpl;
 import io.pp.net_disk_demo.mvp.presenter.DeletePresenter;
@@ -41,9 +42,9 @@ public class DeletePresenterImpl implements DeletePresenter {
     }
 
     @Override
-    public void onDeleteFinish() {
+    public void onDeleteFinish(DeletingInfo deletingInfo) {
         if (mDeleteView != null) {
-            mDeleteView.onDeleteFinish();
+            mDeleteView.onDeleteFinish(deletingInfo);
         }
     }
 

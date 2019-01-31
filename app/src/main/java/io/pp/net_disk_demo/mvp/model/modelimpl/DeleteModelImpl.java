@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import java.lang.ref.WeakReference;
 
+import io.pp.net_disk_demo.data.DeletingInfo;
 import io.pp.net_disk_demo.mvp.model.DeleteModel;
 import io.pp.net_disk_demo.mvp.presenter.DeletePresenter;
 import io.pp.net_disk_demo.ppio.PossUtil;
@@ -43,13 +44,13 @@ public class DeleteModelImpl implements DeleteModel {
         }
     }
 
-    private void showDeleteFinish() {
+    private void showDeleteFinish(DeletingInfo deletingInfo) {
         if (mDeletePresenter != null) {
-            mDeletePresenter.onDeleteFinish();
+            mDeletePresenter.onDeleteFinish(deletingInfo);
         }
     }
 
-    static class DeleteAsyncTask extends AsyncTask<String, String, Boolean> {
+    static class DeleteAsyncTask extends AsyncTask<String, String, DeletingInfo> {
 
         final WeakReference<DeleteModelImpl> mDeleteModelWeakReference;
 
@@ -67,13 +68,16 @@ public class DeleteModelImpl implements DeleteModel {
         }
 
         @Override
-        protected Boolean doInBackground(String... strings) {
-            return !TextUtils.isEmpty(PossUtil.deleteObject(strings[0], strings[1], new PossUtil.DeleteObjectListener() {
+        protected DeletingInfo doInBackground(String... strings) {
+            String name = strings[0] + strings[1];
+            String taskId = PossUtil.deleteObject(strings[0], strings[1], new PossUtil.DeleteObjectListener() {
                 @Override
                 public void onDeleteObjectError(String errMsg) {
                     publishProgress(errMsg);
                 }
-            }));
+            });
+
+            return new DeletingInfo(name, taskId);
         }
 
         @Override
@@ -86,11 +90,11 @@ public class DeleteModelImpl implements DeleteModel {
         }
 
         @Override
-        protected void onPostExecute(Boolean downloadSuccess) {
-            super.onPostExecute(downloadSuccess);
+        protected void onPostExecute(DeletingInfo deletingInfo) {
+            super.onPostExecute(deletingInfo);
 
             if (mDeleteModelWeakReference.get() != null) {
-                mDeleteModelWeakReference.get().showDeleteFinish();
+                mDeleteModelWeakReference.get().showDeleteFinish(deletingInfo);
             }
         }
     }

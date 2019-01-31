@@ -7,8 +7,10 @@ import android.util.Log;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import io.pp.net_disk_demo.Constant;
+import io.pp.net_disk_demo.data.DeletingInfo;
 import io.pp.net_disk_demo.data.FileInfo;
 import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.database.AccountDatabaseManager;
@@ -16,6 +18,7 @@ import io.pp.net_disk_demo.mvp.model.PpioDataModel;
 import io.pp.net_disk_demo.mvp.presenter.PpioDataPresenter;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
+import poss.Progress;
 
 public class PpioDataModelImpl implements PpioDataModel {
 
@@ -69,10 +72,10 @@ public class PpioDataModelImpl implements PpioDataModel {
     }
 
     @Override
-    public void refreshMyFileList() {
+    public void refreshMyFileList(HashMap<String, DeletingInfo> deletingInfoHashMap) {
         Log.e(TAG, "refreshMyFileList()");
 
-        mRefreshMyFilePool.execute(new RefreshMyFileRunnable(PpioDataModelImpl.this));
+        mRefreshMyFilePool.execute(new RefreshMyFileRunnable(deletingInfoHashMap, PpioDataModelImpl.this));
     }
 
     private void showRefreshingMyFileList() {
@@ -87,9 +90,9 @@ public class PpioDataModelImpl implements PpioDataModel {
         }
     }
 
-    public void showRefreshMyFilListSucceed(HashMap<String, TaskInfo> uploadedTaskHashMap, ArrayList<FileInfo> fileInfoList) {
+    public void showRefreshMyFilListSucceed(HashMap<String, DeletingInfo> deletingInfoHashMap, HashMap<String, TaskInfo> uploadedTaskHashMap, ArrayList<FileInfo> fileInfoList) {
         if (mPpioDataPresenter != null) {
-            mPpioDataPresenter.showAllFileList(uploadedTaskHashMap, fileInfoList);
+            mPpioDataPresenter.showAllFileList(deletingInfoHashMap, uploadedTaskHashMap, fileInfoList);
         }
     }
 
@@ -172,9 +175,11 @@ public class PpioDataModelImpl implements PpioDataModel {
     }
 
     static class RefreshMyFileRunnable implements Runnable {
+        final HashMap<String, DeletingInfo> mDeletingInfoHashMap;
         final WeakReference<PpioDataModelImpl> mModelImplWeakReference;
 
-        public RefreshMyFileRunnable(PpioDataModelImpl ppioDataModel) {
+        public RefreshMyFileRunnable(HashMap<String, DeletingInfo> deletingInfoHashMap, PpioDataModelImpl ppioDataModel) {
+            mDeletingInfoHashMap = deletingInfoHashMap;
             mModelImplWeakReference = new WeakReference<>(ppioDataModel);
         }
 
@@ -203,6 +208,32 @@ public class PpioDataModelImpl implements PpioDataModel {
                     });
                 }
 
+                Log.e(TAG, "RefreshMyFileRunnable() " + mDeletingInfoHashMap.size());
+
+                HashMap<String, DeletingInfo> deletingInfoHashMap = new HashMap<>();
+                if (mDeletingInfoHashMap != null) {
+                    for (Map.Entry entry : mDeletingInfoHashMap.entrySet()) {
+                        DeletingInfo deletingInfo = (DeletingInfo) entry.getValue();
+
+                        Log.e(TAG, "RefreshMyFileRunnable() " + deletingInfo.getName());
+
+                        Progress progress = PossUtil.getTaskProgress(deletingInfo.getTaskId());
+
+                        Log.e(TAG, "RefreshMyFileRunnable() " + progress.getFinishedBytes());
+                        Log.e(TAG, "RefreshMyFileRunnable() " + progress.getTotalBytes());
+                        Log.e(TAG, "RefreshMyFileRunnable() " + progress.getJobState());
+
+                        if (!Constant.ProgressState.FINISHED.equals(progress.getJobState())) {
+                            if (progress.getTotalBytes() != 0l) {
+                                deletingInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
+                                deletingInfo.setState(progress.getJobState());
+                            }
+
+                            deletingInfoHashMap.put(deletingInfo.getName(), deletingInfo);
+                        }
+                    }
+                }
+
                 ArrayList<FileInfo> myFileList = PossUtil.listObject(Constant.Data.DEFAULT_BUCKET, new PossUtil.ListObjectListener() {
                     @Override
                     public void onListObjectError(String errMsg) {
@@ -222,7 +253,7 @@ public class PpioDataModelImpl implements PpioDataModel {
                 });
 
                 if (mModelImplWeakReference.get() != null) {
-                    mModelImplWeakReference.get().showRefreshMyFilListSucceed(uploadingTaskHashMap, myFileList);
+                    mModelImplWeakReference.get().showRefreshMyFilListSucceed(deletingInfoHashMap, uploadingTaskHashMap, myFileList);
                 }
             }
         }

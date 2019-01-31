@@ -1,5 +1,7 @@
 package io.pp.net_disk_demo.mvp.presenter;
 
+import io.pp.net_disk_demo.data.DeletingInfo;
+
 public interface DeletePresenter {
 
     void delete(String bucket, String key);
@@ -9,7 +11,7 @@ public interface DeletePresenter {
 
     void onDeleteError(String errMsg);
 
-    void onDeleteFinish();
+    void onDeleteFinish(DeletingInfo deletingInfo);
 
 
     void onDestroy();

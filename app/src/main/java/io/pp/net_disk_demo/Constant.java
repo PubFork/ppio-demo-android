@@ -93,6 +93,11 @@ public class Constant {
         public static final String ERROR = "Error";
     }
 
+    public static class ProgressState {
+        public static final String FINISHED = "Finished";
+        public static final String ERROR = "Error";
+    }
+
     public static class PPIO_File {
         public static final String APP_CACHE_DIR = Environment.getExternalStorageDirectory().getPath() +
                 "/io.pp.net_disk_demo";

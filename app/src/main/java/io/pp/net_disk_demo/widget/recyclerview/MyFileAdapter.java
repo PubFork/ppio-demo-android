@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +13,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.data.DeletingInfo;
 import io.pp.net_disk_demo.data.FileInfo;
 import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.util.FileUtil;
@@ -32,6 +33,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
 
     private OnItemListener mOnItemListener = null;
 
+    private HashMap<String, DeletingInfo> mDeletingInfoHashMap = null;
     private HashMap<String, TaskInfo> mUploadingTaskHashMap = null;
     private ArrayList<FileInfo> mMyFileList = null;
 
@@ -49,6 +51,8 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
 
     @Override
     public void onBindViewHolder(@NonNull MyFileItemHolder myFileItemHolder, int i) {
+        myFileItemHolder.setFooterItem(i == (getItemCount() - 1));
+
         FileInfo fileInfo = mMyFileList.get(i);
         if (fileInfo != null) {
 
@@ -60,9 +64,19 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
                 myFileItemHolder.setFileName(fileInfo.getName());
                 myFileItemHolder.setFileIcon(fileInfo.getName());
 
-                String stateStr = "expire: " + fileInfo.getExpiredTime().substring(0, 10);
-                if (Constant.ObjectState.BID.equals(fileInfo.getStatus())) {
-                    stateStr = stateStr + " <font color='#FF0000'>Bid</font>";
+                String stateStr = "expired: " + fileInfo.getExpiredTime().substring(0, 10);
+
+                if (mDeletingInfoHashMap != null && mDeletingInfoHashMap.containsKey(fileInfo.getBucketName() + fileInfo.getName())) {
+                    DeletingInfo deletingInfo = mDeletingInfoHashMap.get(fileInfo.getBucketName() + fileInfo.getName());
+                    if (Constant.ProgressState.ERROR.equals(deletingInfo.getState())) {
+                        stateStr = stateStr + "   <font color='#2297F3'>delete failed</font>";
+                    } else {
+                        double progress2digits = new BigDecimal(deletingInfo.getProgress() * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        stateStr = stateStr + "   <font color='#2297F3'>deleting: " + progress2digits + "% </font>";
+                    }
+
+                } else if (Constant.ObjectState.BID.equals(fileInfo.getStatus())) {
+                    stateStr = stateStr + "   <font color='#FF0000'>losting</font>";
                 }
 
                 //myFileItemHolder.setFileModifiedDate("expire: " + fileInfo.getExpiredTime() + " " + fileInfo.getStatus());
@@ -79,8 +93,6 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
                 myFileItemHolder.setClickListener(mOnItemListener, i);
             }
         }
-
-        myFileItemHolder.setFooterItem(i == (getItemCount() - 1));
     }
 
     @Override
@@ -90,6 +102,10 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         }
 
         return 0;
+    }
+
+    public void refreshDeletingInfoHashMap(HashMap<String, DeletingInfo> deletingInfoHashMap) {
+        mDeletingInfoHashMap = deletingInfoHashMap;
     }
 
     public void refreshUploadingTaskHashMap(HashMap<String, TaskInfo> uploadingTaskHashMap) {
@@ -123,6 +139,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
     }
 
     public class MyFileItemHolder extends RecyclerView.ViewHolder {
+        private Context mContext = null;
 
         private View mItemLayout = null;
 
@@ -141,9 +158,11 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         public MyFileItemHolder(Context context, ViewGroup viewGroup) {
             super(LayoutInflater.from(context).inflate(R.layout.item_myfilelist_layout, viewGroup, false));
 
+            mContext = context;
+
             mItemLayout = itemView;
             mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    Util.dp2px(context, 74)));
+                    Util.dp2px(mContext, 75)));
 
             mContentLayout = mItemLayout.findViewById(R.id.content_layout);
             mBottomLine = mItemLayout.findViewById(R.id.bottom_line);
@@ -252,11 +271,11 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         public void setFooterItem(boolean isFooter) {
             if (isFooter) {
                 mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        Util.dp2px(mContext, 151)));
+                        Util.dp2px(mContext, 150)));
                 mFooterLayout.setVisibility(View.VISIBLE);
             } else {
                 mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        Util.dp2px(mContext, 74)));
+                        Util.dp2px(mContext, 75)));
                 mFooterLayout.setVisibility(View.GONE);
             }
         }
@@ -265,9 +284,25 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
             if (inVisible) {
                 mContentLayout.setVisibility(View.GONE);
                 mBottomLine.setVisibility(View.GONE);
+
+                if (mFooterLayout.getVisibility() == View.GONE) {
+                    mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            Util.dp2px(mContext, 0)));
+                } else {
+                    mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            Util.dp2px(mContext, 75)));
+                }
             } else {
                 mContentLayout.setVisibility(View.VISIBLE);
-                mBottomLine.setVisibility(View.GONE);
+                mBottomLine.setVisibility(View.VISIBLE);
+
+                if (mFooterLayout.getVisibility() == View.GONE) {
+                    mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            Util.dp2px(mContext, 75)));
+                } else {
+                    mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            Util.dp2px(mContext, 150)));
+                }
             }
         }
     }

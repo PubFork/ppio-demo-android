@@ -3,6 +3,7 @@ package io.pp.net_disk_demo.mvp.presenter.presenterimpl;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import io.pp.net_disk_demo.data.DeletingInfo;
 import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.mvp.presenter.PpioDataPresenter;
 import io.pp.net_disk_demo.mvp.view.PpioDataView;
@@ -65,9 +66,9 @@ public class PpioDataPresenterImpl implements PpioDataPresenter {
     }
 
     @Override
-    public void refreshAllFileList() {
+    public void refreshAllFileList(HashMap<String , DeletingInfo> deletingInfoHashMap) {
         if (mPpioDataModel != null) {
-            mPpioDataModel.refreshMyFileList();
+            mPpioDataModel.refreshMyFileList(deletingInfoHashMap);
         }
     }
 
@@ -86,9 +87,9 @@ public class PpioDataPresenterImpl implements PpioDataPresenter {
     }
 
     @Override
-    public void showAllFileList(HashMap<String, TaskInfo> uploadingTaskHashMap, ArrayList<FileInfo> mMyFileList) {
+    public void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, HashMap<String, TaskInfo> uploadingTaskHashMap, ArrayList<FileInfo> mMyFileList) {
         if (mPpioDataView != null) {
-            mPpioDataView.showAllFileList(uploadingTaskHashMap, mMyFileList);
+            mPpioDataView.showAllFileList(deletingInfoHashMap, uploadingTaskHashMap, mMyFileList);
         }
     }
 
