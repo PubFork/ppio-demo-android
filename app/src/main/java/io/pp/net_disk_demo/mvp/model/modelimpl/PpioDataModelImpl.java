@@ -190,7 +190,7 @@ public class PpioDataModelImpl implements PpioDataModel {
         @Override
         public void run() {
             if (mModelImplWeakReference.get() != null) {
-                mModelImplWeakReference.get().showRefreshingMyFileList();
+                //mModelImplWeakReference.get().showRefreshingMyFileList();
 
                 ArrayList<FileInfo> bucketList = PossUtil.listBucket(new PossUtil.ListBucketListener() {
                     @Override

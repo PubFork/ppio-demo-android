@@ -474,6 +474,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             public void run() {
                 mDeletingInfoHashMap = deletingInfoHashMap;
 
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mPpioDataPresenter != null) {
+                            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+                        }
+                    }
+                }, 1500);
+
                 if (mDeletingInfoHashMap.size() != 0) {
                     mHandler.postDelayed(new Runnable() {
                         @Override
