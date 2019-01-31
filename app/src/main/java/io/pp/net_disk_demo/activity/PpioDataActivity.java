@@ -1720,43 +1720,48 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
         mDownloadTaskAdapter.setDownloadTaskItemClickListener(new DownloadTaskAdapter.DownloadTaskItemClickListener() {
             @Override
-            public void onDelete(final String taskId) {
+            public void onDelete(final TaskInfo taskInfo) {
                 if (mDeleteDialog != null) {
                     mDeleteDialog.dismiss();
                     mDeleteDialog = null;
                 }
 
-                mDeleteDialog = new DeleteDialog(PpioDataActivity.this,
-                        "delete task " + taskId,
-                        new DeleteDialog.OnDeleteOnClickListener() {
-                            @Override
-                            public void onCancel() {
-                                mDeleteDialog.dismiss();
-                            }
+                if (Constant.TaskState.RUNNING.equals(taskInfo.getState())) {
+                    ToastUtil.showToast(PpioDataActivity.this, "the task is running!", Toast.LENGTH_SHORT);
+                } else {
+                    final String taskId = taskInfo.getId();
+                    mDeleteDialog = new DeleteDialog(PpioDataActivity.this,
+                            "delete task " + taskId,
+                            new DeleteDialog.OnDeleteOnClickListener() {
+                                @Override
+                                public void onCancel() {
+                                    mDeleteDialog.dismiss();
+                                }
 
-                            @Override
-                            public void onDelete() {
+                                @Override
+                                public void onDelete() {
 
-                                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                    @Override
-                                    public void onRunOperation() {
-                                        if (mExecuteTaskPresenter != null) {
-                                            mExecuteTaskPresenter.deleteTask(taskId);
+                                    Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
+                                        @Override
+                                        public void onRunOperation() {
+                                            if (mExecuteTaskPresenter != null) {
+                                                mExecuteTaskPresenter.deleteTask(taskId);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
-                                mDeleteDialog.dismiss();
-                            }
-                        },
-                        new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
+                                    mDeleteDialog.dismiss();
+                                }
+                            },
+                            new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
 
-                            }
-                        });
+                                }
+                            });
 
-                mDeleteDialog.show();
+                    mDeleteDialog.show();
+                }
             }
 
             @Override

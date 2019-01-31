@@ -64,7 +64,7 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
             downloadTaskItemHolder.setProgress(progress2digits);
 
             downloadTaskItemHolder.setPauseResume(taskInfo.getId(), taskInfo.getState());
-            downloadTaskItemHolder.setDelete(taskInfo.getId());
+            downloadTaskItemHolder.setDelete(taskInfo);
 
             if (Constant.TaskType.GET.equals(taskInfo.getType()) &&
                     Constant.TaskState.FINISHED.equals(taskInfo.getState())) {
@@ -241,12 +241,12 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
             mTaskPauseResumeLayout.setOnClickListener(taskPauseResumeOnClickListener);
         }
 
-        public void setDelete(final String taskId) {
+        public void setDelete(final TaskInfo taskInfo) {
             View.OnClickListener deleteClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mDownloadTaskItemClickListener != null) {
-                        mDownloadTaskItemClickListener.onDelete(taskId);
+                        mDownloadTaskItemClickListener.onDelete(taskInfo);
                     }
                 }
             };
@@ -299,7 +299,7 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
     }
 
     public interface DownloadTaskItemClickListener {
-        void onDelete(String taskId);
+        void onDelete(TaskInfo taskInfo);
 
         void onPause(String taskId);
 
