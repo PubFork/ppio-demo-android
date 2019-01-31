@@ -22,7 +22,7 @@ public interface PpioDataView {
 
     void showRefreshAllFileListFailView(String failStr);
 
-    void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, HashMap<String, TaskInfo> uploadingTaskHashMap, ArrayList<FileInfo> mMyFileList);
+    void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap,  ArrayList<FileInfo> mMyFileList);
 
     void showUploadGet();
 

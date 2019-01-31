@@ -34,8 +34,6 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
     private OnItemListener mOnItemListener = null;
 
     private HashMap<String, DeletingInfo> mDeletingInfoHashMap = null;
-    private HashMap<String, String> mUploadFailedInfoHashMap = null;
-    private HashMap<String, TaskInfo> mUploadingTaskHashMap = null;
     private ArrayList<FileInfo> mMyFileList = null;
 
     public MyFileAdapter(Context context) {
@@ -56,44 +54,36 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
 
         FileInfo fileInfo = mMyFileList.get(i);
         if (fileInfo != null) {
+            myFileItemHolder.setFileName(fileInfo.getName());
+            myFileItemHolder.setFileIcon(fileInfo.getName());
 
-            if ((mUploadingTaskHashMap != null && mUploadingTaskHashMap.containsKey(fileInfo.getBucketName() + "/" + fileInfo.getName())) ||
-                    mUploadFailedInfoHashMap != null && mUploadFailedInfoHashMap.containsKey(fileInfo.getBucketName() + fileInfo.getName())) {
-                myFileItemHolder.setInVisible(true);
-            } else {
-                myFileItemHolder.setInVisible(false);
+            String stateStr = "expired: " + fileInfo.getExpiredTime().substring(0, 10);
 
-                myFileItemHolder.setFileName(fileInfo.getName());
-                myFileItemHolder.setFileIcon(fileInfo.getName());
-
-                String stateStr = "expired: " + fileInfo.getExpiredTime().substring(0, 10);
-
-                if (mDeletingInfoHashMap != null && mDeletingInfoHashMap.containsKey(fileInfo.getBucketName() + fileInfo.getName())) {
-                    DeletingInfo deletingInfo = mDeletingInfoHashMap.get(fileInfo.getBucketName() + fileInfo.getName());
-                    if (Constant.ProgressState.ERROR.equals(deletingInfo.getState())) {
-                        stateStr = stateStr + "   <font color='#2297F3'>delete failed</font>";
-                    } else {
-                        double progress2digits = new BigDecimal(deletingInfo.getProgress() * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                        stateStr = stateStr + "   <font color='#2297F3'>deleting: " + progress2digits + "% </font>";
-                    }
-
-                } else if (Constant.ObjectState.BID.equals(fileInfo.getStatus())) {
-                    stateStr = stateStr + "   <font color='#FF0000'>losting</font>";
-                }
-
-                //myFileItemHolder.setFileModifiedDate("expire: " + fileInfo.getExpiredTime() + " " + fileInfo.getStatus());
-                myFileItemHolder.setFileModifiedDate(Html.fromHtml(stateStr));
-
-                if (fileInfo.isSecure()) {
-                    myFileItemHolder.setEncrypt();
-                } else if (fileInfo.isShare()) {
-                    myFileItemHolder.setShared();
+            if (mDeletingInfoHashMap != null && mDeletingInfoHashMap.containsKey(fileInfo.getBucketName() + fileInfo.getName())) {
+                DeletingInfo deletingInfo = mDeletingInfoHashMap.get(fileInfo.getBucketName() + fileInfo.getName());
+                if (Constant.ProgressState.ERROR.equals(deletingInfo.getState())) {
+                    stateStr = stateStr + "   <font color='#2297F3'>delete failed</font>";
                 } else {
-                    myFileItemHolder.setNormal();
+                    double progress2digits = new BigDecimal(deletingInfo.getProgress() * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    stateStr = stateStr + "   <font color='#2297F3'>deleting: " + progress2digits + "% </font>";
                 }
 
-                myFileItemHolder.setClickListener(mOnItemListener, i);
+            } else if (Constant.ObjectState.BID.equals(fileInfo.getStatus())) {
+                stateStr = stateStr + "   <font color='#FF0000'>losting</font>";
             }
+
+            //myFileItemHolder.setFileModifiedDate("expire: " + fileInfo.getExpiredTime() + " " + fileInfo.getStatus());
+            myFileItemHolder.setFileModifiedDate(Html.fromHtml(stateStr));
+
+            if (fileInfo.isSecure()) {
+                myFileItemHolder.setEncrypt();
+            } else if (fileInfo.isShare()) {
+                myFileItemHolder.setShared();
+            } else {
+                myFileItemHolder.setNormal();
+            }
+
+            myFileItemHolder.setClickListener(mOnItemListener, i);
         }
     }
 
@@ -106,16 +96,8 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         return 0;
     }
 
-    public void refreshUploadFailedHashMap(HashMap<String, String> uploadFailedInfoHashMap) {
-        mUploadFailedInfoHashMap = uploadFailedInfoHashMap;
-    }
-
     public void refreshDeletingInfoHashMap(HashMap<String, DeletingInfo> deletingInfoHashMap) {
         mDeletingInfoHashMap = deletingInfoHashMap;
-    }
-
-    public void refreshUploadingTaskHashMap(HashMap<String, TaskInfo> uploadingTaskHashMap) {
-        mUploadingTaskHashMap = uploadingTaskHashMap;
     }
 
     public void refreshFileList(ArrayList<FileInfo> myFileList) {
@@ -149,8 +131,6 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
 
         private View mItemLayout = null;
 
-        private LinearLayout mContentLayout = null;
-        private View mBottomLine = null;
         private LinearLayout mFooterLayout = null;
         private ImageView mFileIv = null;
         private ImageView mFileStatusIv = null;
@@ -169,9 +149,6 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
             mItemLayout = itemView;
             mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     Util.dp2px(mContext, 75)));
-
-            mContentLayout = mItemLayout.findViewById(R.id.content_layout);
-            mBottomLine = mItemLayout.findViewById(R.id.bottom_line);
 
             mFooterLayout = mItemLayout.findViewById(R.id.footer_layout);
             mFooterLayout.setVisibility(View.GONE);
@@ -281,34 +258,8 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
                 mFooterLayout.setVisibility(View.VISIBLE);
             } else {
                 mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        Util.dp2px(mContext, 75)));
+                        Util.dp2px(mContext, 74)));
                 mFooterLayout.setVisibility(View.GONE);
-            }
-        }
-
-        public void setInVisible(boolean inVisible) {
-            if (inVisible) {
-                mContentLayout.setVisibility(View.GONE);
-                mBottomLine.setVisibility(View.GONE);
-
-                if (mFooterLayout.getVisibility() == View.GONE) {
-                    mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            Util.dp2px(mContext, 0)));
-                } else {
-                    mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            Util.dp2px(mContext, 75)));
-                }
-            } else {
-                mContentLayout.setVisibility(View.VISIBLE);
-                mBottomLine.setVisibility(View.VISIBLE);
-
-                if (mFooterLayout.getVisibility() == View.GONE) {
-                    mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            Util.dp2px(mContext, 75)));
-                } else {
-                    mItemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            Util.dp2px(mContext, 150)));
-                }
             }
         }
     }

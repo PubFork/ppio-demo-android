@@ -466,7 +466,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, HashMap<String, TaskInfo> uploadingTaskHashMap, final ArrayList<FileInfo> mMyFileInfoList) {
+    public void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, final ArrayList<FileInfo> mMyFileInfoList) {
         stopShowNetWorkingView();
 
         runOnUiThread(new Runnable() {
@@ -479,7 +479,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                         @Override
                         public void run() {
                             if (mPpioDataPresenter != null) {
-                                mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap);
+                                mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
                             }
                         }
                     }, 300);
@@ -491,9 +491,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mWActionBarTitleTv.setText("Files");
 
-                mMyFileAdapter.refreshUploadFailedHashMap(mUploadFailedInfoHashMap);
                 mMyFileAdapter.refreshDeletingInfoHashMap(mDeletingInfoHashMap);
-                mMyFileAdapter.refreshUploadingTaskHashMap(uploadingTaskHashMap);
                 mMyFileAdapter.refreshFileList(mMyFileInfoList);
 
                 //
@@ -826,7 +824,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     public void showRefreshFileListView() {
         if (mPpioDataPresenter != null) {
-            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap);
+            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
         }
     }
 
@@ -990,7 +988,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mDeletingInfoHashMap.put(deletingInfo.getName(), deletingInfo);
 
                 if (mPpioDataPresenter != null) {
-                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap);
+                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
                 }
 
                 if (mAccountInfoPresenter != null) {
@@ -1201,15 +1199,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         //mSwipeRefreshLayout.setProgressBackgroundColorSchemeColor(getResources().getColor(R.color.account_background_blue));
 
         mMyFileRecyclerView.setLayoutManager(new LinearLayoutManager(PpioDataActivity.this));
-//        mMyFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
-//            @Override
-//            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-//                super.getItemOffsets(outRect, view, parent, state);
-//                if (parent.getChildAdapterPosition(view) != 0) {
-//                    outRect.top = Util.dp2px(PpioDataActivity.this, 1);
-//                }
-//            }
-//        });
+        mMyFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                super.getItemOffsets(outRect, view, parent, state);
+                if (parent.getChildAdapterPosition(view) != 0) {
+                    outRect.top = Util.dp2px(PpioDataActivity.this, 1);
+                }
+            }
+        });
 
         mMyFileAdapter = new MyFileAdapter(PpioDataActivity.this);
         mMyFileRecyclerView.setAdapter(mMyFileAdapter);
@@ -1416,7 +1414,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     @Override
                     public void onRunOperation() {
                         if (mPpioDataPresenter != null) {
-                            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap);
+                            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
                         }
                     }
                 });
@@ -1429,7 +1427,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 showAllFileView();
 
                 if (mPpioDataPresenter != null) {
-                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap);
+                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
                 }
             }
         });
@@ -1796,7 +1794,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 //        }
 
         if (mPpioDataPresenter != null) {
-            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap);
+            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
         }
 
         if (mShowSide) {

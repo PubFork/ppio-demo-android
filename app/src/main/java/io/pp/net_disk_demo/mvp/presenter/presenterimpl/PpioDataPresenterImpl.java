@@ -66,9 +66,9 @@ public class PpioDataPresenterImpl implements PpioDataPresenter {
     }
 
     @Override
-    public void refreshAllFileList(HashMap<String , DeletingInfo> deletingInfoHashMap) {
+    public void refreshAllFileList(HashMap<String , DeletingInfo> deletingInfoHashMap, HashMap<String, String> uploadFailedInfoHashMap) {
         if (mPpioDataModel != null) {
-            mPpioDataModel.refreshMyFileList(deletingInfoHashMap);
+            mPpioDataModel.refreshMyFileList(deletingInfoHashMap, uploadFailedInfoHashMap);
         }
     }
 
@@ -87,9 +87,9 @@ public class PpioDataPresenterImpl implements PpioDataPresenter {
     }
 
     @Override
-    public void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, HashMap<String, TaskInfo> uploadingTaskHashMap, ArrayList<FileInfo> mMyFileList) {
+    public void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, ArrayList<FileInfo> mMyFileList) {
         if (mPpioDataView != null) {
-            mPpioDataView.showAllFileList(deletingInfoHashMap, uploadingTaskHashMap, mMyFileList);
+            mPpioDataView.showAllFileList(deletingInfoHashMap, mMyFileList);
         }
     }
 

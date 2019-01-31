@@ -72,10 +72,10 @@ public class PpioDataModelImpl implements PpioDataModel {
     }
 
     @Override
-    public void refreshMyFileList(HashMap<String, DeletingInfo> deletingInfoHashMap) {
+    public void refreshMyFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, HashMap<String, String> uploadFailedInfoHashMap) {
         Log.e(TAG, "refreshMyFileList()");
 
-        mRefreshMyFilePool.execute(new RefreshMyFileRunnable(deletingInfoHashMap, PpioDataModelImpl.this));
+        mRefreshMyFilePool.execute(new RefreshMyFileRunnable(deletingInfoHashMap, uploadFailedInfoHashMap, PpioDataModelImpl.this));
     }
 
     private void showRefreshingMyFileList() {
@@ -90,9 +90,9 @@ public class PpioDataModelImpl implements PpioDataModel {
         }
     }
 
-    public void showRefreshMyFilListSucceed(HashMap<String, DeletingInfo> deletingInfoHashMap, HashMap<String, TaskInfo> uploadedTaskHashMap, ArrayList<FileInfo> fileInfoList) {
+    public void showRefreshMyFilListSucceed(HashMap<String, DeletingInfo> deletingInfoHashMap, ArrayList<FileInfo> fileInfoList) {
         if (mPpioDataPresenter != null) {
-            mPpioDataPresenter.showAllFileList(deletingInfoHashMap, uploadedTaskHashMap, fileInfoList);
+            mPpioDataPresenter.showAllFileList(deletingInfoHashMap, fileInfoList);
         }
     }
 
@@ -176,10 +176,14 @@ public class PpioDataModelImpl implements PpioDataModel {
 
     static class RefreshMyFileRunnable implements Runnable {
         final HashMap<String, DeletingInfo> mDeletingInfoHashMap;
+        final HashMap<String, String> mUploadFailedInfoHashMap;
         final WeakReference<PpioDataModelImpl> mModelImplWeakReference;
 
-        public RefreshMyFileRunnable(HashMap<String, DeletingInfo> deletingInfoHashMap, PpioDataModelImpl ppioDataModel) {
+        public RefreshMyFileRunnable(HashMap<String, DeletingInfo> deletingInfoHashMap,
+                                     HashMap<String, String> uploadFailedInfoHashMap,
+                                     PpioDataModelImpl ppioDataModel) {
             mDeletingInfoHashMap = deletingInfoHashMap;
+            mUploadFailedInfoHashMap = uploadFailedInfoHashMap;
             mModelImplWeakReference = new WeakReference<>(ppioDataModel);
         }
 
@@ -252,8 +256,17 @@ public class PpioDataModelImpl implements PpioDataModel {
                     }
                 });
 
+                ArrayList<FileInfo> mFileList = new ArrayList<FileInfo>();
+                for(int i = 0;i<myFileList.size();i++) {
+                    FileInfo fileInfo = myFileList.get(i);
+                    if (!uploadingTaskHashMap.containsKey(fileInfo.getBucketName() + "/" + fileInfo.getName()) &&
+                            !mUploadFailedInfoHashMap.containsKey(fileInfo.getBucketName() + fileInfo.getName())) {
+                        mFileList.add(fileInfo);
+                    }
+                }
+
                 if (mModelImplWeakReference.get() != null) {
-                    mModelImplWeakReference.get().showRefreshMyFilListSucceed(deletingInfoHashMap, uploadingTaskHashMap, myFileList);
+                    mModelImplWeakReference.get().showRefreshMyFilListSucceed(deletingInfoHashMap, mFileList);
                 }
             }
         }
