@@ -10,7 +10,7 @@ import io.pp.net_disk_demo.service.ExecuteTaskService;
 
 public class GetModelImpl implements GetModel,
         //ExecuteTaskService.GetListener,
-        DownloadService.DownloadListener {
+        DownloadService.DownloadSharedListener {
 
     private static final String TAG = "GetModelImpl";
 
@@ -27,21 +27,21 @@ public class GetModelImpl implements GetModel,
     }
 
     @Override
-    public void onStartingDownload() {
+    public void onStartingDownloadShared() {
         if (mGetPresenter != null) {
             mGetPresenter.showRequestingGet();
         }
     }
 
     @Override
-    public void onDownloadStartFailed(String errMsg) {
+    public void onDownloadSharedStartFailed(String errMsg) {
         if (mGetPresenter != null) {
             mGetPresenter.showStartGetFail(errMsg);
         }
     }
 
     @Override
-    public void onDownloadStartSucceed() {
+    public void onDownloadSharedStartSucceed() {
         if (mGetPresenter != null) {
             mGetPresenter.showStartGetSucceed();
         }
@@ -62,7 +62,8 @@ public class GetModelImpl implements GetModel,
         mDownloadService = downloadService;
 
         if (mDownloadService != null) {
-            mDownloadService.setDownloadListener(GetModelImpl.this);
+            //mDownloadService.setDownloadListener(GetModelImpl.this);
+            mDownloadService.setDownloadSharedListener(GetModelImpl.this);
         }
     }
 

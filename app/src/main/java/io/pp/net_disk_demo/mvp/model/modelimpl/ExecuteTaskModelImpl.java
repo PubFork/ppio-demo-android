@@ -18,6 +18,7 @@ import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.service.UploadService;
 
 public class ExecuteTaskModelImpl implements ExecuteTasksModel,
+        DownloadService.DownloadListener,
         UploadService.ShowUploadTaskListListener,
         DownloadService.ShowDownloadTaskListListener {
 
@@ -56,6 +57,7 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         mDownloadService = downloadService;
 
         mDownloadService.setShowDownloadTaskListListener(ExecuteTaskModelImpl.this);
+        mDownloadService.setDownloadListener(ExecuteTaskModelImpl.this);
     }
 
     @Override
@@ -109,6 +111,23 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         if (mExecuteTasksService != null) {
             mExecuteTasksService.stopAllTask();
         }
+    }
+
+    @Override
+    public void onStartingDownload() {
+
+    }
+
+    @Override
+    public void onDownloadStartSucceed() {
+        if (mExecuteTasksPresenter != null) {
+            mExecuteTasksPresenter.showRequestDownloadFinished();
+        }
+    }
+
+    @Override
+    public void onDownloadStartFailed(String errMsg) {
+
     }
 
     @Override

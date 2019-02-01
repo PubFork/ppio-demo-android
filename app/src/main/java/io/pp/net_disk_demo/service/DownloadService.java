@@ -50,6 +50,7 @@ public class DownloadService extends Service {
 
     private ShowDownloadTaskListListener mShowDownloadTaskListListener = null;
     private DownloadListener mDownloadListener = null;
+    private DownloadSharedListener mDownloadSharedListener = null;
 
     private int mUploadingNotificationId;
     private int mDownloadingCount;
@@ -154,10 +155,20 @@ public class DownloadService extends Service {
     }
 
     private void showDownloadStartFail(final String errMsg) {
-
         if (mDownloadListener != null) {
             mDownloadListener.onDownloadStartFailed(errMsg);
+        }
+    }
 
+    private void showDownloadSharedStartSucceed() {
+        if (mDownloadSharedListener != null) {
+            mDownloadSharedListener.onDownloadSharedStartSucceed();
+        }
+    }
+
+    private void showDownloadSharedStartFail(final String errMsg) {
+        if (mDownloadSharedListener != null) {
+            mDownloadSharedListener.onDownloadSharedStartFailed(errMsg);
         }
     }
 
@@ -208,6 +219,10 @@ public class DownloadService extends Service {
 
     public void setDownloadListener(DownloadListener downloadListener) {
         mDownloadListener = downloadListener;
+    }
+
+    public void setDownloadSharedListener(DownloadSharedListener downloadSharedListener) {
+        mDownloadSharedListener = downloadSharedListener;
     }
 
     static class DownloadAsyncTask extends AsyncTask<DownloadInfo, String, Boolean> {
@@ -340,7 +355,7 @@ public class DownloadService extends Service {
         protected void onProgressUpdate(String[] values) {
             super.onProgressUpdate(values);
 
-            mDownloadServiceWeakReference.get().showDownloadStartFail(values[0]);
+            mDownloadServiceWeakReference.get().showDownloadSharedStartFail(values[0]);
         }
 
         @Override
@@ -348,7 +363,7 @@ public class DownloadService extends Service {
             super.onPostExecute(succeed);
 
             if (mDownloadServiceWeakReference.get() != null && succeed) {
-                mDownloadServiceWeakReference.get().showDownloadStartSucceed();
+                mDownloadServiceWeakReference.get().showDownloadSharedStartSucceed();
             }
         }
     }
@@ -430,6 +445,14 @@ public class DownloadService extends Service {
         void onDownloadStartSucceed();
 
         void onDownloadStartFailed(String errMsg);
+    }
+
+    public interface DownloadSharedListener {
+        void onStartingDownloadShared();
+
+        void onDownloadSharedStartSucceed();
+
+        void onDownloadSharedStartFailed(String errMsg);
     }
 
 }

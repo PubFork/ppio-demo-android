@@ -175,6 +175,8 @@ public class GetActivity extends BaseActivity implements GetView {
                     mProgressDialog = null;
                 }
 
+                setResult(Constant.Code.RESULT_DOWNLOAD_OK);
+
                 finish();
             }
         });
