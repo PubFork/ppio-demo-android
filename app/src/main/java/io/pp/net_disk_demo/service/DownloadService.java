@@ -11,7 +11,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Base64;
 import android.util.Log;
@@ -268,7 +267,7 @@ public class DownloadService extends Service {
                 final String bucket = downloadInfos[0].getBucket();
                 final String key = downloadInfos[0].getKey();
                 final String chiPrice = downloadInfos[0].getChiPrice();
-                String file = Constant.PPIO_File.DOWNLOAD_DIR + key;
+                String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + key;
 
                 return PossUtil.getObject(bucket, key, file, chiPrice, new PossUtil.GetObjectListener() {
                     @Override
@@ -342,7 +341,7 @@ public class DownloadService extends Service {
                     return false;
                 }
 
-                final String file = Constant.PPIO_File.DOWNLOAD_DIR + name;
+                final String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + name;
 
                 return PossUtil.getObjectShared(shareCode, file, chiPrice, new PossUtil.GetObjectListener() {
                     @Override

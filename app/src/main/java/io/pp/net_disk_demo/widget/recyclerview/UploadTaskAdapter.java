@@ -143,8 +143,8 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
         public void setFileName(String bucketKey) {
             String fileName = "";
             if (!TextUtils.isEmpty(bucketKey)) {
-                if (bucketKey.startsWith(Constant.Data.DEFAULT_BUCKET + "//")) {
-                    fileName = bucketKey.replaceFirst(Constant.Data.DEFAULT_BUCKET + "//", "");
+                if (bucketKey.startsWith(Constant.Data.DEFAULT_BUCKET + "/")) {
+                    fileName = bucketKey.replaceFirst(Constant.Data.DEFAULT_BUCKET + "/", "");
                 } else {
                     fileName = bucketKey;
                 }

@@ -227,7 +227,7 @@ public class UploadService extends Service {
             final String bucket = "bucket";
             final String fileName = uploadInfos[0].getFileName();
             final String filePath = uploadInfos[0].getFile();
-            final String key = "/" + fileName;
+            final String key = fileName;
             final String meta = "filename=" + "fileName" + ",fileSize=" + uploadInfos[0].getFileSize();
             final long copies = uploadInfos[0].getCopiesCount();
             final String storageTime = uploadInfos[0].getExpiredTime();

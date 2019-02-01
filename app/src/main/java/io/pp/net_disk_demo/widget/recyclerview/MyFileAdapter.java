@@ -175,16 +175,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
             mFileModifiedDateTv = mItemLayout.findViewById(R.id.file_modifieddate_tv);
         }
 
-        public void setFileName(String bucketKey) {
-            String fileName = "";
-            if (!TextUtils.isEmpty(bucketKey)) {
-                if (bucketKey.startsWith("/")) {
-                    fileName = bucketKey.replaceFirst("/", "");
-                } else {
-                    fileName = bucketKey;
-                }
-            }
-
+        public void setFileName(String fileName) {
             mFileNameTv.setText(fileName);
         }
 

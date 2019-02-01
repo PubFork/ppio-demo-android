@@ -50,8 +50,10 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
 
         if (taskInfo != null) {
             String destinationPath = taskInfo.getTo();
-            if (!TextUtils.isEmpty(destinationPath) && destinationPath.startsWith(Constant.PPIO_File.DOWNLOAD_DIR + "/")) {
-                downloadTaskItemHolder.setFileName(destinationPath.replace(Constant.PPIO_File.DOWNLOAD_DIR + "/", ""));
+
+            downloadTaskItemHolder.setFileName(destinationPath);
+            if (!TextUtils.isEmpty(destinationPath) && destinationPath.startsWith(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX )) {
+                downloadTaskItemHolder.setFileName(destinationPath.replaceFirst(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX, ""));
             }
 
             downloadTaskItemHolder.setStatus(taskInfo.getState(), taskInfo.getError());
@@ -157,16 +159,7 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
             mDefaultStatusTvTextColor = mTaskStatusTv.getCurrentTextColor();
         }
 
-        public void setFileName(String bucketKey) {
-            String fileName = "";
-            if (!TextUtils.isEmpty(bucketKey)) {
-                if (bucketKey.startsWith("/")) {
-                    fileName = bucketKey.replaceFirst("/", "");
-                } else {
-                    fileName = bucketKey;
-                }
-            }
-
+        public void setFileName(String fileName) {
             mFileNameTv.setText(fileName);
         }
 
