@@ -19,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -90,6 +91,9 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         StatusView, StartRenewView, ShareCodeView, DeleteView {
 
     private static final String TAG = "PpioDataActivity";
+
+    private static final int SLOW_REFRESH_DURATION = 1500;
+    private static final int QUICK_REFRESH_DURATION = 500;
 
     private static final String CURRENT_SHOW_VIEW = "CURRENT_SHOW_VIEW";
     private static final int ALLFILE_VIEW = 0x01;
@@ -187,6 +191,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private HashMap<String, String> mUploadFailedInfoHashMap = null;
 
     private Handler mHandler = null;
+
+    private int mRefreshDuration = SLOW_REFRESH_DURATION;
 
     private int mCurrentShowView = ALLFILE_VIEW;
     private boolean mShowSide = false;
@@ -474,6 +480,12 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             public void run() {
                 mDeletingInfoHashMap = deletingInfoHashMap;
 
+                if (mDeletingInfoHashMap.size() != 0) {
+                    mRefreshDuration = QUICK_REFRESH_DURATION;
+                } else {
+                    mRefreshDuration = SLOW_REFRESH_DURATION;
+                }
+
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -481,18 +493,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                             mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
                         }
                     }
-                }, 1500);
-
-                if (mDeletingInfoHashMap.size() != 0) {
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mPpioDataPresenter != null) {
-                                mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
-                            }
-                        }
-                    }, 300);
-                }
+                }, mRefreshDuration);
 
                 mSwipeRefreshLayout.setRefreshing(false);
 
@@ -1456,7 +1457,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                     @Override
                                     public void onRunOperation() {
                                         if (mShowStatusPresenter != null) {
-                                            mShowStatusPresenter.startStatus(Constant.Data.DEFAULT_BUCKET, mMyFileAdapter.getFileHash(position));
+                                            String fileHash = mMyFileAdapter.getFileHash(position);
+                                            if (!TextUtils.isEmpty(fileHash)) {
+                                                mShowStatusPresenter.startStatus(Constant.Data.DEFAULT_BUCKET, fileHash);
+                                            }
                                         }
                                     }
                                 });
@@ -1475,12 +1479,16 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                     @Override
                                     public void onSet(int chiPrice) {
                                         if (mExecuteTaskPresenter != null) {
-                                            DownloadInfo downloadInfo = new DownloadInfo();
-                                            downloadInfo.setBucket(mMyFileAdapter.getFileInfoBucket(position));
-                                            downloadInfo.setKey(mMyFileAdapter.getFileInfoKey(position));
-                                            downloadInfo.setChiPrice("" + chiPrice);
+                                            String bucket = mMyFileAdapter.getFileInfoBucket(position);
+                                            String key = mMyFileAdapter.getFileInfoKey(position);
+                                            if (!TextUtils.isEmpty(bucket) && !TextUtils.isEmpty(key)) {
+                                                DownloadInfo downloadInfo = new DownloadInfo();
+                                                downloadInfo.setBucket(bucket);
+                                                downloadInfo.setKey(key);
+                                                downloadInfo.setChiPrice("" + chiPrice);
 
-                                            mExecuteTaskPresenter.startDownload(downloadInfo);
+                                                mExecuteTaskPresenter.startDownload(downloadInfo);
+                                            }
                                             mSetChiPriceDialog.dismiss();
                                         }
                                     }
@@ -1502,7 +1510,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                     @Override
                                     public void onRunOperation() {
                                         if (mShowShareCodePresenter != null) {
-                                            mShowShareCodePresenter.getShareCode(Constant.Data.DEFAULT_BUCKET, mMyFileAdapter.getFileHash(position));
+                                            String fileHash = mMyFileAdapter.getFileHash(position);
+                                            if (!TextUtils.isEmpty(fileHash)) {
+                                                mShowShareCodePresenter.getShareCode(Constant.Data.DEFAULT_BUCKET, fileHash);
+                                            }
                                         }
                                     }
                                 });
@@ -1569,41 +1580,48 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                     mDeleteDialog = null;
                                 }
 
-                                mDeleteDialog = new DeleteDialog(PpioDataActivity.this,
-                                        mMyFileAdapter.getFileHash(position),
-                                        new DeleteDialog.OnDeleteOnClickListener() {
-                                            @Override
-                                            public void onCancel() {
-                                                mDeleteDialog.dismiss();
-                                            }
+                                String fileHash = mMyFileAdapter.getFileHash(position);
+                                String bucket = mMyFileAdapter.getFileInfoBucket(position);
+                                String key = mMyFileAdapter.getFileInfoKey(position);
+                                if (!TextUtils.isEmpty(fileHash) &&
+                                        !TextUtils.isEmpty(bucket) &&
+                                        !TextUtils.isEmpty(key)) {
+                                    mDeleteDialog = new DeleteDialog(PpioDataActivity.this,
+                                            fileHash,
+                                            new DeleteDialog.OnDeleteOnClickListener() {
+                                                @Override
+                                                public void onCancel() {
+                                                    mDeleteDialog.dismiss();
+                                                }
 
-                                            @Override
-                                            public void onDelete() {
-                                                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                                    @Override
-                                                    public void onRunOperation() {
-                                                        Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                                            @Override
-                                                            public void onRunOperation() {
-                                                                if (mDeletePresenter != null) {
-                                                                    mDeletePresenter.delete(mMyFileAdapter.getFileInfoBucket(position), mMyFileAdapter.getFileInfoKey(position));
+                                                @Override
+                                                public void onDelete() {
+                                                    Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
+                                                        @Override
+                                                        public void onRunOperation() {
+                                                            Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
+                                                                @Override
+                                                                public void onRunOperation() {
+                                                                    if (mDeletePresenter != null) {
+                                                                        mDeletePresenter.delete(bucket, key);
+                                                                    }
                                                                 }
-                                                            }
-                                                        });
-                                                    }
-                                                });
+                                                            });
+                                                        }
+                                                    });
 
-                                                mDeleteDialog.dismiss();
-                                            }
-                                        },
-                                        new DialogInterface.OnDismissListener() {
-                                            @Override
-                                            public void onDismiss(DialogInterface dialog) {
+                                                    mDeleteDialog.dismiss();
+                                                }
+                                            },
+                                            new DialogInterface.OnDismissListener() {
+                                                @Override
+                                                public void onDismiss(DialogInterface dialog) {
 
-                                            }
-                                        });
+                                                }
+                                            });
 
-                                mDeleteDialog.show();
+                                    mDeleteDialog.show();
+                                }
                             }
 
                             @Override

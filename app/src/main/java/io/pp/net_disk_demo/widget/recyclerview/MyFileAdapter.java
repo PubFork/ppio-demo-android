@@ -111,19 +111,35 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
     }
 
     public String getFileHash(int position) {
-        return mMyFileList.get(position).getName();
+        if (mMyFileList != null && position < mMyFileList.size()) {
+            return mMyFileList.get(position).getName();
+        } else {
+            return null;
+        }
     }
 
     public String getFileInfoBucket(int position) {
-        return mMyFileList.get(position).getBucketName();
+        if (mMyFileList != null && position < mMyFileList.size()) {
+            return mMyFileList.get(position).getBucketName();
+        } else {
+            return null;
+        }
     }
 
     public String getFileInfoKey(int position) {
-        return mMyFileList.get(position).getName();
+        if (mMyFileList != null && position < mMyFileList.size()) {
+            return mMyFileList.get(position).getName();
+        } else {
+            return null;
+        }
     }
 
     public FileInfo getFileInfo(int position) {
-        return mMyFileList.get(position);
+        if (mMyFileList != null && position < mMyFileList.size()) {
+            return mMyFileList.get(position);
+        } else {
+            return null;
+        }
     }
 
     public class MyFileItemHolder extends RecyclerView.ViewHolder {
