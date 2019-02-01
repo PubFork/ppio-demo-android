@@ -11,6 +11,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Base64;
 import android.util.Log;
@@ -54,16 +55,18 @@ public class DownloadService extends Service {
 
     private int mUploadingNotificationId;
     private int mDownloadingCount;
+    private long mDownloadNotificationWhen;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        mUploadingNotificationId = android.os.Process.myPid() + 100;
+        mUploadingNotificationId = android.os.Process.myPid() + 150;
 
         mRefreshTaskPool = new CancelFixedThreadPool(1);
         mRefreshTaskListHandler = new Handler();
+        mDownloadNotificationWhen = System.currentTimeMillis();
     }
 
     @Override
@@ -87,6 +90,8 @@ public class DownloadService extends Service {
     }
 
     private Notification getDownloadingNotification(int downloadingCount, double progress) {
+        progress = progress <= 1.00d ? progress : 1.00d;
+
         Log.e(TAG, "progress = " + progress);
         double progress2digits;
         if (progress != 0) {
@@ -125,6 +130,8 @@ public class DownloadService extends Service {
                     .setChannelId("ppio");//no effect
             notification = notificationBuilder.build();
         }
+
+        notification.when = mDownloadNotificationWhen;
 
         return notification;
     }
@@ -400,17 +407,16 @@ public class DownloadService extends Service {
                             Constant.TaskState.RUNNING.equals(taskInfo.getState()) ||
                             Constant.TaskState.PAUSED.equals(taskInfo.getState())) {
                         downloadingCount++;
+
+                        Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
+                        if (progress.getTotalBytes() != 0l) {
+                            taskInfo.setFinished(progress.getFinishedBytes());
+                            finishedDownload = finishedDownload + taskInfo.getFinished();
+                            totalDownload = totalDownload + taskInfo.getTotal();
+
+                            taskInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
+                        }
                     }
-
-                    Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
-                    if (progress.getTotalBytes() != 0l) {
-                        taskInfo.setFinished(progress.getFinishedBytes());
-                        finishedDownload = finishedDownload + taskInfo.getFinished();
-                        totalDownload = totalDownload + taskInfo.getTotal();
-
-                        taskInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
-                    }
-
                     uploadTaskList.add(taskInfo);
                 }
             }

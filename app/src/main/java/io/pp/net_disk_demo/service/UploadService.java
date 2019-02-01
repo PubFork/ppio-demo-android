@@ -48,6 +48,7 @@ public class UploadService extends Service {
 
     private int mUploadingNotificationId;
     private int mUploadingCount;
+    private long mUploadNotificationWhen;
 
     @Override
     public void onCreate() {
@@ -58,6 +59,8 @@ public class UploadService extends Service {
 
         mRefreshTaskPool = new CancelFixedThreadPool(1);
         mRefreshTaskListHandler = new Handler();
+
+        mUploadNotificationWhen = System.currentTimeMillis();
     }
 
     @Override
@@ -81,6 +84,8 @@ public class UploadService extends Service {
     }
 
     private Notification getUploadingNotification(int uploadingCount, double progress) {
+        progress = progress <= 1.00d ? progress : 1.00d;
+
         double progress2digits;
         if (progress != 0) {
             progress2digits = new BigDecimal(progress * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
@@ -119,6 +124,8 @@ public class UploadService extends Service {
             notification = notificationBuilder.build();
         }
 
+        notification.when = mUploadNotificationWhen;
+
         return notification;
     }
 
@@ -133,6 +140,7 @@ public class UploadService extends Service {
     private void updateNotification(int uploadingCount, double progress) {
         if (uploadingCount > 0) {
             Notification notification = getUploadingNotification(uploadingCount, progress);
+
             mNotificationManager.notify(mUploadingNotificationId, notification);
 
             if (mUploadingCount == 0) {
@@ -142,7 +150,6 @@ public class UploadService extends Service {
             stopForeground(true);
             mNotificationManager.cancel(mUploadingNotificationId);
         }
-
 
         mUploadingCount = uploadingCount;
     }
@@ -374,17 +381,16 @@ public class UploadService extends Service {
                             Constant.TaskState.RUNNING.equals(taskInfo.getState()) ||
                             Constant.TaskState.PAUSED.equals(taskInfo.getState())) {
                         uploadingCount++;
+
+                        Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
+                        if (progress.getTotalBytes() != 0l) {
+                            taskInfo.setFinished(progress.getFinishedBytes());
+                            finishedUpload = finishedUpload + taskInfo.getFinished();
+                            totalUpload = totalUpload + taskInfo.getTotal();
+
+                            taskInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
+                        }
                     }
-
-                    Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
-                    if (progress.getTotalBytes() != 0l) {
-                        taskInfo.setFinished(progress.getFinishedBytes());
-                        finishedUpload = finishedUpload + taskInfo.getFinished();
-                        totalUpload = totalUpload + taskInfo.getTotal();
-
-                        taskInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
-                    }
-
                     uploadTaskList.add(taskInfo);
                     Log.e(TAG, "RefreshUploadTaskRunnable() taskId == " + taskInfo.getId());
 
