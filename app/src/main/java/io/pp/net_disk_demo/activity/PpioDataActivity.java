@@ -496,34 +496,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mSwipeRefreshLayout.setRefreshing(false);
 
-                mCurrentShowView = ALLFILE_VIEW;
-
-                mWActionBarTitleTv.setText("Files");
-
                 mMyFileAdapter.refreshDeletingInfoHashMap(mDeletingInfoHashMap);
                 mMyFileAdapter.refreshFileList(mMyFileInfoList);
 
-                //
-//                mSwipeRefreshLayout.setVisibility(View.VISIBLE);
-//                mUploadingFileRecyclerView.setVisibility(View.GONE);
-//                mDownloadingFileRecyclerView.setVisibility(View.GONE);
-//
-//                mAllFileIv.setBackgroundResource(R.mipmap.allfile_selected);
-//                mUploadingIv.setBackgroundResource(R.mipmap.uploading_unselected);
-//                mDownloadingIv.setBackgroundResource(R.mipmap.downloading_unselected);
-//
-//                mAllFileTv.setTextColor(0xFF1989FA);
-//                mUploadingTv.setTextColor(0xFF606266);
-//                mDownloadingTv.setTextColor(0xFF606266);
-                //
-
-                if (mMyFileAdapter.getItemCount() == 0) {
+                if (mMyFileAdapter.getItemCount() == 0 && mSwipeRefreshLayout.getVisibility() == View.VISIBLE) {
                     mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
                 }
             }
         });
     }
-
 
     /**
      * AccountInfoView
