@@ -43,6 +43,7 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
         boolean can_use_internet = false;
         boolean can_listen_internet = false;
         boolean can_use_camera = false;
+        boolean can_set_foreground_service = false;
 
         for (int i = 0; i < permissions.length; i++) {
             if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permissions[i])) {
@@ -94,6 +95,16 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                     e.printStackTrace();
                 }
             }
+
+            if (Manifest.permission.FOREGROUND_SERVICE.equals(permissions[i])) {
+                try {
+                    if (grantResults[i] == PERMISSION_GRANTED) {
+                        can_set_foreground_service = true;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         //Whether all permissions are given, if given, check if has log in, not given, direct finish
@@ -101,7 +112,8 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                 can_read_storage &&
                 can_use_internet &&
                 can_listen_internet &&
-                can_use_camera) {
+                can_use_camera &&
+                can_set_foreground_service) {
             Util.runNetOperation(CheckHasKeyStoreActivity.this, new Util.RunNetOperationCallBack() {
                 @Override
                 public void onRunOperation() {
@@ -170,7 +182,8 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.INTERNET,
                         Manifest.permission.ACCESS_NETWORK_STATE,
-                        Manifest.permission.CAMERA})) {
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.FOREGROUND_SERVICE})) {
 
             //If there are permissions not given, apply for these permissions
             XPermissionUtils.requestPermissionsForActivity(CheckHasKeyStoreActivity.this,
@@ -179,7 +192,8 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                             Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.INTERNET,
                             Manifest.permission.ACCESS_NETWORK_STATE,
-                            Manifest.permission.CAMERA},
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.FOREGROUND_SERVICE},
                     new XPermissionUtils.OnPermissionListener() {
                         @Override
                         public void onPermissionGranted() {
