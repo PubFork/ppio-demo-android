@@ -643,7 +643,6 @@ public class UploadActivity extends BaseActivity implements UploadView {
 
         if (mUploadPresenter != null) {
             mUploadPresenter.bindService(mExecuteTaskService);
-
         }
     }
 

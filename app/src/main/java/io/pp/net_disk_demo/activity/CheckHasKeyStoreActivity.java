@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import io.pp.net_disk_demo.R;
@@ -112,8 +113,10 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                 can_read_storage &&
                 can_use_internet &&
                 can_listen_internet &&
-                can_use_camera &&
-                can_set_foreground_service) {
+                can_use_camera
+            //&&
+            //can_set_foreground_service
+                ) {
             Util.runNetOperation(CheckHasKeyStoreActivity.this, new Util.RunNetOperationCallBack() {
                 @Override
                 public void onRunOperation() {
