@@ -472,7 +472,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, final ArrayList<FileInfo> mMyFileInfoList) {
+    public void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, final ArrayList<FileInfo> mMyFileInfoList, final boolean allRefresh) {
         stopShowNetWorkingView();
 
         runOnUiThread(new Runnable() {
@@ -486,19 +486,25 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     mRefreshDuration = SLOW_REFRESH_DURATION;
                 }
 
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mPpioDataPresenter != null) {
-                            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+                if (mDeletingInfoHashMap != null && mDeletingInfoHashMap.size() > 0) {
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mPpioDataPresenter != null) {
+                                mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, false);
+                            }
                         }
-                    }
-                }, mRefreshDuration);
+                    }, mRefreshDuration);
+                }
 
                 mSwipeRefreshLayout.setRefreshing(false);
 
-                mMyFileAdapter.refreshDeletingInfoHashMap(mDeletingInfoHashMap);
-                mMyFileAdapter.refreshFileList(mMyFileInfoList);
+                if (allRefresh) {
+                    //mMyFileAdapter.refreshDeletingInfoHashMap(mDeletingInfoHashMap);
+                    mMyFileAdapter.refreshFileList(mDeletingInfoHashMap, mMyFileInfoList);
+                } else {
+                    mMyFileAdapter.updateDeletingFileList(mDeletingInfoHashMap, mMyFileInfoList);
+                }
 
                 if (mMyFileAdapter.getItemCount() == 0 && mSwipeRefreshLayout.getVisibility() == View.VISIBLE) {
                     mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
@@ -815,7 +821,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     public void showRefreshFileListView() {
         if (mPpioDataPresenter != null) {
-            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
         }
     }
 
@@ -979,7 +985,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mDeletingInfoHashMap.put(deletingInfo.getName(), deletingInfo);
 
                 if (mPpioDataPresenter != null) {
-                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, false);
                 }
 
                 if (mAccountInfoPresenter != null) {
@@ -1405,7 +1411,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     @Override
                     public void onRunOperation() {
                         if (mPpioDataPresenter != null) {
-                            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+                            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
                         }
                     }
                 });
@@ -1418,7 +1424,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 showAllFileView();
 
                 if (mPpioDataPresenter != null) {
-                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
                 }
             }
         });
@@ -1802,7 +1808,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 //        }
 
         if (mPpioDataPresenter != null) {
-            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
         }
 
         if (mShowSide) {

@@ -45,6 +45,9 @@ public class UploadService extends Service {
 
     private ShowUploadTaskListListener mShowUploadTaskListListener = null;
     private UploadListener mUploadListener = null;
+    private ShowUploadedListener mShowUploadedListener = null;
+
+    private static HashMap<String, String> mUploadingTaskHashMap = null;
 
     private int mUploadingNotificationId;
     private int mUploadingCount;
@@ -61,6 +64,8 @@ public class UploadService extends Service {
         mRefreshTaskListHandler = new Handler();
 
         mUploadNotificationWhen = System.currentTimeMillis();
+
+        mUploadingTaskHashMap = new HashMap<>();
     }
 
     @Override
@@ -197,12 +202,22 @@ public class UploadService extends Service {
 
     }
 
+    private void showUploaded() {
+        if (mShowUploadedListener != null) {
+            mShowUploadedListener.onUploaded();
+        }
+    }
+
     public void setShowUploadTaskListListener(ShowUploadTaskListListener showUploadTaskListListener) {
         mShowUploadTaskListListener = showUploadTaskListListener;
     }
 
     public void setUploadListener(UploadListener uploadListener) {
         mUploadListener = uploadListener;
+    }
+
+    public void setShowUploadedListener(ShowUploadedListener showUploadedListener) {
+        mShowUploadedListener = showUploadedListener;
     }
 
     static class UploadAsyncTask extends AsyncTask<UploadInfo, String, Boolean> {
@@ -370,6 +385,7 @@ public class UploadService extends Service {
             int uploadingCount = 0;
             double finishedUpload = 0;
             double totalUpload = 0;
+            boolean mUploaded = false;
 
             ArrayList<TaskInfo> uploadTaskList = new ArrayList<>();
 
@@ -390,10 +406,18 @@ public class UploadService extends Service {
 
                             taskInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
                         }
+
+                        mUploadingTaskHashMap.put(taskInfo.getTo(), taskInfo.getTo());
+                    } else {
+                        if(Constant.TaskState.FINISHED.equals(taskInfo.getState())&&
+                                mUploadingTaskHashMap.containsKey(taskInfo.getTo())) {
+                            mUploaded = true;
+                        }
+
+                        mUploadingTaskHashMap.remove(taskInfo.getTo());
                     }
                     uploadTaskList.add(taskInfo);
                     Log.e(TAG, "RefreshUploadTaskRunnable() taskId == " + taskInfo.getId());
-
                 }
             }
 
@@ -407,6 +431,10 @@ public class UploadService extends Service {
 
                 mUploadServiceWeakReference.get().updateNotification(uploadingCount, progress);
                 mUploadServiceWeakReference.get().showUploadTaskList(uploadTaskList);
+
+                if(mUploaded) {
+                    mUploadServiceWeakReference.get().showUploaded();
+                }
             }
         }
     }
@@ -427,5 +455,9 @@ public class UploadService extends Service {
         void onUploadStartSucceed();
 
         void onUploadStartFailed(String errMsg);
+    }
+
+    public interface ShowUploadedListener {
+        void onUploaded();
     }
 }

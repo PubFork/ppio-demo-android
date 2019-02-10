@@ -20,7 +20,8 @@ import io.pp.net_disk_demo.service.UploadService;
 public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         DownloadService.DownloadListener,
         UploadService.ShowUploadTaskListListener,
-        DownloadService.ShowDownloadTaskListListener {
+        DownloadService.ShowDownloadTaskListListener,
+        UploadService.ShowUploadedListener {
 
     private static final String TAG = "ExecuteTaskModelImpl";
 
@@ -50,6 +51,7 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         mUploadService = uploadService;
 
         mUploadService.setShowUploadTaskListListener(ExecuteTaskModelImpl.this);
+        mUploadService.setShowUploadedListener(ExecuteTaskModelImpl.this);
     }
 
     @Override
@@ -141,6 +143,13 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     public void showDownloadTaskList(ArrayList<TaskInfo> taskInfoList) {
         if (mExecuteTasksPresenter != null) {
             mExecuteTasksPresenter.showDownloadTaskList(taskInfoList);
+        }
+    }
+
+    @Override
+    public void onUploaded() {
+        if (mExecuteTasksPresenter != null) {
+            mExecuteTasksPresenter.refreshFileList();
         }
     }
 
