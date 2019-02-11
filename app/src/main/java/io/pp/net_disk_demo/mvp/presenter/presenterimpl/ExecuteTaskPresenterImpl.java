@@ -174,7 +174,7 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     @Override
     public void showDownloadingTasks(ArrayList<TaskInfo> downloadingTaskList) {
         if (mExecuteTaskView != null) {
-            mExecuteTaskView.showDownloadingTasks(downloadingTaskList);
+            //mExecuteTaskView.showDownloadingTasks(downloadingTaskList);
         }
     }
 
@@ -208,9 +208,9 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     }
 
     @Override
-    public void showDownloadTaskList(ArrayList<TaskInfo> downloadTaskList) {
+    public void showDownloadTaskList(ArrayList<TaskInfo> downloadTaskList, boolean allRefresh) {
         if (mExecuteTaskView != null) {
-            mExecuteTaskView.showDownloadingTasks(downloadTaskList);
+            mExecuteTaskView.showDownloadingTasks(downloadTaskList,allRefresh);
         }
     }
 

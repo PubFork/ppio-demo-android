@@ -81,6 +81,7 @@ import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.util.XPermissionUtils;
 import io.pp.net_disk_demo.widget.LeftDrawerLayout;
 import io.pp.net_disk_demo.widget.StatusBarUtil;
+import io.pp.net_disk_demo.widget.recyclerview.CustomLinearLayoutManager;
 import io.pp.net_disk_demo.widget.recyclerview.DownloadTaskAdapter;
 import io.pp.net_disk_demo.widget.recyclerview.MyFileAdapter;
 import io.pp.net_disk_demo.widget.recyclerview.UploadTaskAdapter;
@@ -785,11 +786,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showDownloadingTasks(final ArrayList<TaskInfo> downloadingTaskList) {
+    public void showDownloadingTasks(final ArrayList<TaskInfo> downloadingTaskList, boolean allRefresh) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mDownloadTaskAdapter.refreshUploadingList(downloadingTaskList);
+                if (allRefresh) {
+                    mDownloadTaskAdapter.refreshDownloadingList(downloadingTaskList);
+                } else {
+                    mDownloadTaskAdapter.updateDownloadingList(downloadingTaskList);
+                }
 
                 if (mCurrentShowView == DOWNLOADING_VIEW) {
                     if (mDownloadTaskAdapter.getItemCount() == 0) {
@@ -1199,7 +1204,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.account_background_blue));
         //mSwipeRefreshLayout.setProgressBackgroundColorSchemeColor(getResources().getColor(R.color.account_background_blue));
 
-        mMyFileRecyclerView.setLayoutManager(new LinearLayoutManager(PpioDataActivity.this));
+        mMyFileRecyclerView.setLayoutManager(new CustomLinearLayoutManager(PpioDataActivity.this));
         mMyFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
@@ -1213,7 +1218,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mMyFileAdapter = new MyFileAdapter(PpioDataActivity.this);
         mMyFileRecyclerView.setAdapter(mMyFileAdapter);
 
-        mUploadingFileRecyclerView.setLayoutManager(new LinearLayoutManager(PpioDataActivity.this));
+        mUploadingFileRecyclerView.setLayoutManager(new CustomLinearLayoutManager(PpioDataActivity.this));
         mUploadingFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
@@ -1227,7 +1232,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mUploadTaskAdapter = new UploadTaskAdapter(PpioDataActivity.this, null);
         mUploadingFileRecyclerView.setAdapter(mUploadTaskAdapter);
 
-        mDownloadingFileRecyclerView.setLayoutManager(new LinearLayoutManager(PpioDataActivity.this));
+        mDownloadingFileRecyclerView.setLayoutManager(new CustomLinearLayoutManager(PpioDataActivity.this));
         mDownloadingFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {

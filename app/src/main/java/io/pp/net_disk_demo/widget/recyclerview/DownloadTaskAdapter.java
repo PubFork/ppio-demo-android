@@ -24,6 +24,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
@@ -45,14 +46,49 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
     }
 
     @Override
+    public void onBindViewHolder(@NonNull DownloadTaskItemHolder holder, int position, @NonNull List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
+
+        if (!payloads.isEmpty()) {
+            TaskInfo taskInfo = mDownloadTaskList.get(position);
+
+            if (taskInfo != null) {
+                holder.setTaskInfo(taskInfo);
+
+                holder.setStatus(taskInfo.getState(), taskInfo.getError());
+
+                double progress2digits = 0;
+                if (taskInfo.getTotal() != 0) {
+                    progress2digits = new BigDecimal(taskInfo.getProgress()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                }
+                holder.setProgress(progress2digits);
+
+                holder.setPauseResume(taskInfo.getId(), taskInfo.getState());
+                //holder.setDelete(taskInfo);
+
+                if (Constant.TaskType.GET.equals(taskInfo.getType()) &&
+                        Constant.TaskState.FINISHED.equals(taskInfo.getState())) {
+                    holder.setOnEnterDownloadedDirectoryListener(taskInfo.getTo());
+                }
+            }
+
+            holder.setFooterItem(position == (getItemCount() - 1));
+        } else {
+            onBindViewHolder(holder, position);
+        }
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull DownloadTaskAdapter.DownloadTaskItemHolder downloadTaskItemHolder, int i) {
         TaskInfo taskInfo = mDownloadTaskList.get(i);
 
         if (taskInfo != null) {
+            downloadTaskItemHolder.setTaskInfo(taskInfo);
+
             String destinationPath = taskInfo.getTo();
 
             downloadTaskItemHolder.setFileName(destinationPath);
-            if (!TextUtils.isEmpty(destinationPath) && destinationPath.startsWith(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX )) {
+            if (!TextUtils.isEmpty(destinationPath) && destinationPath.startsWith(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX)) {
                 downloadTaskItemHolder.setFileName(destinationPath.replaceFirst(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX, ""));
             }
 
@@ -66,12 +102,12 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
             downloadTaskItemHolder.setProgress(progress2digits);
 
             downloadTaskItemHolder.setPauseResume(taskInfo.getId(), taskInfo.getState());
-            downloadTaskItemHolder.setDelete(taskInfo);
+            //downloadTaskItemHolder.setDelete(taskInfo);
 
-            if (Constant.TaskType.GET.equals(taskInfo.getType()) &&
-                    Constant.TaskState.FINISHED.equals(taskInfo.getState())) {
-                downloadTaskItemHolder.setOnEnterDownloadedDirectoryListener(taskInfo.getTo());
-            }
+//            if (Constant.TaskType.GET.equals(taskInfo.getType()) &&
+//                    Constant.TaskState.FINISHED.equals(taskInfo.getState())) {
+//                downloadTaskItemHolder.setOnEnterDownloadedDirectoryListener(taskInfo.getTo());
+//            }
         }
 
         downloadTaskItemHolder.setFooterItem(i == (getItemCount() - 1));
@@ -92,10 +128,28 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
         return 0;
     }
 
-    public void refreshUploadingList(ArrayList<TaskInfo> uploadTaskList) {
+    public void refreshDownloadingList(ArrayList<TaskInfo> uploadTaskList) {
         mDownloadTaskList = uploadTaskList;
 
         notifyDataSetChanged();
+    }
+
+    public void updateDownloadingList(ArrayList<TaskInfo> uploadTaskList) {
+        mDownloadTaskList = uploadTaskList;
+
+        if (mDownloadTaskList != null && mDownloadTaskList.size() > 0) {
+            for (int i = 0; i < mDownloadTaskList.size(); i++) {
+                TaskInfo taskInfo = mDownloadTaskList.get(i);
+                if (taskInfo != null &&
+                        (taskInfo.isChanged() ||
+                                Constant.TaskState.RUNNING.equals(taskInfo.getState())) ||
+                        Constant.TaskState.PAUSED.equals(taskInfo.getState())) {
+                    notifyItemChanged(i, mDownloadTaskList.get(i));
+                }
+            }
+        } else {
+            notifyDataSetChanged();
+        }
     }
 
     public void setDownloadTaskItemClickListener(DownloadTaskItemClickListener downloadTaskItemClickListener) {
@@ -125,6 +179,8 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
         private ImageView mDeleteIv = null;
 
         private int mDefaultStatusTvTextColor;
+
+        private TaskInfo mTaskInfo = null;
 
         public DownloadTaskItemHolder(@NonNull View itemView) {
             super(itemView);
@@ -157,6 +213,77 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
             mUploadingIv.setBackgroundResource(R.mipmap.downloading);
 
             mDefaultStatusTvTextColor = mTaskStatusTv.getCurrentTextColor();
+
+            View.OnClickListener taskPauseResumeOnClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mTaskInfo != null) {
+                        final String state = mTaskInfo.getState();
+                        final String taskId = mTaskInfo.getId();
+
+                        if (mDownloadTaskItemClickListener != null) {
+                            if (Constant.TaskState.RUNNING.equals(state)) {
+                                mDownloadTaskItemClickListener.onPause(taskId);
+                            } else if (Constant.TaskState.PAUSED.equals(state)) {
+                                mDownloadTaskItemClickListener.onResume(taskId);
+                            }
+                        }
+                    }
+                }
+            };
+
+            mTaskPauseResumeIv.setOnClickListener(taskPauseResumeOnClickListener);
+            mTaskPauseResumeLayout.setOnClickListener(taskPauseResumeOnClickListener);
+
+            View.OnClickListener deleteClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mTaskInfo != null) {
+                        if (mDownloadTaskItemClickListener != null) {
+                            mDownloadTaskItemClickListener.onDelete(mTaskInfo);
+                        }
+                    }
+                }
+            };
+
+            mDeleteIv.setOnClickListener(deleteClickListener);
+            mTaskDeleteLayout.setOnClickListener(deleteClickListener);
+
+            mItemLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mTaskInfo != null &&
+                            Constant.TaskType.GET.equals(mTaskInfo.getType()) &&
+                            Constant.TaskState.FINISHED.equals(mTaskInfo.getState())) {
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        try {
+                            File downloadedFile = new File(mTaskInfo.getTo());
+                            File parentFile = downloadedFile.getParentFile();
+
+                            if (Build.VERSION.SDK_INT >= 24) {
+                                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                                StrictMode.setVmPolicy(builder.build());
+                            }
+                            Uri uri = Uri.fromFile(parentFile);
+
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.setDataAndType(uri, "*/*");
+                            mContext.startActivity(intent);
+
+                            Log.e(TAG, "uri = " + uri);
+                        } catch (Exception e) {
+                            Log.e(TAG, "start Activity for scan file failed!:" + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+        }
+
+        public void setTaskInfo(TaskInfo taskInfo) {
+            mTaskInfo = taskInfo;
         }
 
         public void setFileName(String fileName) {
@@ -216,66 +343,14 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
                 layoutParams.height = Util.dp2px(mContext, 14);
                 mTaskPauseResumeIv.setLayoutParams(layoutParams);
             }
-
-            View.OnClickListener taskPauseResumeOnClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mDownloadTaskItemClickListener != null) {
-                        if (Constant.TaskState.RUNNING.equals(state)) {
-                            mDownloadTaskItemClickListener.onPause(taskId);
-                        } else if (Constant.TaskState.PAUSED.equals(state)) {
-                            mDownloadTaskItemClickListener.onResume(taskId);
-                        }
-                    }
-                }
-            };
-
-            mTaskPauseResumeIv.setOnClickListener(taskPauseResumeOnClickListener);
-            mTaskPauseResumeLayout.setOnClickListener(taskPauseResumeOnClickListener);
         }
 
         public void setDelete(final TaskInfo taskInfo) {
-            View.OnClickListener deleteClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mDownloadTaskItemClickListener != null) {
-                        mDownloadTaskItemClickListener.onDelete(taskInfo);
-                    }
-                }
-            };
 
-            mDeleteIv.setOnClickListener(deleteClickListener);
-            mTaskDeleteLayout.setOnClickListener(deleteClickListener);
         }
 
         public void setOnEnterDownloadedDirectoryListener(String downloadedPath) {
-            mItemLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    try {
-                        File downloadedFile = new File(downloadedPath);
-                        File parentFile = downloadedFile.getParentFile();
 
-                        if (Build.VERSION.SDK_INT >= 24) {
-                            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-                            StrictMode.setVmPolicy(builder.build());
-                        }
-                        Uri uri = Uri.fromFile(parentFile);
-
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.setDataAndType(uri, "*/*");
-                        mContext.startActivity(intent);
-
-                        Log.e(TAG, "uri = " + uri);
-                    } catch (Exception e) {
-                        Log.e(TAG, "start Activity for scan file failed!:" + e.getMessage());
-                        e.printStackTrace();
-                    }
-                }
-            });
         }
 
         public void setFooterItem(boolean isFooter) {

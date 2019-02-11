@@ -65,7 +65,7 @@ public interface ExecuteTaskPresenter {
 
     void showUploadTaskList(ArrayList<TaskInfo> uploadTaskList, boolean allRefresh);
 
-    void showDownloadTaskList(ArrayList<TaskInfo> downloadTaskList);
+    void showDownloadTaskList(ArrayList<TaskInfo> downloadTaskList, boolean allRefresh);
 
 
     void onDestroy();

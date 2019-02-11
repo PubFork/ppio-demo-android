@@ -62,6 +62,8 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
 
                 holder.setTaskInfo(taskInfo);
             }
+
+            holder.setFooterItem(position == (getItemCount() - 1));
         } else {
             onBindViewHolder(holder, position);
         }

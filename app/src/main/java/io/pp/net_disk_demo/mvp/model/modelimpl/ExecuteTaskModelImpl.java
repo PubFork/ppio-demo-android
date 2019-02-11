@@ -140,9 +140,9 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
-    public void showDownloadTaskList(ArrayList<TaskInfo> taskInfoList) {
+    public void showDownloadTaskList(ArrayList<TaskInfo> taskInfoList, boolean allRefresh) {
         if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showDownloadTaskList(taskInfoList);
+            mExecuteTasksPresenter.showDownloadTaskList(taskInfoList, allRefresh);
         }
     }
 

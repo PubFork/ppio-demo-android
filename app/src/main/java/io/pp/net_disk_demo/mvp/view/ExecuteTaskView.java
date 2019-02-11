@@ -13,7 +13,7 @@ public interface ExecuteTaskView {
     void showUploadTaskError(String errMsg);
 
 
-    void showDownloadingTasks(ArrayList<TaskInfo> downloadingTaskList);
+    void showDownloadingTasks(ArrayList<TaskInfo> downloadingTaskList, boolean allRefresh);
 
     void showDownloadTaskError(String errMsg);
 
