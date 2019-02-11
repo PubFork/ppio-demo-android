@@ -63,7 +63,7 @@ public interface ExecuteTaskPresenter {
     void stopAllTask();
 
 
-    void showUploadTaskList(ArrayList<TaskInfo> uploadTaskList);
+    void showUploadTaskList(ArrayList<TaskInfo> uploadTaskList, boolean allRefresh);
 
     void showDownloadTaskList(ArrayList<TaskInfo> downloadTaskList);
 

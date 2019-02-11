@@ -650,7 +650,7 @@ public class PossUtil {
 
                     taskInfos[i] = taskInfo;
 
-                    Log.e(TAG, "getTask = " + mUser.getTask(taskInfo.getId()));
+                    //Log.e(TAG, "getTask = " + mUser.getTask(taskInfo.getId()));
                 }
 
                 for (int i = 0; i < length - 1; i++) {

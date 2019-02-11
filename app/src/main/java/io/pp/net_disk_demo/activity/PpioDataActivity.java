@@ -758,11 +758,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showUploadingTasks(final ArrayList<TaskInfo> uploadingTaskList) {
+    public void showUploadingTasks(final ArrayList<TaskInfo> uploadingTaskList, boolean allRefresh) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mUploadTaskAdapter.refreshUploadingList(uploadingTaskList);
+                if (allRefresh) {
+                    mUploadTaskAdapter.refreshUploadingList(uploadingTaskList);
+                } else {
+                    mUploadTaskAdapter.updateUploadingList(uploadingTaskList);
+                }
 
                 if (mCurrentShowView == UPLOADING_VIEW) {
                     if (mUploadTaskAdapter.getItemCount() == 0) {

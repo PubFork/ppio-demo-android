@@ -133,9 +133,9 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
-    public void showUploadTaskList(ArrayList<TaskInfo> taskInfoList) {
+    public void showUploadTaskList(ArrayList<TaskInfo> taskInfoList, boolean allRefresh) {
         if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showUploadTaskList(taskInfoList);
+            mExecuteTasksPresenter.showUploadTaskList(taskInfoList, allRefresh);
         }
     }
 
@@ -225,6 +225,10 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         @Override
         protected void onPostExecute(Boolean succeed) {
             super.onPostExecute(succeed);
+
+            if(succeed) {
+
+            }
 
             if (mExecuteTaskModelImplWeakReference.get() != null) {
                 mExecuteTaskModelImplWeakReference.get().showOperateTaskFinished();

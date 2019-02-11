@@ -8,7 +8,7 @@ public interface ExecuteTaskView {
     void showRefreshTasksError(String errMsg);
 
 
-    void showUploadingTasks(ArrayList<TaskInfo> uploadingTaskList);
+    void showUploadingTasks(ArrayList<TaskInfo> uploadingTaskList, boolean allRefresh);
 
     void showUploadTaskError(String errMsg);
 
