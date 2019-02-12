@@ -414,6 +414,10 @@ public class UploadService extends Service {
 
             ArrayList<TaskInfo> uploadTaskList = new ArrayList<>();
 
+            HashMap<String, String> lastUploadingTaskHashMap = new HashMap<>();
+            lastUploadingTaskHashMap.putAll(mUploadingTaskHashMap);
+            mUploadingTaskHashMap.clear();
+
             for (Map.Entry entry : taskInfoHashMap.entrySet()) {
                 TaskInfo taskInfo = (TaskInfo) entry.getValue();
 
@@ -434,14 +438,12 @@ public class UploadService extends Service {
 
                         mUploadingTaskHashMap.put(taskInfo.getTo(), taskInfo.getTo());
                     } else {
-                        if (mUploadingTaskHashMap.containsKey(taskInfo.getTo())) {
+                        if (lastUploadingTaskHashMap.containsKey(taskInfo.getTo())) {
                             taskInfo.setChanged();
                             if (Constant.TaskState.FINISHED.equals(taskInfo.getState())) {
                                 mUploaded = true;
                             }
                         }
-
-                        mUploadingTaskHashMap.remove(taskInfo.getTo());
                     }
                     uploadTaskList.add(taskInfo);
                     Log.e(TAG, "RefreshUploadTaskRunnable() taskId == " + taskInfo.getId());
@@ -489,6 +491,10 @@ public class UploadService extends Service {
             double totalUpload = 0;
             boolean mUploaded = false;
 
+            HashMap<String, String> lastUploadingTaskHashMap = new HashMap<>();
+            lastUploadingTaskHashMap.putAll(mUploadingTaskHashMap);
+            mUploadingTaskHashMap.clear();
+
             ArrayList<TaskInfo> uploadTaskList = new ArrayList<>();
 
             for (Map.Entry entry : taskInfoHashMap.entrySet()) {
@@ -511,14 +517,12 @@ public class UploadService extends Service {
 
                         mUploadingTaskHashMap.put(taskInfo.getTo(), taskInfo.getTo());
                     } else {
-                        if (mUploadingTaskHashMap.containsKey(taskInfo.getTo())) {
+                        if (lastUploadingTaskHashMap.containsKey(taskInfo.getTo())) {
                             taskInfo.setChanged();
                             if (Constant.TaskState.FINISHED.equals(taskInfo.getState())) {
                                 mUploaded = true;
                             }
                         }
-
-                        mUploadingTaskHashMap.remove(taskInfo.getTo());
                     }
                     uploadTaskList.add(taskInfo);
                     Log.e(TAG, "RefreshUploadTaskRunnable() taskId == " + taskInfo.getId());

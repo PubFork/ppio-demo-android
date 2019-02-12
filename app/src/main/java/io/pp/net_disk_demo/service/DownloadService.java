@@ -428,6 +428,10 @@ public class DownloadService extends Service {
             double finishedDownload = 0;
             double totalDownload = 0;
 
+            HashMap<String, String> lastDownloadingTaskHashMap = new HashMap<>();
+            lastDownloadingTaskHashMap.putAll(mDownloadingTaskHashMap);
+            mDownloadingTaskHashMap.clear();
+
             ArrayList<TaskInfo> uploadTaskList = new ArrayList<>();
 
             for (Map.Entry entry : taskInfoHashMap.entrySet()) {
@@ -450,11 +454,9 @@ public class DownloadService extends Service {
 
                         mDownloadingTaskHashMap.put(taskInfo.getId(), taskInfo.getId());
                     } else {
-                        if (mDownloadingTaskHashMap.containsKey(taskInfo.getId())) {
+                        if (lastDownloadingTaskHashMap.containsKey(taskInfo.getId())) {
                             taskInfo.setChanged();
                         }
-
-                        mDownloadingTaskHashMap.remove(taskInfo.getId());
                     }
                     uploadTaskList.add(taskInfo);
                 }
@@ -496,6 +498,10 @@ public class DownloadService extends Service {
             double finishedDownload = 0;
             double totalDownload = 0;
 
+            HashMap<String, String> lastDownloadingTaskHashMap = new HashMap<>();
+            lastDownloadingTaskHashMap.putAll(mDownloadingTaskHashMap);
+            mDownloadingTaskHashMap.clear();
+
             ArrayList<TaskInfo> uploadTaskList = new ArrayList<>();
 
             for (Map.Entry entry : taskInfoHashMap.entrySet()) {
@@ -517,11 +523,9 @@ public class DownloadService extends Service {
                         }
                         mDownloadingTaskHashMap.put(taskInfo.getId(), taskInfo.getId());
                     } else {
-                        if (mDownloadingTaskHashMap.containsKey(taskInfo.getId())) {
+                        if (lastDownloadingTaskHashMap.containsKey(taskInfo.getId())) {
                             taskInfo.setChanged();
                         }
-
-                        mDownloadingTaskHashMap.remove(taskInfo.getId());
                     }
                     uploadTaskList.add(taskInfo);
                 }
