@@ -16,7 +16,6 @@ import io.pp.net_disk_demo.data.UploadInfo;
 import io.pp.net_disk_demo.mvp.model.UploadModel;
 import io.pp.net_disk_demo.mvp.presenter.UploadPresenter;
 import io.pp.net_disk_demo.ppio.RpcUtil;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.service.UploadService;
 import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
 
@@ -33,8 +32,6 @@ public class UploadModelImpl implements UploadModel,
 
     private UploadPresenter mUploadPresenter;
 
-    private ExecuteTaskService mExecuteTaskService;
-
     private UploadService mUploadService;
 
     private CancelFixedThreadPool mRequestStorageChiPool;
@@ -48,11 +45,6 @@ public class UploadModelImpl implements UploadModel,
         mDateInfo = new DateInfo();
 
         mRequestStorageChiPool = new CancelFixedThreadPool(1);
-    }
-
-    @Override
-    public void bindService(ExecuteTaskService executeTaskService) {
-        mExecuteTaskService = executeTaskService;
     }
 
     @Override
@@ -230,7 +222,6 @@ public class UploadModelImpl implements UploadModel,
     public void onDestroy() {
         mContext = null;
         mUploadPresenter = null;
-        mExecuteTaskService = null;
         mUploadService = null;
     }
 

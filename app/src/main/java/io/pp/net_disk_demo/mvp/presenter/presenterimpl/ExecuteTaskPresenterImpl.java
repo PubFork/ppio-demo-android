@@ -13,7 +13,6 @@ import io.pp.net_disk_demo.mvp.model.modelimpl.ExecuteTaskModelImpl;
 import io.pp.net_disk_demo.mvp.presenter.ExecuteTaskPresenter;
 import io.pp.net_disk_demo.mvp.view.ExecuteTaskView;
 import io.pp.net_disk_demo.service.DownloadService;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.service.UploadService;
 
 public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
@@ -28,13 +27,6 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
         mContext = context;
         mExecuteTaskView = executeView;
         mExecuteTaskModel = new ExecuteTaskModelImpl(context, ExecuteTaskPresenterImpl.this);
-    }
-
-    @Override
-    public void bindExecuteTaskService(ExecuteTaskService executeTasksService) {
-        if (mExecuteTaskModel != null) {
-            mExecuteTaskModel.bindExecuteTaskService(executeTasksService);
-        }
     }
 
     @Override

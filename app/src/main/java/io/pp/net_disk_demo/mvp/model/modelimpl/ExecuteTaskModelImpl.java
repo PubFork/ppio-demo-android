@@ -14,7 +14,6 @@ import io.pp.net_disk_demo.mvp.model.ExecuteTasksModel;
 import io.pp.net_disk_demo.mvp.presenter.ExecuteTaskPresenter;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.DownloadService;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.service.UploadService;
 
 public class ExecuteTaskModelImpl implements ExecuteTasksModel,
@@ -27,7 +26,6 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
 
     private Context mContext;
     private ExecuteTaskPresenter mExecuteTasksPresenter;
-    private ExecuteTaskService mExecuteTasksService;
 
     private UploadService mUploadService = null;
     private DownloadService mDownloadService = null;
@@ -39,11 +37,6 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         mExecuteTasksPresenter = executeTasksPresenter;
 
         mTaskIdList = new ArrayList<>();
-    }
-
-    @Override
-    public void bindExecuteTaskService(ExecuteTaskService executeTasksService) {
-        mExecuteTasksService = executeTasksService;
     }
 
     @Override
@@ -107,12 +100,11 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         }
     }
 
-
     @Override
     public void stopAllTask() {
-        if (mExecuteTasksService != null) {
-            mExecuteTasksService.stopAllTask();
-        }
+//        if (mExecuteTasksService != null) {
+//            mExecuteTasksService.stopAllTask();
+//        }
     }
 
     @Override
@@ -157,7 +149,6 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     public void onDestroy() {
         mContext = null;
         mExecuteTasksPresenter = null;
-        mExecuteTasksService = null;
         mUploadService = null;
         mDownloadService = null;
     }

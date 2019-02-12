@@ -141,8 +141,6 @@
             android:authorities="io.pp.net_disk_demo"
             android:exported="false" />
 
-        <service android:name=".service.ExecuteTaskService" />
-
         <service android:name=".service.UploadService" />
 
         <service android:name=".service.DownloadService" />

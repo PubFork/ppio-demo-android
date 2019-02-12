@@ -8,7 +8,6 @@ import io.pp.net_disk_demo.mvp.view.UploadView;
 import io.pp.net_disk_demo.data.UploadInfo;
 import io.pp.net_disk_demo.mvp.model.UploadModel;
 import io.pp.net_disk_demo.mvp.model.modelimpl.UploadModelImpl;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.service.UploadService;
 
 public class UploadPresenterImpl implements UploadPresenter {
@@ -25,13 +24,6 @@ public class UploadPresenterImpl implements UploadPresenter {
 
         mUploadView = uploadView;
         mUploadModel = new UploadModelImpl(mContext, UploadPresenterImpl.this);
-    }
-
-    @Override
-    public void bindService(ExecuteTaskService executeTaskService) {
-        if (mUploadModel != null) {
-            mUploadModel.bindService(executeTaskService);
-        }
     }
 
     @Override
