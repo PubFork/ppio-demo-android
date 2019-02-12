@@ -33,6 +33,12 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public void setNavigationBarBackgroundColor(int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setNavigationBarColor(color);
+        }
+    }
+
     public void setupUI(View view) {
         //Set up touch listener for non-text box views to hide keyboard.
         if (!(view instanceof EditText)) {

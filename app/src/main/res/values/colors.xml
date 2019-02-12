@@ -5,4 +5,5 @@
     <color name="colorAccent">#D81B60</color>
 
     <color name="account_background_blue">#2297F3</color>
+    <color name="account_background_purple">#243243</color>
 </resources>
