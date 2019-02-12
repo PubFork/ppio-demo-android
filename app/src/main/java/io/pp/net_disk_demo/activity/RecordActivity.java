@@ -1,34 +1,52 @@
 package io.pp.net_disk_demo.activity;
 
+import android.app.ProgressDialog;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.data.RecordInfo;
+import io.pp.net_disk_demo.mvp.presenter.RecordPresenter;
+import io.pp.net_disk_demo.mvp.presenter.presenterimpl.RecordPresenterImpl;
+import io.pp.net_disk_demo.mvp.view.RecordView;
 import io.pp.net_disk_demo.ppio.RpcUtil;
+import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.widget.recyclerview.RecordAdapter;
 
-public class RecordActivity extends BaseActivity {
+public class RecordActivity extends BaseActivity implements RecordView {
+
+    private static final String TAG = "RecordActivity";
 
     private Toolbar mRecordToolBar = null;
     private LinearLayout mToolBarLeftTvLayout = null;
     private TextView mToolBarTitleTv = null;
 
+    private ImageView mNoContentIv = null;
+    private TextView mNoContentTv = null;
+
+    private SwipeRefreshLayout mSwipeRefreshLayout = null;
     private RecyclerView mRecordRecyclerView = null;
     private RecordAdapter mRecordAdapter = null;
+
+    private ProgressDialog mProgressDialog = null;
+
+    private RecordPresenter mRecordPresenter = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,7 +54,74 @@ public class RecordActivity extends BaseActivity {
 
         setContentView(R.layout.activity_record);
 
+        mRecordPresenter = new RecordPresenterImpl(RecordActivity.this);
+
         init();
+    }
+
+    @Override
+    protected void onDestroy() {
+        hideProgressDialog();
+
+        if (mRecordPresenter != null) {
+            mRecordPresenter.onDestroy();
+            mRecordPresenter = null;
+        }
+
+        super.onDestroy();
+    }
+
+    @Override
+    public void back() {
+        finish();
+    }
+
+    @Override
+    public void showRequestingRecordView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                hideProgressDialog();
+                showProgressDialog();
+            }
+        });
+    }
+
+    @Override
+    public void showRequestRecordFailView(String errMsg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                hideProgressDialog();
+
+                mNoContentIv.setVisibility(View.VISIBLE);
+                mNoContentTv.setVisibility(View.VISIBLE);
+                mNoContentTv.setText("No records");
+                mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
+
+                ToastUtil.showToast(RecordActivity.this, "request records fails!", Toast.LENGTH_LONG);
+            }
+        });
+    }
+
+    @Override
+    public void showRequestRecordFinishedView(ArrayList<RecordInfo> recordInfoList) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                hideProgressDialog();
+
+                if (recordInfoList != null && recordInfoList.size() > 0) {
+                    mRecordAdapter.setRecordList(recordInfoList);
+                    mSwipeRefreshLayout.setVisibility(View.VISIBLE);
+                } else {
+                    mNoContentIv.setVisibility(View.VISIBLE);
+                    mNoContentTv.setVisibility(View.VISIBLE);
+                    mNoContentTv.setText("No records");
+                    mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
     }
 
     private void init() {
@@ -52,6 +137,29 @@ public class RecordActivity extends BaseActivity {
 
         mToolBarTitleTv = findViewById(R.id.actionbar_title_tv);
 
+        mNoContentIv = findViewById(R.id.no_content_iv);
+        mNoContentTv = findViewById(R.id.no_content_tv);
+
+        mSwipeRefreshLayout = findViewById(R.id.refresh_layout);
+
+        mRecordRecyclerView = findViewById(R.id.record_recyclerview);
+
+        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.account_background_blue));
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Util.runNetOperation(RecordActivity.this, new Util.RunNetOperationCallBack() {
+                    @Override
+                    public void onRunOperation() {
+                        if (mRecordPresenter != null) {
+                            mRecordPresenter.startRequestRecord();
+                        }
+                    }
+                });
+            }
+        });
+
         View.OnClickListener toolBarLeftOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,7 +171,8 @@ public class RecordActivity extends BaseActivity {
 
         mToolBarTitleTv.setText("Record");
 
-        mRecordRecyclerView = findViewById(R.id.record_recyclerview);
+        mNoContentIv.setVisibility(View.GONE);
+        mNoContentTv.setVisibility(View.GONE);
 
         mRecordRecyclerView.setLayoutManager(new LinearLayoutManager(RecordActivity.this));
         mRecordRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
@@ -85,18 +194,23 @@ public class RecordActivity extends BaseActivity {
 
         mRecordRecyclerView.setAdapter(mRecordAdapter);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<RecordInfo> recordInfList = RpcUtil.transferRecord();
+        mRecordPresenter.startRequestRecord();
+    }
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRecordAdapter.setRecordList(recordInfList);
-                    }
-                });
-            }
-        }).start();
+    private void showProgressDialog() {
+        hideProgressDialog();
+
+        mProgressDialog = new ProgressDialog(RecordActivity.this);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCanceledOnTouchOutside(false);
+
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
     }
 }

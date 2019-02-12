@@ -22,9 +22,10 @@ public class RpcUtil {
     private static final String mRpcUrlStr = Constant.URL.RPC_URL;
     private static JSONRPCHttpClient mBalanceRpcClient;
     private static JSONRPCHttpClient mFundRpcClient;
-    private static JSONRPCHttpClient mOraclepcClient;
+    private static JSONRPCHttpClient mOracleRpcClient;
     private static JSONRPCHttpClient mStorageRpcClient;
     private static JSONRPCHttpClient mDownloadRpcClient;
+    private static JSONRPCHttpClient mTransferRecordRpcClient;
     private static JSONRPCHttpClient mRpcClient;
 
     public static boolean peerAvailable() {
@@ -123,16 +124,16 @@ public class RpcUtil {
     }
 
     public static OracleChiPrice oracleChiPrice(QueryAccountListener queryAccountListener) {
-        mOraclepcClient = new JSONRPCHttpClient(mRpcUrlStr);
-        mOraclepcClient.setDebug(true);
+        mOracleRpcClient = new JSONRPCHttpClient(mRpcUrlStr);
+        mOracleRpcClient.setDebug(true);
 
         try {
             Log.e(TAG, "oracleChiPrice() start...");
-            String oracleChiPriceResultStr = mOraclepcClient.callString("oracleChiPrice");
+            String oracleChiPriceResultStr = mOracleRpcClient.callString("oracleChiPrice");
             Log.e(TAG, "oracleChiPrice() end...");
             Log.e(TAG, "oracleChiPrice() " + oracleChiPriceResultStr);
 
-            mOraclepcClient = null;
+            mOracleRpcClient = null;
 
             JSONObject oracleChiPriceJSONObject = new JSONObject(oracleChiPriceResultStr);
             return new OracleChiPrice(oracleChiPriceJSONObject.getString("StorageChiPrice"),
@@ -144,7 +145,7 @@ public class RpcUtil {
             Log.e(TAG, "oracleChiPrice() err = " + e.getMessage());
             e.printStackTrace();
 
-            mOraclepcClient = null;
+            mOracleRpcClient = null;
 
             return null;
         }
@@ -301,8 +302,9 @@ public class RpcUtil {
         return "";
     }
 
-    public static ArrayList<RecordInfo> transferRecord() {
-        initClient();
+    public static ArrayList<RecordInfo> transferRecord(QueryAccountListener queryAccountListener) {
+        mTransferRecordRpcClient = new JSONRPCHttpClient(mRpcUrlStr);
+        mTransferRecordRpcClient.setDebug(true);
 
         ArrayList<RecordInfo> transferRecordList = new ArrayList<>();
 
@@ -310,10 +312,13 @@ public class RpcUtil {
             JSONObject requestJSONObject = new JSONObject();
             requestJSONObject.put("accountID", PossUtil.getAccount());
             requestJSONObject.put("start", 0);
-            requestJSONObject.put("limit", 20);
+            requestJSONObject.put("limit", 10);
+
+            Object[] params = new Object[1];
+            params[0] = requestJSONObject;
 
             Log.e(TAG, "transferRecord() start...");
-            String transferRecordResultStr = mRpcClient.callString("transferRecord", new Object[]{requestJSONObject});
+            String transferRecordResultStr = mTransferRecordRpcClient.callString("transferRecord", params);
             Log.e(TAG, "transferRecord() end...");
             Log.e(TAG, "transferRecord() " + transferRecordResultStr);
 
@@ -335,6 +340,9 @@ public class RpcUtil {
                 }
             }
         } catch (Exception e) {
+            if (queryAccountListener != null) {
+                queryAccountListener.onQueryAccountError(e.getMessage());
+            }
             Log.e(TAG, "transferRecord() err = " + e.getMessage());
             e.printStackTrace();
         }
