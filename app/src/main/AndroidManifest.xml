@@ -29,21 +29,6 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <!--<activity-->
-        <!--android:name=".activity.LoadingActivity"-->
-        <!--android:screenOrientation="portrait"-->
-        <!--android:theme="@style/LoadingActivityTheme">-->
-
-        <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.MAIN" />-->
-        <!--<action android:name="android.intent.action.VIEW" />-->
-
-        <!--<category android:name="android.intent.category.LAUNCHER" />-->
-        <!--<category android:name="android.intent.category.DEFAULT" />-->
-        <!--</intent-filter>-->
-
-        <!--</activity>-->
-
         <activity
             android:name=".activity.CheckHasKeyStoreActivity"
             android:screenOrientation="portrait"
@@ -69,50 +54,10 @@
         </activity>
 
         <activity
-            android:name=".activity.LogInOrRegisterActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
-            android:name=".activity.LogInActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
-            android:name=".activity.RegisterActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
-            android:name=".activity.KeystoreOrPrivateKeyActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
             android:name=".activity.KeyStoreLogInActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/LoadingActivityTheme"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
-            android:name=".activity.PrivateKeyLogInActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustUnspecified">
 
         </activity>
