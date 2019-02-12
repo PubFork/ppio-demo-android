@@ -550,7 +550,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mRequestUsedStatusIv.clearAnimation();
                 mRequestUsedStatusIv.setVisibility(View.INVISIBLE);
 
-                mUsedValueTv.setText(used + "G");
+                mUsedValueTv.setText(used);
             }
         });
     }
