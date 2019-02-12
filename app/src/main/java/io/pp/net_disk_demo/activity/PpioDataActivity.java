@@ -282,9 +282,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         super.onActivityResult(requestCode, resultCode, data);
 
         if ((requestCode == Constant.Code.REQUEST_UPLOAD &&
-                resultCode == Constant.Code.RESULT_UPLOAD_OK) ||
-                (requestCode == Constant.Code.REQUEST_RENEW &&
-                        resultCode == Constant.Code.RESULT_RENEW_OK)) {
+                resultCode == Constant.Code.RESULT_UPLOAD_OK)) {
             mBackFromUpload = true;
 
             if (mExecuteTaskPresenter != null) {
