@@ -28,11 +28,11 @@ android {
             def date = new Date().format("yyyyMMdd", TimeZone.getTimeZone("GMT+08"))
 
             if (variant.buildType.name.equals('debug')) {
-                outputFileName = "netdisk_demo_android_v${versionName}_${date}.apk"
+                outputFileName = "ppio-demo-${versionName}_${date}.apk"
             }
 
             if (variant.buildType.name.equals('release')) {
-                outputFileName = "netdisk_demo_android_v${versionName}.apk"
+                outputFileName = "ppio-demo-${versionName}.apk"
             }
         }
     }
