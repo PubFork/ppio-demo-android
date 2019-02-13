@@ -1,5 +1,5 @@
 # ppio-demo-android
-> An official decentralized personal cloud storage demo application based on PPIO Object Storage Service - POSS.
+> An official decentralized personal cloud storage demo application based on PPIO.
 
 ## Features
 - [x] upload & download file (Support breakpoint transmission)
