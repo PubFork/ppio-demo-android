@@ -31,7 +31,7 @@ public class XPermissionUtils {
             mOnPermissionListener = listener;
             List deniedPermissions = getDeniedPermissions(context, permissions);
             if (deniedPermissions.size() > 0) {
-                Log.e(TAG, "if (deniedPermissions.size() > 0)");
+                Log.e(TAG, "requestPermissions() if (deniedPermissions.size() > 0)");
                 mRequestCode = requestCode;
                 ((Activity) context).requestPermissions(permissions, requestCode);
             } else {
@@ -47,7 +47,7 @@ public class XPermissionUtils {
     public static void requestPermissionsForActivity(Activity activity, int requestCode, String[] permissions, OnPermissionListener onPermissionListener) {
         List deniedPermissions = getDeniedPermissions(activity, permissions);
         if (deniedPermissions.size() > 0) {
-            Log.e(TAG, "if (deniedPermissions.size() > 0)");
+            Log.e(TAG, "requestPermissionsForActivity(） if (deniedPermissions.size() > 0)");
             mRequestCode = requestCode;
             ActivityCompat.requestPermissions(activity, permissions, requestCode);
         } else {

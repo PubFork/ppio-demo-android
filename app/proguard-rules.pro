@@ -69,6 +69,9 @@
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.stream.** { *; }
 
+-keep  class org.alexd.jsonrpc.*
+-keep  class org.alexd.jsonrpc.**{*;}
+
 #Bugly
 -dontwarn com.tencent.bugly
 -keep class com.tencent.bugly.**{*;}

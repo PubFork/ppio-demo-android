@@ -14,19 +14,18 @@ import io.pp.net_disk_demo.mvp.model.ExecuteTasksModel;
 import io.pp.net_disk_demo.mvp.presenter.ExecuteTaskPresenter;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.DownloadService;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.service.UploadService;
 
 public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         DownloadService.DownloadListener,
         UploadService.ShowUploadTaskListListener,
-        DownloadService.ShowDownloadTaskListListener {
+        DownloadService.ShowDownloadTaskListListener,
+        UploadService.ShowUploadedListener {
 
     private static final String TAG = "ExecuteTaskModelImpl";
 
     private Context mContext;
     private ExecuteTaskPresenter mExecuteTasksPresenter;
-    private ExecuteTaskService mExecuteTasksService;
 
     private UploadService mUploadService = null;
     private DownloadService mDownloadService = null;
@@ -41,15 +40,11 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
-    public void bindExecuteTaskService(ExecuteTaskService executeTasksService) {
-        mExecuteTasksService = executeTasksService;
-    }
-
-    @Override
     public void bindUploadService(UploadService uploadService) {
         mUploadService = uploadService;
 
         mUploadService.setShowUploadTaskListListener(ExecuteTaskModelImpl.this);
+        mUploadService.setShowUploadedListener(ExecuteTaskModelImpl.this);
     }
 
     @Override
@@ -105,12 +100,11 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         }
     }
 
-
     @Override
     public void stopAllTask() {
-        if (mExecuteTasksService != null) {
-            mExecuteTasksService.stopAllTask();
-        }
+//        if (mExecuteTasksService != null) {
+//            mExecuteTasksService.stopAllTask();
+//        }
     }
 
     @Override
@@ -131,16 +125,23 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
-    public void showUploadTaskList(ArrayList<TaskInfo> taskInfoList) {
+    public void showUploadTaskList(ArrayList<TaskInfo> taskInfoList, boolean allRefresh) {
         if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showUploadTaskList(taskInfoList);
+            mExecuteTasksPresenter.showUploadTaskList(taskInfoList, allRefresh);
         }
     }
 
     @Override
-    public void showDownloadTaskList(ArrayList<TaskInfo> taskInfoList) {
+    public void showDownloadTaskList(ArrayList<TaskInfo> taskInfoList, boolean allRefresh) {
         if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showDownloadTaskList(taskInfoList);
+            mExecuteTasksPresenter.showDownloadTaskList(taskInfoList, allRefresh);
+        }
+    }
+
+    @Override
+    public void onUploaded() {
+        if (mExecuteTasksPresenter != null) {
+            mExecuteTasksPresenter.refreshFileList();
         }
     }
 
@@ -148,7 +149,6 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     public void onDestroy() {
         mContext = null;
         mExecuteTasksPresenter = null;
-        mExecuteTasksService = null;
         mUploadService = null;
         mDownloadService = null;
     }
@@ -216,6 +216,10 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         @Override
         protected void onPostExecute(Boolean succeed) {
             super.onPostExecute(succeed);
+
+            if(succeed) {
+
+            }
 
             if (mExecuteTaskModelImplWeakReference.get() != null) {
                 mExecuteTaskModelImplWeakReference.get().showOperateTaskFinished();

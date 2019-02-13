@@ -108,6 +108,8 @@ public class Constant {
         public static final String CACHE_QOS_DIR_SUFFIX = "/qoslog";
         public static final String DOWNLOAD_DIR = Environment.getExternalStorageDirectory().getPath() +
                 "/PPIO_Download";//can not add '/ in end
+        public static final String DOWNLOAD_PATH_SUFFIX = Environment.getExternalStorageDirectory().getPath() +
+                "/PPIO_Download/";
 
         public static final String REGISTER_RECORD_PREFIX = Constant.PPIO_File.CACHE_DIR_PREFIX + "/Register_Record";
         public static final String LOGIN_RECORD_FILE = Constant.PPIO_File.CACHE_DIR_PREFIX + "/LogIn_Record.txt";

@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="false"
@@ -20,22 +22,12 @@
         android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
 
-        <!--<activity-->
-        <!--android:name=".activity.LoadingActivity"-->
-        <!--android:screenOrientation="portrait"-->
-        <!--android:theme="@style/LoadingActivityTheme">-->
-
-        <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.MAIN" />-->
-        <!--<action android:name="android.intent.action.VIEW" />-->
-
-        <!--<category android:name="android.intent.category.LAUNCHER" />-->
-        <!--<category android:name="android.intent.category.DEFAULT" />-->
-        <!--</intent-filter>-->
-
-        <!--</activity>-->
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <activity
             android:name=".activity.CheckHasKeyStoreActivity"
@@ -56,38 +48,7 @@
             android:name=".activity.InputPassPhraseActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
-            android:name=".activity.LogInOrRegisterActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
-            android:name=".activity.LogInActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
-            android:name=".activity.RegisterActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
-            android:name=".activity.KeystoreOrPrivateKeyActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
+            android:theme="@style/LoadingActivityTheme"
             android:windowSoftInputMode="adjustUnspecified">
 
         </activity>
@@ -96,14 +57,7 @@
             android:name=".activity.KeyStoreLogInActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified">
-
-        </activity>
-
-        <activity
-            android:name=".activity.PrivateKeyLogInActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
+            android:theme="@style/LoadingActivityTheme"
             android:windowSoftInputMode="adjustUnspecified">
 
         </activity>
@@ -186,8 +140,6 @@
             android:name=".database.AccountContentProvider"
             android:authorities="io.pp.net_disk_demo"
             android:exported="false" />
-
-        <service android:name=".service.ExecuteTaskService" />
 
         <service android:name=".service.UploadService" />
 

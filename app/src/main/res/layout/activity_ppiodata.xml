@@ -55,7 +55,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
                     android:includeFontPadding="false"
-                    android:text="All file"
+                    android:text="Files"
                     android:textColor="#FFFFFF"
                     android:textSize="19dp" />
 

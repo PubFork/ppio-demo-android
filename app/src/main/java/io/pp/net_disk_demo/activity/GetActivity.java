@@ -25,7 +25,6 @@ import io.pp.net_disk_demo.mvp.presenter.GetPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.GetPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.GetView;
 import io.pp.net_disk_demo.service.DownloadService;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.util.ToastUtil;
 
 public class GetActivity extends BaseActivity implements GetView {
@@ -44,9 +43,6 @@ public class GetActivity extends BaseActivity implements GetView {
 
     private GetPresenter mGetPresenter = null;
 
-    private ExecuteTaskService mExecuteTaskService = null;
-    private ExecuteTaskServiceConnection mExecuteTaskServiceConnection = null;
-
     private DownloadService mDownloadService = null;
     private DownloadServiceConnection mDownloadServiceConnection = null;
 
@@ -60,15 +56,9 @@ public class GetActivity extends BaseActivity implements GetView {
 
         init();
 
-        mExecuteTaskServiceConnection = new ExecuteTaskServiceConnection(GetActivity.this);
         mDownloadServiceConnection = new DownloadServiceConnection(GetActivity.this);
 
-        startService(new Intent(GetActivity.this, ExecuteTaskService.class));
         startService(new Intent(GetActivity.this, DownloadService.class));
-
-        bindService(new Intent(GetActivity.this, ExecuteTaskService.class),
-                mExecuteTaskServiceConnection,
-                BIND_AUTO_CREATE);
 
         bindService(new Intent(GetActivity.this, DownloadService.class),
                 mDownloadServiceConnection,
@@ -79,11 +69,7 @@ public class GetActivity extends BaseActivity implements GetView {
 
     @Override
     protected void onDestroy() {
-        unbindService(mExecuteTaskServiceConnection);
         unbindService(mDownloadServiceConnection);
-
-        mExecuteTaskService = null;
-        mExecuteTaskServiceConnection = null;
 
         mDownloadService = null;
         mDownloadServiceConnection = null;
@@ -221,40 +207,12 @@ public class GetActivity extends BaseActivity implements GetView {
         mGetPresenter = new GetPresenterImpl(GetActivity.this, GetActivity.this);
     }
 
-    private void bindExecuteTaskService(IBinder service) {
-        mExecuteTaskService = ((ExecuteTaskService.ExecuteTaskBinder) service).getExecuteTaskService();
-
-        if (mGetPresenter != null) {
-            mGetPresenter.bindGetService(mExecuteTaskService);
-        }
-    }
 
     private void bindDownloadService(IBinder service) {
         mDownloadService = ((DownloadService.DownloadServiceBinder) service).getDownloadService();
 
         if (mGetPresenter != null) {
             mGetPresenter.bindDownloadService(mDownloadService);
-        }
-    }
-
-    static class ExecuteTaskServiceConnection implements ServiceConnection {
-
-        final WeakReference<GetActivity> getActivityWeakReference;
-
-        public ExecuteTaskServiceConnection(GetActivity getActivity) {
-            getActivityWeakReference = new WeakReference<>(getActivity);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            if (getActivityWeakReference.get() != null) {
-                getActivityWeakReference.get().bindExecuteTaskService(service);
-            }
         }
     }
 

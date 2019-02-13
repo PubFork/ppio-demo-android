@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
@@ -38,6 +39,37 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
     }
 
     @Override
+    public void onBindViewHolder(@NonNull UploadTaskItemHolder holder, int position, @NonNull List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
+
+        if (!payloads.isEmpty()) {
+            TaskInfo taskInfo = mUploadTaskList.get(position);
+
+            if (taskInfo != null) {
+                //holder.setFileName(taskInfo.getTo());
+                holder.setState(taskInfo.getState(), taskInfo.getError());
+                if (Constant.TaskState.RUNNING.equals(taskInfo.getState()) ||
+                        Constant.TaskState.PAUSED.equals(taskInfo.getState())) {
+                    double progress2digits = 0;
+                    if (taskInfo.getTotal() != 0) {
+                        progress2digits = new BigDecimal(taskInfo.getProgress()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    }
+
+                    holder.setProgress(progress2digits);
+
+                    holder.setPauseResume(taskInfo.getId(), taskInfo.getState());
+                }
+
+                holder.setTaskInfo(taskInfo);
+            }
+
+            holder.setFooterItem(position == (getItemCount() - 1));
+        } else {
+            onBindViewHolder(holder, position);
+        }
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull UploadTaskItemHolder uploadTaskItemHolder, int i) {
         TaskInfo taskInfo = mUploadTaskList.get(i);
 
@@ -54,7 +86,8 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
 
             uploadTaskItemHolder.setPauseResume(taskInfo.getId(), taskInfo.getState());
 
-            uploadTaskItemHolder.setDelete(taskInfo);
+            //uploadTaskItemHolder.setDelete(taskInfo);
+            uploadTaskItemHolder.setTaskInfo(taskInfo);
         }
 
         uploadTaskItemHolder.setFooterItem(i == (getItemCount() - 1));
@@ -79,6 +112,24 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
         mUploadTaskList = uploadTaskList;
 
         notifyDataSetChanged();
+    }
+
+    public void updateUploadingList(ArrayList<TaskInfo> uploadTaskList) {
+        mUploadTaskList = uploadTaskList;
+
+        if (mUploadTaskList != null && mUploadTaskList.size() > 0) {
+            for (int i = 0; i < mUploadTaskList.size(); i++) {
+                TaskInfo taskInfo = mUploadTaskList.get(i);
+                if (taskInfo != null &&
+                        (taskInfo.isChanged() ||
+                                Constant.TaskState.RUNNING.equals(taskInfo.getState())) ||
+                        Constant.TaskState.PAUSED.equals(taskInfo.getState())) {
+                    notifyItemChanged(i, mUploadTaskList.get(i));
+                }
+            }
+        } else {
+            notifyDataSetChanged();
+        }
     }
 
     public void setUploadTaskItemClickListener(UploadTaskItemClickListener uploadTaskItemClickListener) {
@@ -107,6 +158,8 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
         private ImageView mDeleteIv = null;
 
         private int mDefaultStatusTvTextColor;
+
+        private TaskInfo mTaskInfo = null;
 
         public UploadTaskItemHolder(@NonNull View itemView) {
             super(itemView);
@@ -138,13 +191,51 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
             mUploadingIv.setBackgroundResource(R.mipmap.uploading);
 
             mDefaultStatusTvTextColor = mTaskStatusTv.getCurrentTextColor();
+
+            View.OnClickListener taskPauseResumeOnClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mTaskInfo != null) {
+                        final String state = mTaskInfo.getState();
+                        final String taskId = mTaskInfo.getId();
+                        if (mUploadTaskItemClickListener != null) {
+                            if (Constant.TaskState.RUNNING.equals(state)) {
+                                mUploadTaskItemClickListener.onPause(taskId);
+                            } else if (Constant.TaskState.PAUSED.equals(state)) {
+                                mUploadTaskItemClickListener.onResume(taskId);
+                            }
+                        }
+                    }
+                }
+            };
+
+            mTaskPauseResumeLayout.setOnClickListener(taskPauseResumeOnClickListener);
+            mTaskPauseResumeIv.setOnClickListener(taskPauseResumeOnClickListener);
+
+            View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mTaskInfo != null) {
+                        if (mUploadTaskItemClickListener != null) {
+                            mUploadTaskItemClickListener.onDelete(mTaskInfo);
+                        }
+                    }
+                }
+            };
+
+            mTaskDeleteLayout.setOnClickListener(deleteOnClickListener);
+            mDeleteIv.setOnClickListener(deleteOnClickListener);
+        }
+
+        public void setTaskInfo(TaskInfo taskInfo) {
+            mTaskInfo = taskInfo;
         }
 
         public void setFileName(String bucketKey) {
             String fileName = "";
             if (!TextUtils.isEmpty(bucketKey)) {
-                if (bucketKey.startsWith(Constant.Data.DEFAULT_BUCKET + "//")) {
-                    fileName = bucketKey.replaceFirst(Constant.Data.DEFAULT_BUCKET + "//", "");
+                if (bucketKey.startsWith(Constant.Data.DEFAULT_BUCKET + "/")) {
+                    fileName = bucketKey.replaceFirst(Constant.Data.DEFAULT_BUCKET + "/", "");
                 } else {
                     fileName = bucketKey;
                 }
@@ -205,36 +296,10 @@ public class UploadTaskAdapter extends RecyclerView.Adapter<UploadTaskAdapter.Up
                 layoutParams.height = Util.dp2px(mContext, 14);
                 mTaskPauseResumeIv.setLayoutParams(layoutParams);
             }
-
-            View.OnClickListener taskPauseResumeOnClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mUploadTaskItemClickListener != null) {
-                        if (Constant.TaskState.RUNNING.equals(state)) {
-                            mUploadTaskItemClickListener.onPause(taskId);
-                        } else if (Constant.TaskState.PAUSED.equals(state)) {
-                            mUploadTaskItemClickListener.onResume(taskId);
-                        }
-                    }
-                }
-            };
-
-            mTaskPauseResumeLayout.setOnClickListener(taskPauseResumeOnClickListener);
-            mTaskPauseResumeIv.setOnClickListener(taskPauseResumeOnClickListener);
         }
 
         public void setDelete(final TaskInfo taskInfo) {
-            View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mUploadTaskItemClickListener != null) {
-                        mUploadTaskItemClickListener.onDelete(taskInfo);
-                    }
-                }
-            };
 
-            mTaskDeleteLayout.setOnClickListener(deleteOnClickListener);
-            mDeleteIv.setOnClickListener(deleteOnClickListener);
         }
 
         public void setFooterItem(boolean isFooter) {

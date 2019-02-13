@@ -16,6 +16,7 @@ import android.widget.TextView;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
@@ -46,6 +47,27 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
     @Override
     public MyFileItemHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         return new MyFileItemHolder(mContext, viewGroup);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MyFileItemHolder holder, int position, @NonNull List<Object> payloads) {
+        if (!payloads.isEmpty()) {
+            FileInfo fileInfo = mMyFileList.get(position);
+
+            String stateStr = "";
+
+            DeletingInfo deletingInfo = mDeletingInfoHashMap.get(fileInfo.getBucketName() + fileInfo.getName());
+            if (Constant.ProgressState.ERROR.equals(deletingInfo.getState())) {
+                stateStr = stateStr + "   <font color='#2297F3'>delete failed</font>";
+            } else {
+                double progress2digits = new BigDecimal(deletingInfo.getProgress() * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                stateStr = stateStr + "   <font color='#2297F3'>deleting: " + progress2digits + "% </font>";
+            }
+
+            holder.setFileModifiedDate(Html.fromHtml(stateStr));
+        } else {
+            onBindViewHolder(holder, position);
+        }
     }
 
     @Override
@@ -96,14 +118,30 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         return 0;
     }
 
-    public void refreshDeletingInfoHashMap(HashMap<String, DeletingInfo> deletingInfoHashMap) {
-        mDeletingInfoHashMap = deletingInfoHashMap;
-    }
+//    public void refreshDeletingInfoHashMap(HashMap<String, DeletingInfo> deletingInfoHashMap) {
+//        mDeletingInfoHashMap = deletingInfoHashMap;
+//    }
 
-    public void refreshFileList(ArrayList<FileInfo> myFileList) {
+    public void refreshFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, ArrayList<FileInfo> myFileList) {
+        mDeletingInfoHashMap = deletingInfoHashMap;
         mMyFileList = myFileList;
 
         notifyDataSetChanged();
+    }
+
+    public void updateDeletingFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, ArrayList<FileInfo> myFileList) {
+        mDeletingInfoHashMap = deletingInfoHashMap;
+        mMyFileList = myFileList;
+
+        if (mMyFileList != null && mMyFileList.size() != 0) {
+            for (int i = 0; i < mMyFileList.size(); i++) {
+                if (mDeletingInfoHashMap.containsKey(mMyFileList.get(i).getBucketName() + mMyFileList.get(i).getName())) {
+                    notifyItemChanged(i, mMyFileList.get(i));
+                }
+            }
+        } else {
+            notifyDataSetChanged();
+        }
     }
 
     public void setOnItemListener(OnItemListener onItemListener) {
@@ -175,16 +213,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
             mFileModifiedDateTv = mItemLayout.findViewById(R.id.file_modifieddate_tv);
         }
 
-        public void setFileName(String bucketKey) {
-            String fileName = "";
-            if (!TextUtils.isEmpty(bucketKey)) {
-                if (bucketKey.startsWith("/")) {
-                    fileName = bucketKey.replaceFirst("/", "");
-                } else {
-                    fileName = bucketKey;
-                }
-            }
-
+        public void setFileName(String fileName) {
             mFileNameTv.setText(fileName);
         }
 

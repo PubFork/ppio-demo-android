@@ -10,8 +10,8 @@
 
     <!-- Base application theme. -->
     <style name="LoadingActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
-
         <item name="android:background">#243243</item>
+        <item name="android:navigationBarColor">@color/account_background_purple</item>
     </style>
 
     <style name="confirm_button_style">

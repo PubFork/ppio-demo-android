@@ -20,6 +20,7 @@ import android.support.v4.view.AbsSavedState;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,9 @@ import java.util.ArrayList;
  */
 
 public class LeftDrawerLayout extends ViewGroup {
+
+    private static final String TAG = "LeftDrawerLayout";
+
     @SuppressLint("InlinedApi")
     private static final int[] THEME_ATTRS = {
             android.R.attr.colorPrimaryDark
@@ -590,7 +594,8 @@ public class LeftDrawerLayout extends ViewGroup {
             if (isDrawerView(releasedChild)) {
                 finalLeft = xVelocity > 0 || (mSlideOffset > 0.5f && xVelocity == 0) ? 0 : (int) (-dragRange * mDrawerCoefficient);
             } else {
-                finalLeft = xVelocity > 0 || (mSlideOffset > 0.5f && xVelocity == 0) ? dragRange : 0;
+                //finalLeft = xVelocity > 0 || (mSlideOffset > 0.5f && xVelocity == 0) ? dragRange : 0;
+                finalLeft = ((xVelocity > 0) && (Math.abs(xVelocity) > Math.abs(yVelocity))) || (mSlideOffset > 0.5f && xVelocity == 0) ? dragRange : 0;
             }
 
             mViewDragHelper.settleCapturedViewAt(finalLeft, releasedChild.getTop());
@@ -650,8 +655,8 @@ public class LeftDrawerLayout extends ViewGroup {
                 result = Math.round(Math.max(-dragRange * mDrawerCoefficient, Math.min(child.getLeft() + dx * mDrawerCoefficient, 0f)));
             } else {
                 result = Math.min(Math.max(left, 0), dragRange);
+                result = result < 100 ? 0 : result;
             }
-
             return result;
         }
     }

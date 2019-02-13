@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -650,7 +651,7 @@ public class PossUtil {
 
                     taskInfos[i] = taskInfo;
 
-                    Log.e(TAG, "getTask = " + mUser.getTask(taskInfo.getId()));
+                    //Log.e(TAG, "getTask = " + mUser.getTask(taskInfo.getId()));
                 }
 
                 for (int i = 0; i < length - 1; i++) {
@@ -832,8 +833,33 @@ public class PossUtil {
                     totalSize = totalSize + jsonObject.getLong(Constant.ObjectKey.LENGTH);
                 }
 
-                double totalSizeGB = ((double) totalSize / 1024) / 1024 / 1024;
-                mUsedStr = "" + totalSizeGB;
+                DecimalFormat decimalFormat = new DecimalFormat("0.000");
+
+                double totalSizeWithUnit = (double) totalSize;
+                if (totalSizeWithUnit >= 1024d) {
+                    totalSizeWithUnit = totalSizeWithUnit / 1024;
+                    if (totalSizeWithUnit >= 1024d) {
+                        totalSizeWithUnit = totalSizeWithUnit / 1024;
+                        if (totalSizeWithUnit >= 1024d) {
+                            totalSizeWithUnit = totalSizeWithUnit / 1024;
+                            if (totalSizeWithUnit >= 1024d) {
+                                totalSizeWithUnit = totalSizeWithUnit / 1024;
+                                if (totalSizeWithUnit >= 1024d) {
+                                    totalSizeWithUnit = totalSizeWithUnit / 1024;
+                                    mUsedStr = decimalFormat.format(totalSizeWithUnit) + "TB";
+                                }
+                            } else {
+                                mUsedStr = decimalFormat.format(totalSizeWithUnit) + "GB";
+                            }
+                        } else {
+                            mUsedStr = decimalFormat.format(totalSizeWithUnit) + "MB";
+                        }
+                    } else {
+                        mUsedStr = decimalFormat.format(totalSizeWithUnit) + "KB";
+                    }
+                } else {
+                    mUsedStr = decimalFormat.format(totalSizeWithUnit) + "Byte";
+                }
             } catch (Exception e) {
                 if (getUsedListener != null) {
                     getUsedListener.onGetUsedError(e.getMessage());

@@ -74,13 +74,13 @@ import io.pp.net_disk_demo.mvp.view.StartRenewView;
 import io.pp.net_disk_demo.mvp.view.StatusView;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.DownloadService;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.service.UploadService;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.util.XPermissionUtils;
 import io.pp.net_disk_demo.widget.LeftDrawerLayout;
 import io.pp.net_disk_demo.widget.StatusBarUtil;
+import io.pp.net_disk_demo.widget.recyclerview.CustomLinearLayoutManager;
 import io.pp.net_disk_demo.widget.recyclerview.DownloadTaskAdapter;
 import io.pp.net_disk_demo.widget.recyclerview.MyFileAdapter;
 import io.pp.net_disk_demo.widget.recyclerview.UploadTaskAdapter;
@@ -177,11 +177,9 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private ShowShareCodePresenter mShowShareCodePresenter = null;
     private DeletePresenter mDeletePresenter = null;
 
-    private ExecuteTaskService mExecuteTaskService = null;
     private UploadService mUploadService = null;
     private DownloadService mDownloadService = null;
 
-    private ExecuteTaskServiceConnection mExecuteTaskServiceConnection = null;
     private UploadServiceConnection mUploadServiceConnection = null;
     private DownloadServiceConnection mDownloadServiceConnection = null;
 
@@ -224,17 +222,12 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mShowShareCodePresenter = new ShowShareCodePresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
         mDeletePresenter = new DeletePresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
 
-        mExecuteTaskServiceConnection = new ExecuteTaskServiceConnection(PpioDataActivity.this);
         mUploadServiceConnection = new UploadServiceConnection(PpioDataActivity.this);
         mDownloadServiceConnection = new DownloadServiceConnection(PpioDataActivity.this);
 
-        startService(new Intent(PpioDataActivity.this, ExecuteTaskService.class));
         startService(new Intent(PpioDataActivity.this, UploadService.class));
         startService(new Intent(PpioDataActivity.this, DownloadService.class));
 
-        bindService(new Intent(PpioDataActivity.this, ExecuteTaskService.class),
-                mExecuteTaskServiceConnection,
-                BIND_AUTO_CREATE);
 
         bindService(new Intent(PpioDataActivity.this, UploadService.class),
                 mUploadServiceConnection,
@@ -281,9 +274,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         super.onActivityResult(requestCode, resultCode, data);
 
         if ((requestCode == Constant.Code.REQUEST_UPLOAD &&
-                resultCode == Constant.Code.RESULT_UPLOAD_OK) ||
-                (requestCode == Constant.Code.REQUEST_RENEW &&
-                        resultCode == Constant.Code.RESULT_RENEW_OK)) {
+                resultCode == Constant.Code.RESULT_UPLOAD_OK)) {
             mBackFromUpload = true;
 
             if (mExecuteTaskPresenter != null) {
@@ -415,11 +406,9 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mDeletePresenter = null;
 
         //service
-        unbindService(mExecuteTaskServiceConnection);
         unbindService(mUploadServiceConnection);
         unbindService(mDownloadServiceConnection);
 
-        mExecuteTaskService = null;
         mUploadService = null;
         mDownloadService = null;
 
@@ -472,7 +461,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, final ArrayList<FileInfo> mMyFileInfoList) {
+    public void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, final ArrayList<FileInfo> mMyFileInfoList, final boolean allRefresh) {
         stopShowNetWorkingView();
 
         runOnUiThread(new Runnable() {
@@ -486,19 +475,25 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     mRefreshDuration = SLOW_REFRESH_DURATION;
                 }
 
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mPpioDataPresenter != null) {
-                            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+                if (mDeletingInfoHashMap != null && mDeletingInfoHashMap.size() > 0) {
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mPpioDataPresenter != null) {
+                                mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, false);
+                            }
                         }
-                    }
-                }, mRefreshDuration);
+                    }, mRefreshDuration);
+                }
 
                 mSwipeRefreshLayout.setRefreshing(false);
 
-                mMyFileAdapter.refreshDeletingInfoHashMap(mDeletingInfoHashMap);
-                mMyFileAdapter.refreshFileList(mMyFileInfoList);
+                if (allRefresh) {
+                    //mMyFileAdapter.refreshDeletingInfoHashMap(mDeletingInfoHashMap);
+                    mMyFileAdapter.refreshFileList(mDeletingInfoHashMap, mMyFileInfoList);
+                } else {
+                    mMyFileAdapter.updateDeletingFileList(mDeletingInfoHashMap, mMyFileInfoList);
+                }
 
                 if (mMyFileAdapter.getItemCount() == 0 && mSwipeRefreshLayout.getVisibility() == View.VISIBLE) {
                     mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
@@ -545,7 +540,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mRequestUsedStatusIv.clearAnimation();
                 mRequestUsedStatusIv.setVisibility(View.INVISIBLE);
 
-                mUsedValueTv.setText(used + "G");
+                mUsedValueTv.setText(used);
             }
         });
     }
@@ -752,11 +747,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showUploadingTasks(final ArrayList<TaskInfo> uploadingTaskList) {
+    public void showUploadingTasks(final ArrayList<TaskInfo> uploadingTaskList, boolean allRefresh) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mUploadTaskAdapter.refreshUploadingList(uploadingTaskList);
+                if (allRefresh) {
+                    mUploadTaskAdapter.refreshUploadingList(uploadingTaskList);
+                } else {
+                    mUploadTaskAdapter.updateUploadingList(uploadingTaskList);
+                }
 
                 if (mCurrentShowView == UPLOADING_VIEW) {
                     if (mUploadTaskAdapter.getItemCount() == 0) {
@@ -775,11 +774,15 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showDownloadingTasks(final ArrayList<TaskInfo> downloadingTaskList) {
+    public void showDownloadingTasks(final ArrayList<TaskInfo> downloadingTaskList, boolean allRefresh) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mDownloadTaskAdapter.refreshUploadingList(downloadingTaskList);
+                if (allRefresh) {
+                    mDownloadTaskAdapter.refreshDownloadingList(downloadingTaskList);
+                } else {
+                    mDownloadTaskAdapter.updateDownloadingList(downloadingTaskList);
+                }
 
                 if (mCurrentShowView == DOWNLOADING_VIEW) {
                     if (mDownloadTaskAdapter.getItemCount() == 0) {
@@ -815,7 +818,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     public void showRefreshFileListView() {
         if (mPpioDataPresenter != null) {
-            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
         }
     }
 
@@ -979,7 +982,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mDeletingInfoHashMap.put(deletingInfo.getName(), deletingInfo);
 
                 if (mPpioDataPresenter != null) {
-                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, false);
                 }
 
                 if (mAccountInfoPresenter != null) {
@@ -1189,7 +1192,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.account_background_blue));
         //mSwipeRefreshLayout.setProgressBackgroundColorSchemeColor(getResources().getColor(R.color.account_background_blue));
 
-        mMyFileRecyclerView.setLayoutManager(new LinearLayoutManager(PpioDataActivity.this));
+        mMyFileRecyclerView.setLayoutManager(new CustomLinearLayoutManager(PpioDataActivity.this));
         mMyFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
@@ -1203,7 +1206,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mMyFileAdapter = new MyFileAdapter(PpioDataActivity.this);
         mMyFileRecyclerView.setAdapter(mMyFileAdapter);
 
-        mUploadingFileRecyclerView.setLayoutManager(new LinearLayoutManager(PpioDataActivity.this));
+        mUploadingFileRecyclerView.setLayoutManager(new CustomLinearLayoutManager(PpioDataActivity.this));
         mUploadingFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
@@ -1217,7 +1220,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mUploadTaskAdapter = new UploadTaskAdapter(PpioDataActivity.this, null);
         mUploadingFileRecyclerView.setAdapter(mUploadTaskAdapter);
 
-        mDownloadingFileRecyclerView.setLayoutManager(new LinearLayoutManager(PpioDataActivity.this));
+        mDownloadingFileRecyclerView.setLayoutManager(new CustomLinearLayoutManager(PpioDataActivity.this));
         mDownloadingFileRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
@@ -1405,7 +1408,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     @Override
                     public void onRunOperation() {
                         if (mPpioDataPresenter != null) {
-                            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+                            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
                         }
                     }
                 });
@@ -1418,7 +1421,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 showAllFileView();
 
                 if (mPpioDataPresenter != null) {
-                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+                    mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
                 }
             }
         });
@@ -1802,7 +1805,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 //        }
 
         if (mPpioDataPresenter != null) {
-            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap);
+            mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
         }
 
         if (mShowSide) {
@@ -1903,18 +1906,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         });
     }
 
-    public void bindExecuteTaskService(IBinder service) {
-
-        mExecuteTaskService = ((ExecuteTaskService.ExecuteTaskBinder) service).getExecuteTaskService();
-
-        if (mExecuteTaskPresenter != null) {
-
-            mExecuteTaskPresenter.bindExecuteTaskService(mExecuteTaskService);
-
-            mExecuteTaskPresenter.startRefreshTasks();
-        }
-    }
-
     public void bindUploadService(IBinder service) {
 
         mUploadService = ((UploadService.UploadServiceBinder) service).getUploadService();
@@ -1922,8 +1913,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         if (mExecuteTaskPresenter != null) {
 
             mExecuteTaskPresenter.bindUploadService(mUploadService);
-
-            //mExecuteTaskPresenter.startRefreshTasks();
         }
     }
 
@@ -1936,27 +1925,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             mExecuteTaskPresenter.bindDownloadService(mDownloadService);
 
             mExecuteTaskPresenter.startRefreshTasks();
-        }
-    }
-
-    static class ExecuteTaskServiceConnection implements ServiceConnection {
-
-        final WeakReference<PpioDataActivity> PpioDataActivityWeakReference;
-
-        public ExecuteTaskServiceConnection(PpioDataActivity ppioDataActivity) {
-            PpioDataActivityWeakReference = new WeakReference<>(ppioDataActivity);
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            if (PpioDataActivityWeakReference.get() != null) {
-                PpioDataActivityWeakReference.get().bindExecuteTaskService(service);
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
         }
     }
 

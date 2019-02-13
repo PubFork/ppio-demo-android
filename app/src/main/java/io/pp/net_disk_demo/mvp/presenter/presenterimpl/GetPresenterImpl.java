@@ -7,7 +7,6 @@ import io.pp.net_disk_demo.mvp.view.GetView;
 import io.pp.net_disk_demo.mvp.model.GetModel;
 import io.pp.net_disk_demo.mvp.model.modelimpl.GetModelImpl;
 import io.pp.net_disk_demo.service.DownloadService;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 
 public class GetPresenterImpl implements GetPresenter {
 
@@ -26,13 +25,6 @@ public class GetPresenterImpl implements GetPresenter {
     public void back() {
         if (mGetView != null) {
             mGetView.back();
-        }
-    }
-
-    @Override
-    public void bindGetService(ExecuteTaskService executeTaskService) {
-        if (mGetModel != null) {
-            mGetModel.bindGetService(executeTaskService);
         }
     }
 

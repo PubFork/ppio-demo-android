@@ -9,7 +9,7 @@ public interface PpioDataModel {
     void link();
 
 
-    void refreshMyFileList(HashMap<String , DeletingInfo> deletingInfoHashMap, HashMap<String, String> uploadFailedInfoHashMap);
+    void refreshMyFileList(HashMap<String, DeletingInfo> deletingInfoHashMap, HashMap<String, String> uploadFailedInfoHashMap, boolean allRefresh);
 
 
     void onDestroy();

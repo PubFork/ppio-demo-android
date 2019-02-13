@@ -20,13 +20,13 @@ public interface PpioDataPresenter {
     void showNotLogIn();
 
 
-    void refreshAllFileList(HashMap<String , DeletingInfo> deletingInfoHashMap, HashMap<String, String> uploadFailedInfoHashMap);
+    void refreshAllFileList(HashMap<String , DeletingInfo> deletingInfoHashMap, HashMap<String, String> uploadFailedInfoHashMap, boolean allRefresh);
 
     void showRefreshingMyFileList();
 
     void showRefreshAllFileListFail(String failStr);
 
-    void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap,  ArrayList<FileInfo> mMyFileList);
+    void showAllFileList(HashMap<String, DeletingInfo> deletingInfoHashMap,  ArrayList<FileInfo> mMyFileList, final boolean allRefresh);
 
 
     void showUploadGet();

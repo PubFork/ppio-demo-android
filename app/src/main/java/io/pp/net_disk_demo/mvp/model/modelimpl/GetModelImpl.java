@@ -6,16 +6,13 @@ import io.pp.net_disk_demo.data.DownloadInfo;
 import io.pp.net_disk_demo.mvp.model.GetModel;
 import io.pp.net_disk_demo.mvp.presenter.GetPresenter;
 import io.pp.net_disk_demo.service.DownloadService;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 
 public class GetModelImpl implements GetModel,
-        //ExecuteTaskService.GetListener,
         DownloadService.DownloadSharedListener {
 
     private static final String TAG = "GetModelImpl";
 
     private GetPresenter mGetPresenter;
-    //private ExecuteTaskService mExecuteTaskService;
     private DownloadService mDownloadService;
 
     private DownloadInfo mDownloadInfo;
@@ -47,22 +44,11 @@ public class GetModelImpl implements GetModel,
         }
     }
 
-
-    @Override
-    public void bindGetService(ExecuteTaskService executeTaskService) {
-//        mExecuteTaskService = executeTaskService;
-//
-//        if (mExecuteTaskService != null) {
-//            //mExecuteTaskService.setGetListener(GetModelImpl.this);
-//        }
-    }
-
     @Override
     public void bindDownloadService(DownloadService downloadService) {
         mDownloadService = downloadService;
 
         if (mDownloadService != null) {
-            //mDownloadService.setDownloadListener(GetModelImpl.this);
             mDownloadService.setDownloadSharedListener(GetModelImpl.this);
         }
     }
@@ -80,10 +66,6 @@ public class GetModelImpl implements GetModel,
 
     @Override
     public void startGet() {
-//        if (mExecuteTaskService != null) {
-//            mExecuteTaskService.startGet(mDownloadInfo);
-//        }
-
         if (mDownloadService != null) {
             mDownloadService.downloadShared(mDownloadInfo);
         }

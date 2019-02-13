@@ -53,6 +53,8 @@ public class FileUtil {
 
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
+        Log.e(TAG, "getPath() uri = " + uri);
+
         // DocumentProvider
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
@@ -65,13 +67,16 @@ public class FileUtil {
                     return Environment.getExternalStorageDirectory() + "/" + split[1];
                 }
             } else if (isDownloadsDocument(uri)) {
-                // DownloadsProvider
+                // DownloadsProvider;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    return getDataColumn(context, uri);
+                } else {
+                    final String id = DocumentsContract.getDocumentId(uri);
+                    final Uri contentUri = ContentUris.withAppendedId(
+                            Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
 
-                final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-
-                return getDataColumn(context, contentUri, null, null);
+                    return getDataColumn(context, contentUri, null, null);
+                }
             } else if (isMediaDocument(uri)) {
                 // MediaProvider
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -129,14 +134,45 @@ public class FileUtil {
                 return cursor.getString(column_index);
             }
         } catch (Exception e) {
+            Log.e(TAG, "getDataColumn() error:  " + e.getMessage());
             e.printStackTrace();
         }
 
         if (cursor != null)
             cursor.close();
 
-
         return null;
+    }
+
+    public static String getDataColumn(Context context, Uri uri) {
+        //String[] project = {MediaStore.Images.Media.DATA};
+        //String[] project = {"document_id", "mime_type", "_display_name", "summary", "last_modified", "flags", "_size"};
+
+        String filePath = "";
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(uri, null, null, null, null);
+            //int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            int columnIndex = cursor.getColumnIndexOrThrow("document_id");
+            cursor.moveToFirst();
+            Log.e(TAG, "getDataColumn() cursor.getColumnNames() = " + cursor.getColumnNames());
+            String[] names = cursor.getColumnNames();
+            for (int i = 0; i < names.length; i++) {
+                Log.e(TAG, "getDataColumn() names[" + i + "] = " + names[i]);
+            }
+            filePath = cursor.getString(columnIndex);
+            Log.e(TAG, "getDataColumn() filePath = " + filePath);
+        } catch (Exception e) {
+            Log.e(TAG, "getDataColumn() getDataColumn() error:  " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+                cursor = null;
+            }
+        }
+
+        return filePath;
     }
 
     /**

@@ -13,6 +13,8 @@ public class TaskInfo {
     private String mError = "";
     private double mProgress;
 
+    private boolean mHasChanged = false;
+
     public void setId(String id) {
         mId = id;
     }
@@ -53,6 +55,11 @@ public class TaskInfo {
         mProgress = progress;
     }
 
+    public void setChanged() {
+        mHasChanged = true;
+    }
+
+
     public String getId() {
         return mId;
     }
@@ -91,5 +98,9 @@ public class TaskInfo {
 
     public double getProgress() {
         return mProgress;
+    }
+
+    public boolean isChanged() {
+        return mHasChanged;
     }
 }

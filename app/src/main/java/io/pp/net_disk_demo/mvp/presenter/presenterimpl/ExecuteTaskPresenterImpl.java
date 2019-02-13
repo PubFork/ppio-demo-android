@@ -13,7 +13,6 @@ import io.pp.net_disk_demo.mvp.model.modelimpl.ExecuteTaskModelImpl;
 import io.pp.net_disk_demo.mvp.presenter.ExecuteTaskPresenter;
 import io.pp.net_disk_demo.mvp.view.ExecuteTaskView;
 import io.pp.net_disk_demo.service.DownloadService;
-import io.pp.net_disk_demo.service.ExecuteTaskService;
 import io.pp.net_disk_demo.service.UploadService;
 
 public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
@@ -28,13 +27,6 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
         mContext = context;
         mExecuteTaskView = executeView;
         mExecuteTaskModel = new ExecuteTaskModelImpl(context, ExecuteTaskPresenterImpl.this);
-    }
-
-    @Override
-    public void bindExecuteTaskService(ExecuteTaskService executeTasksService) {
-        if (mExecuteTaskModel != null) {
-            mExecuteTaskModel.bindExecuteTaskService(executeTasksService);
-        }
     }
 
     @Override
@@ -131,7 +123,7 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     @Override
     public void showUploadingTasks(ArrayList<TaskInfo> uploadingTaskList) {
         if (mExecuteTaskView != null) {
-            mExecuteTaskView.showUploadingTasks(uploadingTaskList);
+            //mExecuteTaskView.showUploadingTasks(uploadingTaskList);
         }
     }
 
@@ -174,7 +166,7 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     @Override
     public void showDownloadingTasks(ArrayList<TaskInfo> downloadingTaskList) {
         if (mExecuteTaskView != null) {
-            mExecuteTaskView.showDownloadingTasks(downloadingTaskList);
+            //mExecuteTaskView.showDownloadingTasks(downloadingTaskList);
         }
     }
 
@@ -201,16 +193,16 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     }
 
     @Override
-    public void showUploadTaskList(ArrayList<TaskInfo> uploadTaskList) {
+    public void showUploadTaskList(ArrayList<TaskInfo> uploadTaskList, boolean allRefresh) {
         if (mExecuteTaskView != null) {
-            mExecuteTaskView.showUploadingTasks(uploadTaskList);
+            mExecuteTaskView.showUploadingTasks(uploadTaskList, allRefresh);
         }
     }
 
     @Override
-    public void showDownloadTaskList(ArrayList<TaskInfo> downloadTaskList) {
+    public void showDownloadTaskList(ArrayList<TaskInfo> downloadTaskList, boolean allRefresh) {
         if (mExecuteTaskView != null) {
-            mExecuteTaskView.showDownloadingTasks(downloadTaskList);
+            mExecuteTaskView.showDownloadingTasks(downloadTaskList,allRefresh);
         }
     }
 
