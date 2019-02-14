@@ -1,11 +1,18 @@
 package io.pp.net_disk_demo.ppio;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,6 +117,20 @@ public class PossUtil {
 
     public static boolean logInFromKeyStore(final String keyStoreStr, final String passPhrase, final String address, LogInListener logInListener) {
         try {
+            JSONObject bootStrapJSONObject = new JSONObject();
+            try {
+                URL url = new URL(Constant.URL.BOOTSTRAP_URL);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(3 * 1000);
+                conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+                InputStream inputStream = conn.getInputStream();
+                String bootStrapJSONStr = readInputStream(inputStream);
+                bootStrapJSONObject = new JSONObject(bootStrapJSONStr);
+            } catch (Exception e) {
+                Log.e(TAG, "logInFromKeyStore() get http://bootstrap.testnet.pp.io/ error: " + e.getMessage());
+                e.printStackTrace();
+            }
+
             Config config = Poss.createDefaultConfig();
 
             config.setTCPPort(8068);
@@ -129,7 +150,7 @@ public class PossUtil {
 
             if (!directoryExist) {
                 if (logInListener != null) {
-                    logInListener.onLogInError("create directory fail");
+                    logInListener.onLogInError("logInFromKeyStore() create directory fail");
                 }
 
                 return false;
@@ -149,33 +170,68 @@ public class PossUtil {
 
                 config.setTestNet("test");
 
-                config.setBootstrap("[\n" +
-                        "  {\n" +
-                        "    \"Name\": \"ali-bootstrap\",\n" +
-                        "    \"IP\": \"47.110.88.167\",\n" +
-                        "    \"TCPPort\": 8020,\n" +
-                        "    \"UDPPort\": 8020,\n" +
-                        "    \"PeerID\": \"\"\n" +
-                        "  },\n" +
+                String bootStrapStr = null;
+                try {
+                    bootStrapStr = bootStrapJSONObject.getString(Constant.BOOTSTRAP_JSON.Key.BOOTSTRAP);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "logInFromKeyStore() get bootStrapStr error: " + e.getMessage());
+                }
+                if (!TextUtils.isEmpty(bootStrapStr)) {
+                    config.setBootstrap(bootStrapStr);
+                } else {
+                    config.setBootstrap("[\n" +
+                            "  {\n" +
+                            "    \"Name\": \"ali-bootstrap\",\n" +
+                            "    \"IP\": \"47.110.88.167\",\n" +
+                            "    \"TCPPort\": 8020,\n" +
+                            "    \"UDPPort\": 8020,\n" +
+                            "    \"PeerID\": \"\"\n" +
+                            "  },\n" +
 
-                        "  {\n" +
-                        "    \"Name\": \"aws-bootstrap\",\n" +
-                        "    \"IP\": \"54.202.181.27\",\n" +
-                        "    \"TCPPort\": 8020,\n" +
-                        "    \"UDPPort\": 8020,\n" +
-                        "    \"PeerID\": \"\"\n" +
-                        "  }\n" +
-                        "]");
+                            "  {\n" +
+                            "    \"Name\": \"aws-bootstrap\",\n" +
+                            "    \"IP\": \"54.202.181.27\",\n" +
+                            "    \"TCPPort\": 8020,\n" +
+                            "    \"UDPPort\": 8020,\n" +
+                            "    \"PeerID\": \"\"\n" +
+                            "  }\n" +
+                            "]");
+                }
 
-                config.getPayment().setIP("ad04b30b910c311e9b71c02d26ce9aff-567092461.us-west-2.elb.amazonaws.com");
-                config.getPayment().setUDPPort(0);
-                config.getPayment().setTCPPort(0);
-                config.getPayment().setHTTPPort(18030);
+                JSONObject payment = null;
+                try {
+                    payment = (JSONObject) bootStrapJSONObject.get(Constant.BOOTSTRAP_JSON.Key.PAYMENT);
+                } catch (Exception e) {
+                    Log.e(TAG, "logInFromKeyStore() get Payment error: " + e.getMessage());
+                    e.printStackTrace();
+                }
 
-                if (mIsOffice) {
+                //config.getQosServerConfig().setAddr("192.168.50.208:9090")
+                if (payment != null) {
+                    config.getPayment().setIP(payment.getString("IP"));
+                    config.getPayment().setUDPPort(payment.getInt("UDPPort"));
+                    config.getPayment().setTCPPort(payment.getInt("TCPPort"));
+                    config.getPayment().setHTTPPort(payment.getInt("HTTPPort"));
+                } else {
+                    config.getPayment().setIP("ad04b30b910c311e9b71c02d26ce9aff-567092461.us-west-2.elb.amazonaws.com");
+                    config.getPayment().setUDPPort(0);
+                    config.getPayment().setTCPPort(0);
+                    config.getPayment().setHTTPPort(18030);
+                }
+
+                JSONObject qosServerConfig = null;
+                try {
+                    qosServerConfig = (JSONObject) bootStrapJSONObject.get(Constant.BOOTSTRAP_JSON.Key.QOSSERVERCONFIG);
+                } catch (JSONException e) {
+                    Log.e(TAG, "logInFromKeyStore() get qosServerConfig error: " + e.getMessage());
+                    e.printStackTrace();
+                }
+
+                if (qosServerConfig != null) {
+                    config.getQosServerConfig().setAddr(qosServerConfig.getString(Constant.BOOTSTRAP_JSON.Key.ADDR));
                     config.getQosServerConfig().setEnable(true);
                     config.getQosServerConfig().setNetwork("udp");
-                    config.getQosServerConfig().setAddr("192.168.50.208:9090");//if the address is incorrect, the qoslog will saved in local
                     config.getQosServerConfig().setTag("ppioqos");
                     config.getQosServerConfig().setDir(Constant.PPIO_File.CACHE_DIR_PREFIX + address + Constant.PPIO_File.CACHE_QOS_DIR_SUFFIX);
                 } else {
@@ -185,10 +241,6 @@ public class PossUtil {
                     config.getQosServerConfig().setTag("ppioqos");
                     config.getQosServerConfig().setDir(Constant.PPIO_File.CACHE_DIR_PREFIX + address + Constant.PPIO_File.CACHE_QOS_DIR_SUFFIX);
                 }
-
-                //
-                Log.e(TAG, "");
-                //
 
                 //Poss.initKeyStoreData(String keystoreData, String datadir)
                 //the datadir is the datadir in Config
@@ -214,7 +266,7 @@ public class PossUtil {
                 logInListener.onLogInError(e.getMessage());
             }
 
-            Log.e(TAG, "login error : " + e.getMessage());
+            Log.e(TAG, "logInFromKeyStore() login error : " + e.getMessage());
 
             e.printStackTrace();
 
@@ -283,7 +335,9 @@ public class PossUtil {
         return true;
     }
 
-    public static String putObject(String bucket, String key, String file, String meta, String chiPrice, long copies, String expires, boolean encrypt, String fileCode, PutObjectListener putObjectListener) {
+    public static String putObject(String bucket, String key, String file, String meta, String
+            chiPrice, long copies, String expires, boolean encrypt, String fileCode, PutObjectListener
+                                           putObjectListener) {
         Log.e(TAG, "putObject() chiPrice = " + chiPrice);
 
         String taskId;
@@ -307,7 +361,9 @@ public class PossUtil {
         return taskId;
     }
 
-    public static boolean putObjectSync(String bucket, String key, String file, String meta, String chiprice, long copies, String expires, boolean encrypt, String fileCode, PutObjectListener putObjectListener) {
+    public static boolean putObjectSync(String bucket, String key, String file, String
+            meta, String chiprice, long copies, String expires, boolean encrypt, String
+                                                fileCode, PutObjectListener putObjectListener) {
         if (mUser != null) {
             try {
                 mUser.putObjectSync(bucket, key, file, meta, chiprice, copies, expires, encrypt);
@@ -370,7 +426,8 @@ public class PossUtil {
         return bucketList;
     }
 
-    public static ArrayList<FileInfo> listObject(String bucket, ListObjectListener listObjectListener) {
+    public static ArrayList<FileInfo> listObject(String bucket, ListObjectListener
+            listObjectListener) {
         String listObjectStr = "";
         ArrayList<FileInfo> fileInfoList = new ArrayList<>();
 
@@ -428,7 +485,8 @@ public class PossUtil {
     }
 
 
-    public static ObjectStatus getObjectStatus(String bucket, String key, GetObjectStatusListener getObjectStatusListener) {
+    public static ObjectStatus getObjectStatus(String bucket, String
+            key, GetObjectStatusListener getObjectStatusListener) {
         ObjectStatus objectStatus = new ObjectStatus();
         String objectStatusStr = "";
 
@@ -462,7 +520,8 @@ public class PossUtil {
         return objectStatus;
     }
 
-    public static boolean getObject(String bucket, String key, String file, String chiPrice, GetObjectListener getObjectListener) {
+    public static boolean getObject(String bucket, String key, String file, String
+            chiPrice, GetObjectListener getObjectListener) {
         if (mUser != null) {
             try {
                 mUser.getObject(bucket, key, "", file, chiPrice);
@@ -480,7 +539,8 @@ public class PossUtil {
         return true;
     }
 
-    public static boolean getObjectShared(String shareCode, String file, String chiPrice, GetObjectListener getObjectListener) {
+    public static boolean getObjectShared(String shareCode, String file, String
+            chiPrice, GetObjectListener getObjectListener) {
         if (mUser != null) {
             try {
                 mUser.getObject("", "", shareCode, file, chiPrice);
@@ -500,7 +560,8 @@ public class PossUtil {
         return true;
     }
 
-    public static boolean renewObject(String bucket, String key, String chiPrice, long copies, String expires, RenewObjectListener renewObjectListener) {
+    public static boolean renewObject(String bucket, String key, String chiPrice,
+                                      long copies, String expires, RenewObjectListener renewObjectListener) {
         if (mUser != null) {
             try {
                 mUser.renewObject(bucket, key, chiPrice, copies, expires);
@@ -518,7 +579,8 @@ public class PossUtil {
         return true;
     }
 
-    public static String getShareCode(String bucket, String key, GetShareCodeListener getShareCodeListener) {
+    public static String getShareCode(String bucket, String key, GetShareCodeListener
+            getShareCodeListener) {
         String shareCode = "";
 
         if (mUser != null) {
@@ -536,7 +598,9 @@ public class PossUtil {
         return shareCode;
     }
 
-    public static boolean copyObject(String bucket, String key, String source, String meta, String chiPrice, long copies, String expires, boolean encrypt, CopyObjectListener copyObjectListener) {
+    public static boolean copyObject(String bucket, String key, String source, String
+            meta, String chiPrice, long copies, String expires, boolean encrypt, CopyObjectListener
+                                             copyObjectListener) {
         if (mUser != null) {
             try {
                 mUser.copyObject(bucket, key, source, meta, chiPrice, copies, expires, encrypt);
@@ -552,7 +616,8 @@ public class PossUtil {
         return true;
     }
 
-    public static String deleteObject(String bucket, String key, DeleteObjectListener deleteObjectListener) {
+    public static String deleteObject(String bucket, String key, DeleteObjectListener
+            deleteObjectListener) {
         String deleteTaskId = "";
 
         try {
@@ -624,7 +689,8 @@ public class PossUtil {
         return taskInfoList;
     }
 
-    public static LinkedHashMap<String, TaskInfo> listTaskForHashMap(ListTaskListener listTaskListener) {
+    public static LinkedHashMap<String, TaskInfo> listTaskForHashMap(ListTaskListener
+                                                                             listTaskListener) {
         LinkedHashMap<String, TaskInfo> taskInfoMap = new LinkedHashMap<>();
         String taskStr = "";
 
@@ -689,7 +755,8 @@ public class PossUtil {
     }
 
     //get the uploading task list
-    public static LinkedHashMap<String, TaskInfo> listUploadingTask(ListTaskListener listTaskListener) {
+    public static LinkedHashMap<String, TaskInfo> listUploadingTask(ListTaskListener
+                                                                            listTaskListener) {
         LinkedHashMap<String, TaskInfo> taskInfoMap = new LinkedHashMap<>();
         String taskStr = "";
 
@@ -872,6 +939,23 @@ public class PossUtil {
         }
 
         return mUsedStr;
+    }
+
+    /*
+     * @param inputStream
+     * @return
+     * @throws IOException
+     */
+    public static String readInputStream(InputStream inputStream) throws IOException {
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        while ((len = inputStream.read(buffer)) != -1) {
+            bos.write(buffer, 0, len);
+        }
+        bos.close();
+        System.out.println(new String(bos.toByteArray(), "utf-8"));
+        return new String(bos.toByteArray(), "utf-8");
     }
 
     public interface LogInListener {

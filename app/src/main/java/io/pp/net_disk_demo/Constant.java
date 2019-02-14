@@ -118,10 +118,20 @@ public class Constant {
     }
 
     public static class URL {
+        public static final String BOOTSTRAP_URL = "http://bootstrap.testnet.pp.io/";
         public static final String RPC_URL = "http://ad04b30b910c311e9b71c02d26ce9aff-567092461.us-west-2.elb.amazonaws.com:18030/rpc";
         public static final String WALLET_URL = "https://wallet.testnet.pp.io/";
         public static final String UPDATE_URL = "";
         public static final String FEEDBACK_URL = "https://gitter.im/PPIO/chat?utm_source=share-link&utm_medium=link&utm_campaign=share-link";
+    }
+
+    public static class BOOTSTRAP_JSON {
+        public static class Key {
+            public static final String BOOTSTRAP = "Bootstrap";
+            public static final String PAYMENT = "Payment";
+            public static final String QOSSERVERCONFIG = "QosServerConfig";
+            public static final String ADDR = "Addr";
+        }
     }
 
     public static class DEFAULT {
