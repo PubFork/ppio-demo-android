@@ -17,7 +17,7 @@
 - Gradle 4.6
 
 ## Dependent library
-- [POSS SDK Android](https://github.com/ppio/ppio-sdk-android)
+- [PPIO-SDK-Android](https://github.com/ppio/ppio-sdk-android)
 - [Web3j](https://github.com/web3j/web3j)
 - [BIP39](https://github.com/NovaCrypto/BIP39)
 - [Multidex](https://mvnrepository.com/artifact/com.android.support/multidex)
