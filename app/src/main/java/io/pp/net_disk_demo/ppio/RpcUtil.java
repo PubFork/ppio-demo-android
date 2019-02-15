@@ -163,10 +163,11 @@ public class RpcUtil {
             requestJSONObject.put("chunkSize", chunkSize);
             requestJSONObject.put("duration", duration);
 
+            Object[] params = new Object[1];
+            params[0] = requestJSONObject;
+
             Log.e(TAG, "putObjectFunds start...");
-            String putObjectFundsResultStr = mStorageRpcClient.callString("storageChi", new JSONObject[]{
-                    requestJSONObject
-            });
+            String putObjectFundsResultStr = mStorageRpcClient.callString("storageChi", params);
             Log.e(TAG, "putObjectFunds end...");
             Log.e(TAG, "putObjectFunds " + putObjectFundsResultStr);
 
@@ -203,10 +204,11 @@ public class RpcUtil {
             JSONObject requestJSONObject = new JSONObject();
             requestJSONObject.put("chunkSize", chunkSize);
 
+            Object[] params = new Object[1];
+            params[0] = requestJSONObject;
+
             Log.e(TAG, "getObjectFunds start...");
-            String putObjectFundsResultStr = mDownloadRpcClient.callString("downloadChi", new JSONObject[]{
-                    requestJSONObject
-            });
+            String putObjectFundsResultStr = mDownloadRpcClient.callString("downloadChi", params);
             Log.e(TAG, "getObjectFunds end...");
             Log.e(TAG, "getObjectFunds " + putObjectFundsResultStr);
 
@@ -243,8 +245,11 @@ public class RpcUtil {
             storageFundsJSONObject.put("duration", 120);
             storageFundsJSONObject.put("chiPrice", 100);
 
+            Object[] params = new Object[1];
+            params[0] = storageFundsJSONObject;
+
             Log.e(TAG, "storageFundsResult() start...");
-            Object storageFundsResult = mRpcClient.call("storageFunds", new Object[]{storageFundsJSONObject});
+            Object storageFundsResult = mRpcClient.call("storageFunds", params);
 
             Log.e(TAG, "storageFundsResult() end...");
             Log.e(TAG, "storageFundsResult() " + storageFundsResult);
