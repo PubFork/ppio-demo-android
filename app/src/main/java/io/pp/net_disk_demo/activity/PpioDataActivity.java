@@ -1145,7 +1145,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mWActionBarLeftIconIv = findViewById(R.id.wei_actionbar_left_iv);
         mWActionBarTitleTv = findViewById(R.id.wei_actionbar_title_iv);
 
-        mAccountInfoLayout = findViewById(R.id.account_info_layout);
+        //mAccountInfoLayout = findViewById(R.id.account_info_layout);
         mAccountInfoIv = findViewById(R.id.user_photo_iv);
         mAccountInfoTv = findViewById(R.id.user_code_tv);
 
