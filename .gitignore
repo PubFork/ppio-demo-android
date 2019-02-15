@@ -12,3 +12,4 @@ bugly.properties
 /build
 /captures
 .externalNativeBuild
+google-services.json

@@ -144,4 +144,12 @@ public class Constant {
             public static String UPLOAD_FAILED_OBJECT = "upload_failed_object";
         }
     }
+
+    public static class Firebase {
+        public static final class Key {
+            public static final String OPEN_TIME = "open_time";
+            public static final String PHONE_MODEL = "phone_model";
+            public static final String PHONE_BRAND = "phone_brand";
+        }
+    }
 }
