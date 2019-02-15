@@ -113,7 +113,7 @@ public class GetActivity extends BaseActivity implements GetView {
                     }
 
                     @Override
-                    public void onInterNetNoAvailable() {
+                    public void onCanceled() {
 
                     }
                 });

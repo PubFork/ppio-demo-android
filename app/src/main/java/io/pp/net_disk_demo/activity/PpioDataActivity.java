@@ -209,6 +209,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //
+        Log.e(TAG, "onCreate()");
+        //
+
         if (savedInstanceState != null) {
             mCurrentShowView = savedInstanceState.getInt(CURRENT_SHOW_VIEW);
             mShowSide = savedInstanceState.getBoolean(SHOW_SIDE);
@@ -250,13 +254,24 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     @Override
     protected void onStart() {
         super.onStart();
+
+        //
+        Log.e(TAG, "onStart()");
+        //
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
+        //
+        Log.e(TAG, "onRestoreInstanceState");
+        //
+
         if (mPpioDataPresenter != null && PossUtil.getUser() == null) {
+            //
+            Log.e(TAG, "onRestoreInstanceState if (mPpioDataPresenter != null && PossUtil.getUser() == null)");
+            //
             mPpioDataPresenter.link();
         }
     }
@@ -1413,7 +1428,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     }
 
                     @Override
-                    public void onInterNetNoAvailable() {
+                    public void onCanceled() {
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                 });
@@ -1473,7 +1488,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                     }
 
                                     @Override
-                                    public void onInterNetNoAvailable() {
+                                    public void onCanceled() {
 
                                     }
                                 });
@@ -1510,7 +1525,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                             }
 
                                             @Override
-                                            public void onInterNetNoAvailable() {
+                                            public void onCanceled() {
 
                                             }
                                         });

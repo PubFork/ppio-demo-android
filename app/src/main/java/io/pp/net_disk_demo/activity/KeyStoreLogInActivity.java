@@ -19,6 +19,7 @@ import io.pp.net_disk_demo.mvp.presenter.KeyStoreLogInPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.KeyStoreLogInPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.KeyStoreLogInView;
 import io.pp.net_disk_demo.util.ToastUtil;
+import io.pp.net_disk_demo.util.Util;
 
 public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogInView {
     private static final String TAG = "KeyStoreLogInActivity";
@@ -135,9 +136,19 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
         //hidePassPhraseEditKeyBoard();
         hideSoftKeyboard(view);
 
-        if (mKeyStoreLogInPresenter != null) {
-            mKeyStoreLogInPresenter.logIn(mKeyStoreEdit.getText().toString(), mPassPhraseEdit.getText().toString());
-        }
+        Util.runNetStorageOperation(KeyStoreLogInActivity.this, new Util.RunNetOperationCallBack() {
+            @Override
+            public void onRunOperation() {
+                if (mKeyStoreLogInPresenter != null) {
+                    mKeyStoreLogInPresenter.logIn(mKeyStoreEdit.getText().toString(), mPassPhraseEdit.getText().toString());
+                }
+            }
+
+            @Override
+            public void onCanceled() {
+
+            }
+        });
     }
 
     public void onScanCode(View view) {

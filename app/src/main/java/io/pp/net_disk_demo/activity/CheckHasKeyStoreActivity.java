@@ -20,7 +20,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKeyStoreView {
 
-    private static final String TAG = "LoadingActivity";
+    private static final String TAG = "CheckHasKeyStoreActivity";
 
     private ProgressDialog mProgressDialog = null;
 
@@ -126,11 +126,14 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                 }
 
                 @Override
-                public void onInterNetNoAvailable() {
+                public void onCanceled() {
                     hideProgressDialog();
                 }
             });
         } else {
+            //
+            Log.e(TAG, "onRequestPermissionsResult() denied!");
+            //
             finish();
         }
     }
@@ -212,7 +215,11 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
 
                         @Override
                         public void onPermissionDenied() {
-                            finish();
+                            //
+                            Log.e(TAG, "init() denied!");
+                            //
+                            ToastUtil.showToast(CheckHasKeyStoreActivity.this, "Important permissions are not turned on!", Toast.LENGTH_LONG);
+                            //finish();
                         }
                     });
         } else {

@@ -54,7 +54,7 @@ public class Util {
             if (NetWorkUtil.isNetConnected(context)) {
                 runNetOperationCallBack.onRunOperation();
             } else {
-                runNetOperationCallBack.onInterNetNoAvailable();
+                runNetOperationCallBack.onCanceled();
                 Toast.makeText(context, "network is not applicable!", Toast.LENGTH_LONG).show();
             }
         } else {
@@ -69,15 +69,19 @@ public class Util {
                     if (XPermissionUtils.checkPermissions(context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE})) {
                         runNetOperationCallBack.onRunOperation();
                     } else {
+                        runNetOperationCallBack.onCanceled();
                         Toast.makeText(context, "not has android.permission.WRITE_EXTERNAL_STORAGE!", Toast.LENGTH_LONG).show();
                     }
                 } else {
+                    runNetOperationCallBack.onCanceled();
                     Toast.makeText(context, "not has android.permission.READ_EXTERNAL_STORAGE!", Toast.LENGTH_LONG).show();
                 }
             } else {
+                runNetOperationCallBack.onCanceled();
                 Toast.makeText(context, "network is not applicable!", Toast.LENGTH_LONG).show();
             }
         } else {
+            runNetOperationCallBack.onCanceled();
             Toast.makeText(context, "not has android.permission.INTERNET!", Toast.LENGTH_LONG).show();
         }
     }
@@ -85,6 +89,6 @@ public class Util {
     public interface RunNetOperationCallBack {
         void onRunOperation();
 
-        void onInterNetNoAvailable();
+        void onCanceled();
     }
 }

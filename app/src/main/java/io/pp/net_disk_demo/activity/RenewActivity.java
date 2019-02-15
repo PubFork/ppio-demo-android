@@ -491,7 +491,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
                     }
 
                     @Override
-                    public void onInterNetNoAvailable() {
+                    public void onCanceled() {
 
                     }
                 });

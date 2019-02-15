@@ -545,7 +545,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
                     }
 
                     @Override
-                    public void onInterNetNoAvailable() {
+                    public void onCanceled() {
 
                     }
                 });

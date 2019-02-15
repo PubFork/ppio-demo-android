@@ -20,6 +20,7 @@ import io.pp.net_disk_demo.mvp.presenter.InputPassPhrasePresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.InputPassPhrasePresenterImpl;
 import io.pp.net_disk_demo.mvp.view.InputPassPhraseView;
 import io.pp.net_disk_demo.util.ToastUtil;
+import io.pp.net_disk_demo.util.Util;
 
 public class InputPassPhraseActivity extends BaseActivity implements InputPassPhraseView {
 
@@ -119,9 +120,20 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
                 //hidePassPhraseEditKeyBoard();
                 hideSoftKeyboard(v);
 
-                if (mInputPassPhrasePresenter != null) {
-                    mInputPassPhrasePresenter.logIn(mPassPhraseEdit.getText().toString());
-                }
+                Util.runNetStorageOperation(InputPassPhraseActivity.this, new Util.RunNetOperationCallBack() {
+                    @Override
+                    public void onRunOperation() {
+                        if (mInputPassPhrasePresenter != null) {
+                            mInputPassPhrasePresenter.logIn(mPassPhraseEdit.getText().toString());
+                        }
+                    }
+
+                    @Override
+                    public void onCanceled() {
+
+                    }
+                });
+
             }
         });
 
@@ -162,14 +174,6 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
             mProgressDialog = null;
-        }
-    }
-
-    private void hidePassPhraseEditKeyBoard() {
-        InputMethodManager imm = (InputMethodManager) InputPassPhraseActivity.this
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            imm.hideSoftInputFromWindow(mPassPhraseEdit.getWindowToken(), 0);
         }
     }
 }
