@@ -3,6 +3,10 @@ package io.pp.net_disk_demo.widget.recyclerview;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +40,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordItem
         if (recordInfo != null) {
             recordItemHolder.setFileName(recordInfo.getItem());
             recordItemHolder.setRecordDate("" + recordInfo.getRecordDate());
-            recordItemHolder.setCost(recordInfo.getRecordCost());
-            //recordItemHolder.setIsFund(recordInfo.isFund());
+            recordItemHolder.setCost(recordInfo.getRecordCost(), recordInfo.isIncome());
         }
     }
 
@@ -99,9 +102,24 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordItem
             mRecordDateTv.setText(modifiedDate);
         }
 
-        public void setCost(long cost) {
+        public void setCost(long cost, boolean isInCome) {
             double costPPCoin = (double) cost / 1000000000000000000l;
-            mRecordCostTv.setText("cost: " + mDecimalFormat.format(costPPCoin) + " PPCoin");
+            String costValue = mDecimalFormat.format(costPPCoin);
+            if (isInCome) {
+                costValue = "+" + costValue;
+            } else {
+                costValue = "-" + costValue;
+            }
+            String source = costValue + " PPCoin";
+            SpannableString spannableStr = new SpannableString(source);
+
+            if (isInCome) {
+                spannableStr.setSpan(new ForegroundColorSpan(0xffff9e0e), 0, costValue.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            spannableStr.setSpan(new AbsoluteSizeSpan(12, true), costValue.length(), source.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableStr.setSpan(new ForegroundColorSpan(0xff606266), costValue.length(), source.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            mRecordCostTv.setText(spannableStr);
         }
     }
 }

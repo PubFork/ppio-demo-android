@@ -3,36 +3,52 @@
     android:layout_width="match_parent"
     android:layout_height="62dp"
     android:background="#FFFFFF"
-    android:orientation="vertical">
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/record_file_name_tv"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/transaction_iv"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@mipmap/transaction"
+        android:contentDescription="@string/app_name" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:includeFontPadding="false"
-        android:text="item: "
-        android:textColor="#4C4C4C"
-        android:textSize="16dp" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/record_cost_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:includeFontPadding="false"
-        android:text="cost: "
-        android:textColor="#303133"
-        android:textSize="16dp" />
+        <TextView
+            android:id="@+id/record_file_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:textColor="#4C4C4C"
+            android:textSize="14dp" />
 
-    <TextView
-        android:id="@+id/record_date_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:includeFontPadding="false"
-        android:text="date: "
-        android:textColor="#757575"
-        android:textSize="14dp" />
+        <TextView
+            android:id="@+id/record_cost_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:textColor="#303133"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/record_date_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:textColor="#757575"
+            android:textSize="12dp" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -145,6 +145,17 @@ public class Constant {
         }
     }
 
+    public static class TransferRecord {
+        public static class Key {
+            public static String FROM_ACCOUNT_ID = "FromAccountID";
+            public static String TO_ACCOUNT_ID = "ToAccountID";
+            public static String AMOUNT = "Amount";
+            public static String TIME = "Time";
+            public static String COMMENT = "Comment";
+            public static String STATUS = "Status";
+        }
+    }
+
     public static class Firebase {
         public static final class Key {
             public static final String OPEN_TIME = "open_time";

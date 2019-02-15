@@ -317,15 +317,12 @@ public class RpcUtil {
             JSONObject requestJSONObject = new JSONObject();
             requestJSONObject.put("accountID", PossUtil.getAccount());
             requestJSONObject.put("start", 0);
-            requestJSONObject.put("limit", 10);
+            requestJSONObject.put("limit", 50);
 
             Object[] params = new Object[1];
             params[0] = requestJSONObject;
 
-            Log.e(TAG, "transferRecord() start...");
             String transferRecordResultStr = mTransferRecordRpcClient.callString("transferRecord", params);
-            Log.e(TAG, "transferRecord() end...");
-            Log.e(TAG, "transferRecord() " + transferRecordResultStr);
 
             JSONArray transferRecordJSONOArray = new JSONArray(transferRecordResultStr);
 
@@ -333,15 +330,18 @@ public class RpcUtil {
                 Calendar calendar = Calendar.getInstance();
                 DateFormat format1 = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 
+                String accountId = PossUtil.getAccount();
+
                 for (int i = 0; i < transferRecordJSONOArray.length(); i++) {
-                    String comment = transferRecordJSONOArray.getJSONObject(i).getString("Comment");
-                    long amountWei = Long.parseLong(transferRecordJSONOArray.getJSONObject(i).getString("Amount"));
-                    long time = Long.parseLong(transferRecordJSONOArray.getJSONObject(i).getString("Time"));
+                    String comment = transferRecordJSONOArray.getJSONObject(i).getString(Constant.TransferRecord.Key.COMMENT);
+                    long amountWei = Long.parseLong(transferRecordJSONOArray.getJSONObject(i).getString(Constant.TransferRecord.Key.AMOUNT));
+                    long time = Long.parseLong(transferRecordJSONOArray.getJSONObject(i).getString(Constant.TransferRecord.Key.TIME));
+                    boolean isInCome = accountId.equals(transferRecordJSONOArray.getJSONObject(i).getString(Constant.TransferRecord.Key.TO_ACCOUNT_ID));
 
                     calendar.clear();
                     calendar.add(Calendar.SECOND, (int) time);
 
-                    transferRecordList.add(new RecordInfo(comment, format1.format(calendar.getTime()), amountWei));
+                    transferRecordList.add(new RecordInfo(comment, format1.format(calendar.getTime()), amountWei, isInCome));
                 }
             }
         } catch (Exception e) {

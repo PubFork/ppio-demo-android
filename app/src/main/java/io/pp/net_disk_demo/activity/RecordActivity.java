@@ -1,6 +1,5 @@
 package io.pp.net_disk_demo.activity;
 
-import android.app.ProgressDialog;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import io.pp.net_disk_demo.data.RecordInfo;
 import io.pp.net_disk_demo.mvp.presenter.RecordPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.RecordPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.RecordView;
-import io.pp.net_disk_demo.ppio.RpcUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.widget.recyclerview.RecordAdapter;
@@ -44,8 +42,6 @@ public class RecordActivity extends BaseActivity implements RecordView {
     private RecyclerView mRecordRecyclerView = null;
     private RecordAdapter mRecordAdapter = null;
 
-    private ProgressDialog mProgressDialog = null;
-
     private RecordPresenter mRecordPresenter = null;
 
     @Override
@@ -61,7 +57,7 @@ public class RecordActivity extends BaseActivity implements RecordView {
 
     @Override
     protected void onDestroy() {
-        hideProgressDialog();
+        mSwipeRefreshLayout.setRefreshing(false);
 
         if (mRecordPresenter != null) {
             mRecordPresenter.onDestroy();
@@ -81,8 +77,7 @@ public class RecordActivity extends BaseActivity implements RecordView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                hideProgressDialog();
-                showProgressDialog();
+                mSwipeRefreshLayout.setRefreshing(true);
             }
         });
     }
@@ -92,12 +87,12 @@ public class RecordActivity extends BaseActivity implements RecordView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                hideProgressDialog();
+                mSwipeRefreshLayout.setRefreshing(false);
 
                 mNoContentIv.setVisibility(View.VISIBLE);
                 mNoContentTv.setVisibility(View.VISIBLE);
                 mNoContentTv.setText("No records");
-                mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
+                mRecordRecyclerView.setVisibility(View.INVISIBLE);
 
                 ToastUtil.showToast(RecordActivity.this, "request records fails!", Toast.LENGTH_LONG);
             }
@@ -109,16 +104,18 @@ public class RecordActivity extends BaseActivity implements RecordView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                hideProgressDialog();
+                mSwipeRefreshLayout.setRefreshing(false);
 
                 if (recordInfoList != null && recordInfoList.size() > 0) {
                     mRecordAdapter.setRecordList(recordInfoList);
-                    mSwipeRefreshLayout.setVisibility(View.VISIBLE);
+                    mNoContentIv.setVisibility(View.INVISIBLE);
+                    mNoContentTv.setVisibility(View.INVISIBLE);
+                    mRecordRecyclerView.setVisibility(View.VISIBLE);
                 } else {
                     mNoContentIv.setVisibility(View.VISIBLE);
                     mNoContentTv.setVisibility(View.VISIBLE);
                     mNoContentTv.setText("No records");
-                    mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
+                    mRecordRecyclerView.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -195,22 +192,5 @@ public class RecordActivity extends BaseActivity implements RecordView {
         mRecordRecyclerView.setAdapter(mRecordAdapter);
 
         mRecordPresenter.startRequestRecord();
-    }
-
-    private void showProgressDialog() {
-        hideProgressDialog();
-
-        mProgressDialog = new ProgressDialog(RecordActivity.this);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setCanceledOnTouchOutside(false);
-
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-        }
     }
 }
