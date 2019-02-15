@@ -54,6 +54,7 @@ public class Util {
             if (NetWorkUtil.isNetConnected(context)) {
                 runNetOperationCallBack.onRunOperation();
             } else {
+                runNetOperationCallBack.onInterNetNoAvailable();
                 Toast.makeText(context, "network is not applicable!", Toast.LENGTH_LONG).show();
             }
         } else {
@@ -83,5 +84,7 @@ public class Util {
 
     public interface RunNetOperationCallBack {
         void onRunOperation();
+
+        void onInterNetNoAvailable();
     }
 }

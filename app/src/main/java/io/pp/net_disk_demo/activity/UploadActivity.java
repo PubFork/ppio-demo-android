@@ -543,6 +543,11 @@ public class UploadActivity extends BaseActivity implements UploadView {
                             mUploadPresenter.confirm();
                         }
                     }
+
+                    @Override
+                    public void onInterNetNoAvailable() {
+
+                    }
                 });
             }
         });

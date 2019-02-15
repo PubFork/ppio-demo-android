@@ -26,6 +26,7 @@ import io.pp.net_disk_demo.mvp.presenter.presenterimpl.GetPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.GetView;
 import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.util.ToastUtil;
+import io.pp.net_disk_demo.util.Util;
 
 public class GetActivity extends BaseActivity implements GetView {
 
@@ -102,12 +103,22 @@ public class GetActivity extends BaseActivity implements GetView {
 
             @Override
             public void onSet(int chiPrice) {
-                if (mGetPresenter != null) {
-                    mGetPresenter.setChiPrice(chiPrice);
-                    mGetPresenter.startGet();
+                Util.runNetOperation(GetActivity.this, new Util.RunNetOperationCallBack() {
+                    @Override
+                    public void onRunOperation() {
+                        if (mGetPresenter != null) {
+                            mGetPresenter.setChiPrice(chiPrice);
+                            mGetPresenter.startGet();
+                        }
+                    }
 
-                    mSetChiPriceDialog.dismiss();
-                }
+                    @Override
+                    public void onInterNetNoAvailable() {
+
+                    }
+                });
+
+                mSetChiPriceDialog.dismiss();
             }
         }, new DialogInterface.OnDismissListener() {
             @Override

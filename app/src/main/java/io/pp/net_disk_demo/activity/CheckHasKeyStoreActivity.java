@@ -124,6 +124,11 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                         mCheckHasKeyStorePresenter.checkHasKeyStore();
                     }
                 }
+
+                @Override
+                public void onInterNetNoAvailable() {
+                    hideProgressDialog();
+                }
             });
         } else {
             finish();

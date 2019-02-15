@@ -146,14 +146,9 @@ public class RecordActivity extends BaseActivity implements RecordView {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Util.runNetOperation(RecordActivity.this, new Util.RunNetOperationCallBack() {
-                    @Override
-                    public void onRunOperation() {
-                        if (mRecordPresenter != null) {
-                            mRecordPresenter.startRequestRecord();
-                        }
-                    }
-                });
+                if (mRecordPresenter != null) {
+                    mRecordPresenter.startRequestRecord();
+                }
             }
         });
 

@@ -1411,6 +1411,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                             mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
                         }
                     }
+
+                    @Override
+                    public void onInterNetNoAvailable() {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
                 });
             }
         });
@@ -1466,6 +1471,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                             }
                                         }
                                     }
+
+                                    @Override
+                                    public void onInterNetNoAvailable() {
+
+                                    }
                                 });
                             }
 
@@ -1481,19 +1491,31 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                                     @Override
                                     public void onSet(int chiPrice) {
-                                        if (mExecuteTaskPresenter != null) {
-                                            String bucket = mMyFileAdapter.getFileInfoBucket(position);
-                                            String key = mMyFileAdapter.getFileInfoKey(position);
-                                            if (!TextUtils.isEmpty(bucket) && !TextUtils.isEmpty(key)) {
-                                                DownloadInfo downloadInfo = new DownloadInfo();
-                                                downloadInfo.setBucket(bucket);
-                                                downloadInfo.setKey(key);
-                                                downloadInfo.setChiPrice("" + chiPrice);
 
-                                                mExecuteTaskPresenter.startDownload(downloadInfo);
+                                        Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
+                                            @Override
+                                            public void onRunOperation() {
+                                                if (mExecuteTaskPresenter != null) {
+                                                    String bucket = mMyFileAdapter.getFileInfoBucket(position);
+                                                    String key = mMyFileAdapter.getFileInfoKey(position);
+                                                    if (!TextUtils.isEmpty(bucket) && !TextUtils.isEmpty(key)) {
+                                                        DownloadInfo downloadInfo = new DownloadInfo();
+                                                        downloadInfo.setBucket(bucket);
+                                                        downloadInfo.setKey(key);
+                                                        downloadInfo.setChiPrice("" + chiPrice);
+
+                                                        mExecuteTaskPresenter.startDownload(downloadInfo);
+                                                    }
+                                                }
                                             }
-                                            mSetChiPriceDialog.dismiss();
-                                        }
+
+                                            @Override
+                                            public void onInterNetNoAvailable() {
+
+                                            }
+                                        });
+
+                                        mSetChiPriceDialog.dismiss();
                                     }
                                 }, new DialogInterface.OnDismissListener() {
                                     @Override
@@ -1509,17 +1531,12 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                             public void onShareUnShare() {
                                 mBlockFileOptionsBottomDialog.dismiss();
 
-                                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                    @Override
-                                    public void onRunOperation() {
-                                        if (mShowShareCodePresenter != null) {
-                                            String fileHash = mMyFileAdapter.getFileHash(position);
-                                            if (!TextUtils.isEmpty(fileHash)) {
-                                                mShowShareCodePresenter.getShareCode(Constant.Data.DEFAULT_BUCKET, fileHash);
-                                            }
-                                        }
+                                if (mShowShareCodePresenter != null) {
+                                    String fileHash = mMyFileAdapter.getFileHash(position);
+                                    if (!TextUtils.isEmpty(fileHash)) {
+                                        mShowShareCodePresenter.getShareCode(Constant.Data.DEFAULT_BUCKET, fileHash);
                                     }
-                                });
+                                }
                             }
 
                             @Override
@@ -1567,11 +1584,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                 startActivityForResult(new Intent(PpioDataActivity.this, RenewActivity.class)
                                         .setAction(Constant.Intent.RENEW_ACTION)
                                         .putExtra(Constant.Data.RENEW_FILE, fileInfo), Constant.Code.REQUEST_RENEW);
-
-//                                if (mStartRenewPresenter != null) {
-//                                    FileInfo fileInfo = mMyFileAdapter.getFileInfo(position);
-//                                    mStartRenewPresenter.startRenew(fileInfo.getBucketName(), fileInfo.getName());
-//                                }
                             }
 
                             @Override
@@ -1599,19 +1611,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                                                 @Override
                                                 public void onDelete() {
-                                                    Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                                        @Override
-                                                        public void onRunOperation() {
-                                                            Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                                                @Override
-                                                                public void onRunOperation() {
-                                                                    if (mDeletePresenter != null) {
-                                                                        mDeletePresenter.delete(bucket, key);
-                                                                    }
-                                                                }
-                                                            });
-                                                        }
-                                                    });
+
+                                                    if (mDeletePresenter != null) {
+                                                        mDeletePresenter.delete(bucket, key);
+                                                    }
 
                                                     mDeleteDialog.dismiss();
                                                 }
@@ -1674,19 +1677,13 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                                 @Override
                                 public void onDelete() {
-
-                                    Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                        @Override
-                                        public void onRunOperation() {
-                                            if (mExecuteTaskPresenter != null) {
-                                                if (isUploading) {
-                                                    mExecuteTaskPresenter.deleteUploadingTask(bucket, key, taskId);
-                                                } else {
-                                                    mExecuteTaskPresenter.deleteTask(taskId);
-                                                }
-                                            }
+                                    if (mExecuteTaskPresenter != null) {
+                                        if (isUploading) {
+                                            mExecuteTaskPresenter.deleteUploadingTask(bucket, key, taskId);
+                                        } else {
+                                            mExecuteTaskPresenter.deleteTask(taskId);
                                         }
-                                    });
+                                    }
 
                                     mDeleteDialog.dismiss();
                                 }
@@ -1704,26 +1701,16 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
             @Override
             public void onPause(final String taskId) {
-                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                    @Override
-                    public void onRunOperation() {
-                        if (mExecuteTaskPresenter != null) {
-                            mExecuteTaskPresenter.pauseTask(taskId);
-                        }
-                    }
-                });
+                if (mExecuteTaskPresenter != null) {
+                    mExecuteTaskPresenter.pauseTask(taskId);
+                }
             }
 
             @Override
             public void onResume(final String taskId) {
-                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                    @Override
-                    public void onRunOperation() {
-                        if (mExecuteTaskPresenter != null) {
-                            mExecuteTaskPresenter.resumeTask(taskId);
-                        }
-                    }
-                });
+                if (mExecuteTaskPresenter != null) {
+                    mExecuteTaskPresenter.resumeTask(taskId);
+                }
             }
         });
 
@@ -1749,15 +1736,9 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                                 @Override
                                 public void onDelete() {
-
-                                    Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                        @Override
-                                        public void onRunOperation() {
-                                            if (mExecuteTaskPresenter != null) {
-                                                mExecuteTaskPresenter.deleteTask(taskId);
-                                            }
-                                        }
-                                    });
+                                    if (mExecuteTaskPresenter != null) {
+                                        mExecuteTaskPresenter.deleteTask(taskId);
+                                    }
 
                                     mDeleteDialog.dismiss();
                                 }
@@ -1775,35 +1756,21 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
             @Override
             public void onPause(final String taskId) {
-                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                    @Override
-                    public void onRunOperation() {
-                        if (mExecuteTaskPresenter != null) {
-                            mExecuteTaskPresenter.pauseTask(taskId);
-                        }
-                    }
-                });
+                if (mExecuteTaskPresenter != null) {
+                    mExecuteTaskPresenter.pauseTask(taskId);
+                }
             }
 
             @Override
             public void onResume(final String taskId) {
-                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                    @Override
-                    public void onRunOperation() {
-                        if (mExecuteTaskPresenter != null) {
-                            mExecuteTaskPresenter.resumeTask(taskId);
-                        }
-                    }
-                });
+                if (mExecuteTaskPresenter != null) {
+                    mExecuteTaskPresenter.resumeTask(taskId);
+                }
             }
         });
     }
 
     private void initData() {
-//        if (mCurrentShowView == ALLFILE_VIEW && mPpioDataPresenter != null && !mBackFromUpload && !mBackFromDownload) {
-//            mPpioDataPresenter.refreshAllFileList();
-//        }
-
         if (mPpioDataPresenter != null) {
             mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
         }

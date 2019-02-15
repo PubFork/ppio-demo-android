@@ -489,6 +489,11 @@ public class RenewActivity extends BaseActivity implements RenewView {
                             mRenewPresenter.renew();
                         }
                     }
+
+                    @Override
+                    public void onInterNetNoAvailable() {
+
+                    }
                 });
             }
         });
