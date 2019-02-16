@@ -160,7 +160,7 @@ dependencies {
     implementation 'com.tencent.bugly:nativecrashreport:latest.release'
 
     //firebase
-    //implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-core:16.0.6'
 }
 
 apply plugin: 'com.google.gms.google-services'

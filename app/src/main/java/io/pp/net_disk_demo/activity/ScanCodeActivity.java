@@ -217,6 +217,8 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
 
         setImmersiveStatusBar();
 
+        setNavigationBarBackgroundColor(getResources().getColor(R.color.account_background_purple));
+
         mScanCodeToolBar = findViewById(R.id.scancode_toolbar_layout);
         mScanCodeToolBar.setPadding(0, 0, 0, 0);
         mScanCodeToolBar.setContentInsetsAbsolute(0, 0);

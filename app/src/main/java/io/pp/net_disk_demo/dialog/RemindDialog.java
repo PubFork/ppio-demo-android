@@ -2,7 +2,9 @@ package io.pp.net_disk_demo.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,14 +60,15 @@ public class RemindDialog extends Dialog {
 
         Window window = this.getWindow();
         if (window != null) {
+            Resources resources = mContext.getResources();
+            DisplayMetrics dm = resources.getDisplayMetrics();
+
             window.setGravity(Gravity.CENTER);
 
             WindowManager.LayoutParams params = window.getAttributes();
 
-            params.width = WindowManager.LayoutParams.MATCH_PARENT;
+            params.width = dm.widthPixels - 2 * Util.dp2px(mContext, 24);
             params.height = WindowManager.LayoutParams.WRAP_CONTENT;
-
-            params.horizontalMargin = 0.8f;
 
             window.setAttributes(params);
         }
