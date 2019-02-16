@@ -24,6 +24,7 @@ import io.pp.net_disk_demo.dialog.SetChiPriceDialog;
 import io.pp.net_disk_demo.mvp.presenter.GetPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.GetPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.GetView;
+import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
@@ -66,6 +67,10 @@ public class GetActivity extends BaseActivity implements GetView {
                 BIND_AUTO_CREATE);
 
         mTotal = 0;
+
+        if (PossUtil.getUser() == null) {
+            finish();
+        }
     }
 
     @Override

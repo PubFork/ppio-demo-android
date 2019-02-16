@@ -47,6 +47,7 @@ import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.dialog.BlockFileOptionsBottomDialog;
 import io.pp.net_disk_demo.dialog.DeleteDialog;
 import io.pp.net_disk_demo.dialog.PpioDataUploadGetDialog;
+import io.pp.net_disk_demo.dialog.RemindDialog;
 import io.pp.net_disk_demo.dialog.RenameDialog;
 import io.pp.net_disk_demo.dialog.SetChiPriceDialog;
 import io.pp.net_disk_demo.dialog.ShowDetailDialog;
@@ -154,6 +155,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     private FloatingActionButton mUploadGetBtn = null;
 
+    private RemindDialog mRemindDialog = null;
     private BlockFileOptionsBottomDialog mBlockFileOptionsBottomDialog = null;
     private SetChiPriceDialog mSetChiPriceDialog = null;
     private RenameDialog mRenameDialog = null;
@@ -268,11 +270,31 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         Log.e(TAG, "onRestoreInstanceState");
         //
 
-        if (mPpioDataPresenter != null && PossUtil.getUser() == null) {
-            //
-            Log.e(TAG, "onRestoreInstanceState if (mPpioDataPresenter != null && PossUtil.getUser() == null)");
-            //
-            mPpioDataPresenter.link();
+        if (PossUtil.getUser() == null) {
+            Util.runStorageOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
+                @Override
+                public void onRunOperation() {
+                    if (mPpioDataPresenter != null) {
+                        mPpioDataPresenter.link();
+                    }
+                }
+
+                @Override
+                public void onCanceled() {
+                    mRemindDialog = new RemindDialog(PpioDataActivity.this,
+                            "Link disconnect because has no storage permission, and can not login.",
+                            "Please open storage permission",
+                            new RemindDialog.OnOkClickListener() {
+                                @Override
+                                public void onOk() {
+                                    finish();
+                                }
+                            });
+                    mRemindDialog.setCancelable(false);
+                    mRemindDialog.setCanceledOnTouchOutside(false);
+                    mRemindDialog.show();
+                }
+            });
         }
     }
 
@@ -346,6 +368,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         //
 
         //dialog
+        if (mRemindDialog != null) {
+            mRemindDialog.dismiss();
+            mRemindDialog = null;
+        }
+
         if (mBlockFileOptionsBottomDialog != null) {
             mBlockFileOptionsBottomDialog.dismiss();
             mBlockFileOptionsBottomDialog = null;

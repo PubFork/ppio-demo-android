@@ -23,6 +23,7 @@ import io.pp.net_disk_demo.data.RecordInfo;
 import io.pp.net_disk_demo.mvp.presenter.RecordPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.RecordPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.RecordView;
+import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.widget.recyclerview.RecordAdapter;
@@ -53,6 +54,10 @@ public class RecordActivity extends BaseActivity implements RecordView {
         mRecordPresenter = new RecordPresenterImpl(RecordActivity.this);
 
         init();
+
+        if (PossUtil.getUser() == null) {
+            finish();
+        }
     }
 
     @Override

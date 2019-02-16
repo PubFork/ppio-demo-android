@@ -70,6 +70,10 @@ public class TestActivity extends BaseActivity {
         setContentView(R.layout.activity_test);
 
         init();
+
+        if (PossUtil.getUser() == null) {
+            finish();
+        }
     }
 
     @Override

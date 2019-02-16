@@ -15,9 +15,11 @@ import android.widget.Toast;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.dialog.RemindDialog;
 import io.pp.net_disk_demo.mvp.presenter.KeyStoreLogInPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.KeyStoreLogInPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.KeyStoreLogInView;
+import io.pp.net_disk_demo.util.ActivityUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 
@@ -28,6 +30,7 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     private static EditText mPassPhraseEdit = null;
 
     private ProgressDialog mProgressDialog = null;
+    private RemindDialog mRemindDialog = null;
 
     private KeyStoreLogInPresenter mKeyStoreLogInPresenter = null;
 
@@ -42,6 +45,34 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
         setupUI(findViewById(R.id.keystore_login_layout));
 
         init();
+
+        Util.runStorageOperation(KeyStoreLogInActivity.this, new Util.RunNetOperationCallBack() {
+            @Override
+            public void onRunOperation() {
+
+            }
+
+            @Override
+            public void onCanceled() {
+                if (ActivityUtil.hasFinishedForNoStorage()) {
+                    finish();
+                } else {
+                    mRemindDialog = new RemindDialog(KeyStoreLogInActivity.this,
+                            "Because has no storage permission, so can not login.",
+                            "Please open storage permission",
+                            new RemindDialog.OnOkClickListener() {
+                                @Override
+                                public void onOk() {
+                                    ActivityUtil.setHasFinishedForNoStorage();
+                                    finish();
+                                }
+                            });
+                    mRemindDialog.setCancelable(false);
+                    mRemindDialog.setCanceledOnTouchOutside(false);
+                    mRemindDialog.show();
+                }
+            }
+        });
     }
 
     @Override
@@ -85,6 +116,11 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     @Override
     protected void onDestroy() {
         hideProgressDialog();
+
+        if (mRemindDialog != null) {
+            mRemindDialog.dismiss();
+            mRemindDialog = null;
+        }
 
         if (mKeyStoreLogInPresenter != null) {
             mKeyStoreLogInPresenter.onDestroy();

@@ -33,6 +33,7 @@ import io.pp.net_disk_demo.dialog.SetCopiesDialog;
 import io.pp.net_disk_demo.mvp.presenter.RenewPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.RenewPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.RenewView;
+import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.widget.CustomSwitchButton;
@@ -103,6 +104,10 @@ public class RenewActivity extends BaseActivity implements RenewView {
         mDecimalFormat = new DecimalFormat("0.000000000000000000");
 
         init();
+
+        if (PossUtil.getUser() == null) {
+            finish();
+        }
     }
 
     @Override

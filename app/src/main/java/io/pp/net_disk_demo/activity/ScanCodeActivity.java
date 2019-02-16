@@ -20,11 +20,14 @@ import cn.bingoogolapple.qrcode.core.QRCodeView;
 import cn.bingoogolapple.qrcode.zxing.ZXingView;
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.dialog.RemindDialog;
 import io.pp.net_disk_demo.mvp.presenter.ScanCodePresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.ScanCodePresenterImpl;
 import io.pp.net_disk_demo.mvp.view.ScanCodeView;
+import io.pp.net_disk_demo.util.ActivityUtil;
 import io.pp.net_disk_demo.util.FileUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
+import io.pp.net_disk_demo.util.Util;
 
 public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegate, ScanCodeView {
 
@@ -43,6 +46,7 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
     private TextView mRetryTv = null;
 
     private ProgressDialog mProgressDialog = null;
+    private RemindDialog mRemindDialog = null;
 
     private ScanCodePresenter mScanCodePresenter = null;
 
@@ -56,6 +60,30 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
         setContentView(R.layout.activity_scancode_layout);
 
         init();
+
+        Util.runStorageOperation(ScanCodeActivity.this, new Util.RunNetOperationCallBack() {
+            @Override
+            public void onRunOperation() {
+
+            }
+
+            @Override
+            public void onCanceled() {
+                mRemindDialog = new RemindDialog(ScanCodeActivity.this,
+                        "Because has no storage permission, so can not login.",
+                        "Please open storage permission",
+                        new RemindDialog.OnOkClickListener() {
+                            @Override
+                            public void onOk() {
+                                ActivityUtil.setHasFinishedForNoStorage();
+                                finish();
+                            }
+                        });
+                mRemindDialog.setCancelable(false);
+                mRemindDialog.setCanceledOnTouchOutside(false);
+                mRemindDialog.show();
+            }
+        });
     }
 
     @Override
@@ -126,6 +154,11 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
         }
 
         hideProgressDialog();
+
+        if (mRemindDialog != null) {
+            mRemindDialog.dismiss();
+            mRemindDialog = null;
+        }
 
         // Destroy QR code scan control
         mZXingView.onDestroy();

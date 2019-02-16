@@ -41,6 +41,7 @@ import io.pp.net_disk_demo.dialog.SetCopiesDialog;
 import io.pp.net_disk_demo.mvp.presenter.UploadPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.UploadPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.UploadView;
+import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.UploadService;
 import io.pp.net_disk_demo.util.FileUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
@@ -141,6 +142,10 @@ public class UploadActivity extends BaseActivity implements UploadView {
         mTotalChi = 0;
 
         mDecimalFormat = new DecimalFormat("0.000000000000000000");
+
+        if (PossUtil.getUser() == null) {
+            finish();
+        }
     }
 
     @Override

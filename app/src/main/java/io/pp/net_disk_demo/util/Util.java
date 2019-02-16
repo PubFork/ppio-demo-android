@@ -62,6 +62,17 @@ public class Util {
         }
     }
 
+    static public void runStorageOperation(@NonNull Context context, @NonNull RunNetOperationCallBack runNetOperationCallBack) {
+        if (XPermissionUtils.checkPermissions(context,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE})) {
+            runNetOperationCallBack.onRunOperation();
+        } else {
+            runNetOperationCallBack.onCanceled();
+            Toast.makeText(context, "not has storage permission!", Toast.LENGTH_LONG).show();
+        }
+    }
+
     static public void runNetStorageOperation(@NonNull Context context, @NonNull RunNetOperationCallBack runNetOperationCallBack) {
         if (XPermissionUtils.checkPermissions(context, new String[]{Manifest.permission.INTERNET})) {
             if (NetWorkUtil.isNetConnected(context)) {

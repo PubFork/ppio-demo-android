@@ -16,9 +16,11 @@ import android.widget.Toast;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.dialog.RemindDialog;
 import io.pp.net_disk_demo.mvp.presenter.InputPassPhrasePresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.InputPassPhrasePresenterImpl;
 import io.pp.net_disk_demo.mvp.view.InputPassPhraseView;
+import io.pp.net_disk_demo.util.ActivityUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 
@@ -29,6 +31,7 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
     private TextView mImportKeyStoreTv = null;
 
     private ProgressDialog mProgressDialog = null;
+    private RemindDialog mRemindDialog = null;
 
     private InputPassPhrasePresenter mInputPassPhrasePresenter = null;
 
@@ -43,6 +46,33 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
         setupUI(findViewById(R.id.input_passphrase_layout));
 
         init();
+
+        Util.runStorageOperation(InputPassPhraseActivity.this, new Util.RunNetOperationCallBack() {
+            @Override
+            public void onRunOperation() {
+
+            }
+
+            @Override
+            public void onCanceled() {
+                if (ActivityUtil.hasFinishedForNoStorage()) {
+                    finish();
+                } else {
+                    mRemindDialog = new RemindDialog(InputPassPhraseActivity.this,
+                            "Because has no storage permission, so can not login.",
+                            "Please open storage permission",
+                            new RemindDialog.OnOkClickListener() {
+                                @Override
+                                public void onOk() {
+                                    finish();
+                                }
+                            });
+                    mRemindDialog.setCancelable(false);
+                    mRemindDialog.setCanceledOnTouchOutside(false);
+                    mRemindDialog.show();
+                }
+            }
+        });
     }
 
     @Override
@@ -68,6 +98,11 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
     @Override
     protected void onDestroy() {
         hideProgressDialog();
+
+        if (mRemindDialog != null) {
+            mRemindDialog.dismiss();
+            mRemindDialog = null;
+        }
 
         if (mInputPassPhrasePresenter != null) {
             mInputPassPhrasePresenter.onDestroy();
