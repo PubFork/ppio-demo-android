@@ -55,10 +55,10 @@ public class Util {
                 runNetOperationCallBack.onRunOperation();
             } else {
                 runNetOperationCallBack.onCanceled();
-                Toast.makeText(context, "network is not applicable!", Toast.LENGTH_LONG).show();
+                ToastUtil.showToast(context, "network is not applicable!", Toast.LENGTH_LONG);
             }
         } else {
-            Toast.makeText(context, "not has android.permission.INTERNET!", Toast.LENGTH_LONG).show();
+            ToastUtil.showToast(context, "not has android.permission.INTERNET!", Toast.LENGTH_LONG);
         }
     }
 
@@ -69,7 +69,7 @@ public class Util {
             runNetOperationCallBack.onRunOperation();
         } else {
             runNetOperationCallBack.onCanceled();
-            Toast.makeText(context, "not has storage permission!", Toast.LENGTH_LONG).show();
+            ToastUtil.showToast(context, "not has storage permission!", Toast.LENGTH_LONG);
         }
     }
 
@@ -81,19 +81,19 @@ public class Util {
                         runNetOperationCallBack.onRunOperation();
                     } else {
                         runNetOperationCallBack.onCanceled();
-                        Toast.makeText(context, "not has android.permission.WRITE_EXTERNAL_STORAGE!", Toast.LENGTH_LONG).show();
+                        ToastUtil.showToast(context, "not has android.permission.WRITE_EXTERNAL_STORAGE!", Toast.LENGTH_LONG);
                     }
                 } else {
                     runNetOperationCallBack.onCanceled();
-                    Toast.makeText(context, "not has android.permission.READ_EXTERNAL_STORAGE!", Toast.LENGTH_LONG).show();
+                    ToastUtil.showToast(context, "not has android.permission.READ_EXTERNAL_STORAGE!", Toast.LENGTH_LONG);
                 }
             } else {
                 runNetOperationCallBack.onCanceled();
-                Toast.makeText(context, "network is not applicable!", Toast.LENGTH_LONG).show();
+                ToastUtil.showToast(context, "network is not applicable!", Toast.LENGTH_LONG);
             }
         } else {
             runNetOperationCallBack.onCanceled();
-            Toast.makeText(context, "not has android.permission.INTERNET!", Toast.LENGTH_LONG).show();
+            ToastUtil.showToast(context, "not has android.permission.INTERNET!", Toast.LENGTH_LONG);
         }
     }
 

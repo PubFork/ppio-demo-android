@@ -1,19 +1,29 @@
 package io.pp.net_disk_demo.util;
 
 import android.content.Context;
-import android.widget.Toast;
+import android.view.Gravity;
+import android.widget.TextView;
+
+import com.dovar.dtoast.DToast;
+import com.dovar.dtoast.inner.IToast;
+
+import io.pp.net_disk_demo.R;
 
 public class ToastUtil {
 
-    public static Toast mToast;
+    private static IToast toast = null;
 
     public static void showToast(Context context, String text, int time) {
-        mToast = null;
 
-        //It is ok to set the Toast text to null once before actually calling
-        mToast = Toast.makeText(context, "", time);
+        if (toast == null) {
+            toast = DToast.make(context);
+        }
 
-        mToast.setText(text);
-        mToast.show();
+        TextView tv_text = (TextView) toast.getView().findViewById(R.id.tv_content);
+        if (tv_text != null) {
+            tv_text.setText(text);
+        }
+
+        toast.setGravity(Gravity.CENTER, 0, 30).show();
     }
 }

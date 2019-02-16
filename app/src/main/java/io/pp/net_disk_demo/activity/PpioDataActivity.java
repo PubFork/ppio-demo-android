@@ -477,7 +477,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     public void showNotLogInView() {
-        Toast.makeText(PpioDataActivity.this, "not login!", Toast.LENGTH_SHORT).show();
+        ToastUtil.showToast(PpioDataActivity.this, "not login!", Toast.LENGTH_SHORT);
 
         startActivity(new Intent(PpioDataActivity.this, CheckHasKeyStoreActivity.class));
         finish();
@@ -776,7 +776,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         }
         //
 
-        Toast.makeText(PpioDataActivity.this, "log out!", Toast.LENGTH_SHORT).show();
+        ToastUtil.showToast(PpioDataActivity.this, "log out!", Toast.LENGTH_SHORT);
 
         //startActivity(new Intent(PpioDataActivity.this, LogInOrRegisterActivity.class));
         startActivity(new Intent(PpioDataActivity.this, KeyStoreLogInActivity.class));

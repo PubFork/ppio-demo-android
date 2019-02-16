@@ -92,11 +92,11 @@ public class SetCopiesDialog extends Dialog {
                                 Log.e(TAG, "mOkLayout onClick() error: " + e.getMessage());
                                 e.printStackTrace();
 
-                                Toast.makeText(mContext, "please input correct format copies!", Toast.LENGTH_SHORT).show();
+                                ToastUtil.showToast(mContext, "please input correct format copies!", Toast.LENGTH_SHORT);
                                 mNameEditText.setText("");
                             }
                         } else {
-                            Toast.makeText(mContext, "please input copies!", Toast.LENGTH_SHORT).show();
+                            ToastUtil.showToast(mContext, "please input copies!", Toast.LENGTH_SHORT);
                         }
                     }
                 }

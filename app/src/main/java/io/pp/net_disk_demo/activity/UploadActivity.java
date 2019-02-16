@@ -622,7 +622,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
                     e.printStackTrace();
                 }
             } else {
-                Toast.makeText(UploadActivity.this, "filePAth is null!", Toast.LENGTH_LONG).show();
+                ToastUtil.showToast(UploadActivity.this, "filePAth is null!", Toast.LENGTH_LONG);
                 finish();
             }
         } else if (resultCode == Activity.RESULT_CANCELED) {

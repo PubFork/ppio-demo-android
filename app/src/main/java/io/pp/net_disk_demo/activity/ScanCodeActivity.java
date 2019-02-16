@@ -127,7 +127,7 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
                     mScanCodePresenter.decodeBitmapCode(filePath);
                 }
             } else {
-                Toast.makeText(ScanCodeActivity.this, "filePath is null!", Toast.LENGTH_LONG).show();
+                ToastUtil.showToast(ScanCodeActivity.this, "filePath is null!", Toast.LENGTH_LONG);
                 finish();
             }
         }

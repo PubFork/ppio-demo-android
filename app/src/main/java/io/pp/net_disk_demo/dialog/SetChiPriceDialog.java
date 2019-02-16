@@ -251,11 +251,11 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
                                 Log.e(TAG, "mOkLayout onClick() error: " + e.getMessage());
                                 e.printStackTrace();
 
-                                Toast.makeText(mContext, "please input correct format chi price!", Toast.LENGTH_SHORT).show();
+                                ToastUtil.showToast(mContext, "please input correct format chi price!", Toast.LENGTH_SHORT);
                                 mChiPriceEt.setText("");
                             }
                         } else {
-                            Toast.makeText(mContext, "please input chi price!", Toast.LENGTH_SHORT).show();
+                            ToastUtil.showToast(mContext, "please input chi price!", Toast.LENGTH_SHORT);
                         }
                     }
                 }
