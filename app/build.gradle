@@ -6,8 +6,8 @@ android {
         applicationId "io.pp.net_disk_demo"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 1
-        versionName "0.1.0"
+        versionCode 2
+        versionName "0.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {

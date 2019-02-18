@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.dialog.RemindDialog;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.CheckHasKeyStorePresenterImpl;
 import io.pp.net_disk_demo.mvp.view.CheckHasKeyStoreView;
 import io.pp.net_disk_demo.util.ToastUtil;
@@ -23,6 +24,8 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
     private static final String TAG = "CheckHasKeyStoreActivity";
 
     private ProgressDialog mProgressDialog = null;
+
+    private RemindDialog mRemindDialog = null;
 
     private CheckHasKeyStorePresenterImpl mCheckHasKeyStorePresenter = null;
 
@@ -112,8 +115,9 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
         if (can_write_storage &&
                 can_read_storage &&
                 can_use_internet &&
-                can_listen_internet &&
-                can_use_camera
+                can_listen_internet
+//                &&
+//                can_use_camera
             //&&
             //can_set_foreground_service
                 ) {
@@ -134,13 +138,30 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
             //
             Log.e(TAG, "onRequestPermissionsResult() denied!");
             //
-            finish();
+
+            mRemindDialog = new RemindDialog(CheckHasKeyStoreActivity.this,
+                    "Because has no storage permission or has no internet permission, can not login and use the demo.",
+                    "Please open storage and internet permissions",
+                    new RemindDialog.OnOkClickListener() {
+                        @Override
+                        public void onOk() {
+                            finish();
+                        }
+                    });
+            mRemindDialog.setCancelable(false);
+            mRemindDialog.setCanceledOnTouchOutside(false);
+            mRemindDialog.show();
         }
     }
 
     @Override
     protected void onDestroy() {
         hideProgressDialog();
+
+        if (mRemindDialog != null) {
+            mRemindDialog.dismiss();
+            mRemindDialog = null;
+        }
 
         mCheckHasKeyStorePresenter = null;
 

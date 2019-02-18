@@ -97,6 +97,15 @@ public class Util {
         }
     }
 
+    static public void runCamaraOperation(@NonNull Context context, @NonNull RunNetOperationCallBack runNetOperationCallBack) {
+        if (XPermissionUtils.checkPermissions(context, new String[]{Manifest.permission.CAMERA})) {
+            runNetOperationCallBack.onRunOperation();
+        } else {
+            runNetOperationCallBack.onCanceled();
+            ToastUtil.showToast(context, "not has android.permission.CAMERA", Toast.LENGTH_LONG);
+        }
+    }
+
     public interface RunNetOperationCallBack {
         void onRunOperation();
 

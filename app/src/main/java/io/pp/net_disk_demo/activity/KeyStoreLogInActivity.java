@@ -192,10 +192,20 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
         //hidePassPhraseEditKeyBoard();
         hideSoftKeyboard(view);
 
-        if (!mHasStartScanCode) {
-            mHasStartScanCode = true;
-            startActivityForResult(new Intent(KeyStoreLogInActivity.this, ScanCodeActivity.class), Constant.Code.REQUEST_SCAN_CODE);
-        }
+        Util.runCamaraOperation(KeyStoreLogInActivity.this, new Util.RunNetOperationCallBack() {
+            @Override
+            public void onRunOperation() {
+                if (!mHasStartScanCode) {
+                    mHasStartScanCode = true;
+                    startActivityForResult(new Intent(KeyStoreLogInActivity.this, ScanCodeActivity.class), Constant.Code.REQUEST_SCAN_CODE);
+                }
+            }
+
+            @Override
+            public void onCanceled() {
+
+            }
+        });
     }
 
     public void onGenerateAccount(View view) {
