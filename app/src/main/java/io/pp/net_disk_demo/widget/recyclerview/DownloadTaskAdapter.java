@@ -29,6 +29,7 @@ import java.util.List;
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.data.TaskInfo;
+import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.util.Util;
 
 public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapter.DownloadTaskItemHolder> {
@@ -88,8 +89,12 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
             String destinationPath = taskInfo.getTo();
 
             downloadTaskItemHolder.setFileName(destinationPath);
-            if (!TextUtils.isEmpty(destinationPath) && destinationPath.startsWith(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX)) {
-                downloadTaskItemHolder.setFileName(destinationPath.replaceFirst(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX, ""));
+            if (!TextUtils.isEmpty(destinationPath)) {
+                if (destinationPath.startsWith(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount() + "/")) {
+                    downloadTaskItemHolder.setFileName(destinationPath.replaceFirst(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount() + "/", ""));
+                } else if (destinationPath.startsWith(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX)) {
+                    downloadTaskItemHolder.setFileName(destinationPath.replaceFirst(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX, ""));
+                }
             }
 
             downloadTaskItemHolder.setStatus(taskInfo.getState(), taskInfo.getError());

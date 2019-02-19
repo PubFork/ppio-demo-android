@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
@@ -21,12 +22,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import io.pp.net_disk_demo.Constant;
@@ -96,7 +94,7 @@ public class DownloadService extends Service {
     private Notification getDownloadingNotification(int downloadingCount, double progress) {
         progress = progress <= 1.00d ? progress : 1.00d;
 
-        Log.e(TAG, "progress = " + progress);
+        //Log.e(TAG, "progress = " + progress);
         double progress2digits;
         if (progress != 0) {
             progress2digits = new BigDecimal(progress * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
@@ -283,30 +281,79 @@ public class DownloadService extends Service {
             //
             Log.e(TAG, "download DownloadAsyncTask()");
             //
-
-            Date date = new Date(System.currentTimeMillis());
-            SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss", Locale.US);
-            String fileName = sd.format(date);
-
             File downloadDir = new File(Constant.PPIO_File.DOWNLOAD_DIR);
             boolean directoryExists = downloadDir.exists();
             if (!directoryExists) {
                 directoryExists = downloadDir.mkdir();
             }
+
+            File downloadAccountDir = new File(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
+            directoryExists = downloadAccountDir.exists();
+            if (!directoryExists) {
+                directoryExists = downloadAccountDir.mkdir();
+            }
+
             if (directoryExists) {
                 final String bucket = downloadInfos[0].getBucket();
                 final String key = downloadInfos[0].getKey();
                 final String chiPrice = downloadInfos[0].getChiPrice();
-                String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + key;
 
-                return PossUtil.getObject(bucket, key, file, chiPrice, new PossUtil.GetObjectListener() {
-                    @Override
-                    public void onGetObjectError(String errMsg) {
-                        if (mExecuteTasksServiceWeakReference.get() != null) {
-                            mExecuteTasksServiceWeakReference.get().showDownloadStartFail(errMsg);
+                String fileName = key;
+                if (!TextUtils.isEmpty(fileName)) {
+                    String prefixNameStr = fileName;
+                    String typeSuffixStr = "";
+                    if (fileName.contains(".")) {
+                        typeSuffixStr = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+                        prefixNameStr = fileName.substring(0, fileName.lastIndexOf("."));
+                    }
+
+                    int max = 0;
+                    File[] downloadedFiles = downloadAccountDir.listFiles();
+                    if (downloadedFiles != null) {
+                        for (int i = 0; i < downloadedFiles.length; i++) {
+                            String name = downloadedFiles[i].getName();
+
+                            if (fileName.equals(name)) {
+                                if (max == 0) {
+                                    max = 1;
+                                }
+                            } else if (!TextUtils.isEmpty(name) &&
+                                    name.contains(prefixNameStr + "(") &&
+                                    name.contains(")" + typeSuffixStr)) {
+
+                                String tempStr = name.replace(prefixNameStr + "(", "");
+
+                                tempStr = tempStr.replace(")" + typeSuffixStr, "");
+
+                                int number = -1;
+                                try {
+                                    number = Integer.parseInt(tempStr);
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                }
+
+                                max = number >= max ? (number + 1) : max;
+                            }
                         }
                     }
-                });
+
+                    if (max > 0) {
+                        fileName = prefixNameStr + "(" + max + ")" + typeSuffixStr;
+                    }
+
+                    String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount() + "/" + fileName;
+
+                    return PossUtil.getObject(bucket, key, file, chiPrice, new PossUtil.GetObjectListener() {
+                        @Override
+                        public void onGetObjectError(String errMsg) {
+                            if (mExecuteTasksServiceWeakReference.get() != null) {
+                                mExecuteTasksServiceWeakReference.get().showDownloadStartFail(errMsg);
+                            }
+                        }
+                    });
+                } else {
+                    return false;
+                }
             } else {
                 if (mExecuteTasksServiceWeakReference.get() != null) {
                     mExecuteTasksServiceWeakReference.get().showDownloadStartFail("download directory not exist");
@@ -352,16 +399,22 @@ public class DownloadService extends Service {
                 directoryExists = downloadDir.mkdir();
             }
 
+            File downloadAccountDir = new File(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
+            directoryExists = downloadAccountDir.exists();
+            if (!directoryExists) {
+                directoryExists = downloadAccountDir.mkdir();
+            }
+
             if (directoryExists) {
                 final String shareCode = downloadInfos[0].getShareCode();
                 final String chiPrice = downloadInfos[0].getChiPrice();
 
-                String name;
+                String fileName = "";
                 try {
                     String jsonStr = new String(Base64.decode((shareCode.replaceFirst("poss://", "")).getBytes(), Base64.DEFAULT));
 
                     JSONObject jsonObject = new JSONObject(jsonStr);
-                    name = jsonObject.getString("name");
+                    fileName = jsonObject.getString("name");
                 } catch (JSONException e) {
                     Log.e(TAG, "" + e.getMessage());
 
@@ -372,14 +425,58 @@ public class DownloadService extends Service {
                     return false;
                 }
 
-                final String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + name;
 
-                return PossUtil.getObjectShared(shareCode, file, chiPrice, new PossUtil.GetObjectListener() {
-                    @Override
-                    public void onGetObjectError(String errMsg) {
-                        publishProgress(errMsg);
+                if (!TextUtils.isEmpty(fileName)) {
+                    String prefixNameStr = fileName;
+                    String typeSuffixStr = "";
+                    if (fileName.contains(".")) {
+                        typeSuffixStr = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+                        prefixNameStr = fileName.substring(0, fileName.lastIndexOf("."));
                     }
-                });
+
+                    int max = 0;
+                    File[] downloadedFiles = downloadAccountDir.listFiles();
+                    if (downloadedFiles != null) {
+                        for (int i = 0; i < downloadedFiles.length; i++) {
+                            String name = downloadedFiles[i].getName();
+                            if (fileName.equals(name)) {
+                                if (max == 0) {
+                                    max = 1;
+                                }
+                            } else if (!TextUtils.isEmpty(name) &&
+                                    name.contains(prefixNameStr + "(") &&
+                                    name.contains(")" + typeSuffixStr)) {
+
+                                String tempStr = name.replace(prefixNameStr + "(", "");
+                                tempStr = tempStr.replace(")" + typeSuffixStr, "");
+
+                                int number = -1;
+                                try {
+                                    number = Integer.parseInt(tempStr);
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                }
+
+                                max = number >= max ? (number + 1) : max;
+                            }
+                        }
+                    }
+
+                    if (max > 0) {
+                        fileName = prefixNameStr + "(" + max + ")" + typeSuffixStr;
+                    }
+
+                    final String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount() + "/" + fileName;
+
+                    return PossUtil.getObjectShared(shareCode, file, chiPrice, new PossUtil.GetObjectListener() {
+                        @Override
+                        public void onGetObjectError(String errMsg) {
+                            publishProgress(errMsg);
+                        }
+                    });
+                } else {
+                    return false;
+                }
             } else {
                 if (mDownloadServiceWeakReference.get() != null) {
                     publishProgress("download directory not exist");
