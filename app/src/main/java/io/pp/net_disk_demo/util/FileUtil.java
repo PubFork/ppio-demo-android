@@ -441,10 +441,12 @@ public class FileUtil {
                 while ((len = fileInputStream.read(buffer)) > 0) {
                     zipOutputStream.write(buffer, 0, len);
                 }
+
+                zipOutputStream.closeEntry();
+                zipOutputStream.close();
+                fileInputStream.close();
             }
-            zipOutputStream.closeEntry();
-            zipOutputStream.close();
-            fileInputStream.close();
+
             fileOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
