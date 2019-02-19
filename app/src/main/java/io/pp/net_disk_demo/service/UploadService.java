@@ -446,7 +446,7 @@ public class UploadService extends Service {
                         }
                     }
                     uploadTaskList.add(taskInfo);
-                    Log.e(TAG, "RefreshUploadTaskRunnable() taskId == " + taskInfo.getId());
+                    //Log.e(TAG, "RefreshUploadTaskRunnable() taskId == " + taskInfo.getId());
                 }
             }
 

@@ -6,6 +6,7 @@ import io.pp.net_disk_demo.mvp.model.AccountInfoModel;
 import io.pp.net_disk_demo.mvp.model.modelimpl.AccountInfoModelImpl;
 import io.pp.net_disk_demo.mvp.presenter.AccountInfoPresenter;
 import io.pp.net_disk_demo.mvp.view.AccountInfoView;
+import io.pp.net_disk_demo.service.UploadLogService;
 
 public class AccountInfoPresenterImpl implements AccountInfoPresenter {
 
@@ -18,6 +19,13 @@ public class AccountInfoPresenterImpl implements AccountInfoPresenter {
         mAccountInfoView = accountInfoView;
 
         mAccountInfoModel = new AccountInfoModelImpl(mContext, AccountInfoPresenterImpl.this);
+    }
+
+    @Override
+    public void bindUploadLogService(UploadLogService uploadLogService) {
+        if (mAccountInfoModel != null) {
+            mAccountInfoModel.bindUploadService(uploadLogService);
+        }
     }
 
     @Override
@@ -122,6 +130,13 @@ public class AccountInfoPresenterImpl implements AccountInfoPresenter {
     public void requestOracleChiPrice() {
         if (mAccountInfoModel != null) {
             mAccountInfoModel.requestOracleChiPrice();
+        }
+    }
+
+    @Override
+    public void uploadLog(String description) {
+        if (mAccountInfoModel != null) {
+            mAccountInfoModel.uploadLog(description);
         }
     }
 

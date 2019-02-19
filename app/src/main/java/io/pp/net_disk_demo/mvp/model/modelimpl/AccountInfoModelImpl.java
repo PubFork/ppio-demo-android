@@ -15,6 +15,7 @@ import io.pp.net_disk_demo.mvp.presenter.AccountInfoPresenter;
 import io.pp.net_disk_demo.ppio.KeyStoreUtil;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.ppio.RpcUtil;
+import io.pp.net_disk_demo.service.UploadLogService;
 import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
 
 public class AccountInfoModelImpl implements AccountInfoModel {
@@ -26,6 +27,8 @@ public class AccountInfoModelImpl implements AccountInfoModel {
     private CancelFixedThreadPool mRequestBalancePool;
     private CancelFixedThreadPool mRequestFundPool;
 
+    private UploadLogService mUploadLogService = null;
+
     public AccountInfoModelImpl(Context context, AccountInfoPresenter accountInfoPresenter) {
         mContext = context;
 
@@ -34,6 +37,11 @@ public class AccountInfoModelImpl implements AccountInfoModel {
         mRequestUsedPool = new CancelFixedThreadPool(1);
         mRequestBalancePool = new CancelFixedThreadPool(1);
         mRequestFundPool = new CancelFixedThreadPool(1);
+    }
+
+    @Override
+    public void bindUploadService(UploadLogService uploadLogService) {
+        mUploadLogService = uploadLogService;
     }
 
     @Override
@@ -64,6 +72,13 @@ public class AccountInfoModelImpl implements AccountInfoModel {
     @Override
     public void requestOracleChiPrice() {
         new RequestOracleChiPriceAsyncTask(AccountInfoModelImpl.this).execute();
+    }
+
+    @Override
+    public void uploadLog(String description) {
+        if (mUploadLogService != null) {
+            mUploadLogService.uploadLog(description);
+        }
     }
 
     @Override

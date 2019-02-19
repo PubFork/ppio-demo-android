@@ -79,3 +79,7 @@
 -dontwarn com.fasterxml.jackson
 -keep class com.fasterxml.jackson.*
 -keep class com.fasterxml.jackson.**{*;}
+
+-dontwarn okhttp3
+-keep class okhttp3.*
+-keep class okhttp3.**{*;}

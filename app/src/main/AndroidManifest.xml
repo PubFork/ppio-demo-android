@@ -145,6 +145,8 @@
 
         <service android:name=".service.DownloadService" />
 
+        <service android:name=".service.UploadLogService" />
+
         <!--Configure APP ID-->
         <meta-data
             android:name="BUGLY_APPID"

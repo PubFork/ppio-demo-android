@@ -14,7 +14,18 @@ import android.util.Log;
 
 import io.pp.net_disk_demo.Constant;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class FileUtil {
 
@@ -329,5 +340,114 @@ public class FileUtil {
         }
 
         return UNKNOWN_FILE;
+    }
+
+    public static boolean mergeFiles(ArrayList<String> filePathList, String resultPath) {
+        if (filePathList == null || filePathList.size() < 1 || TextUtils.isEmpty(resultPath)) {
+            return false;
+        }
+
+        File[] files = new File[filePathList.size()];
+        for (int i = 0; i < filePathList.size(); i++) {
+            files[i] = new File(filePathList.get(i));
+            if (TextUtils.isEmpty(filePathList.get(i)) || !files[i].exists() || !files[i].isFile()) {
+                return false;
+            }
+        }
+
+        File resultFile = new File(resultPath);
+
+        try {
+            FileChannel resultFileChannel = new FileOutputStream(resultFile, true).getChannel();
+            for (int i = 0; i < filePathList.size(); i++) {
+                FileChannel blk = new FileInputStream(files[i]).getChannel();
+                resultFileChannel.transferFrom(blk, resultFileChannel.size(), blk.size());
+                blk.close();
+            }
+            resultFileChannel.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Generate a .json format file
+     */
+    public static boolean createJsonFile(String jsonString, String filePath) {
+        boolean flag = true;
+
+        try {
+            File file = new File(filePath);
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            if (file.exists()) {
+                file.delete();
+            }
+            file.createNewFile();
+
+            // Format json string
+            //jsonString = JsonUtil.formatJson(jsonString);
+
+            // Write the formatted string to a file
+            Writer write = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            write.write(jsonString);
+            write.flush();
+            write.close();
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }
+
+    public static void zipMultiFile(ArrayList<String> srcFilePaths, String zipFilePath) {
+        ArrayList<File> srcFiles = new ArrayList<>();
+        for (int i = 0; i < srcFilePaths.size(); i++) {
+            srcFiles.add(new File(srcFilePaths.get(i)));
+        }
+
+        File zipFile = new File(zipFilePath);
+
+        if (!zipFile.exists()) {
+            try {
+                zipFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        FileOutputStream fileOutputStream = null;
+        ZipOutputStream zipOutputStream = null;
+        FileInputStream fileInputStream = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(zipFile);
+            zipOutputStream = new ZipOutputStream(fileOutputStream);
+            ZipEntry zipEntry = null;
+            for (int i = 0; i < srcFiles.size(); i++) {
+                fileInputStream = new FileInputStream(srcFiles.get(i));
+                zipEntry = new ZipEntry(srcFiles.get(i).getName());
+                zipOutputStream.putNextEntry(zipEntry);
+                int len;
+                byte[] buffer = new byte[1024];
+                while ((len = fileInputStream.read(buffer)) > 0) {
+                    zipOutputStream.write(buffer, 0, len);
+                }
+            }
+            zipOutputStream.closeEntry();
+            zipOutputStream.close();
+            fileInputStream.close();
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

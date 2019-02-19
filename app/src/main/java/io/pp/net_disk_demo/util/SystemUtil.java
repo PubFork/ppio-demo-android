@@ -2,6 +2,8 @@ package io.pp.net_disk_demo.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
@@ -191,5 +193,35 @@ public class SystemUtil {
             }
         }
         return line;
+    }
+
+    public static String getABIS() {
+        String aibsStr = "";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            String[] aibs = Build.SUPPORTED_ABIS;
+            if (aibs != null) {
+                for (int i = 0; i < aibs.length; i++) {
+                    if (i < aibs.length && i > 0) {
+                        aibsStr = aibsStr + ", ";
+                    }
+                    aibsStr = aibsStr + aibs[i];
+                }
+            }
+        } else {
+            aibsStr = Build.CPU_ABI + ", " + Build.CPU_ABI2;
+        }
+
+        return aibsStr;
+    }
+
+    public static String getAppVersion(Context context) {
+        try {
+            return context.getPackageManager().
+                    getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return "?";
+        }
     }
 }

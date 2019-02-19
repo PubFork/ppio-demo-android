@@ -45,6 +45,8 @@ public class PossUtil {
     private static String mStorageChiPrice = "100";
     private static String mDownloadChiPrice = "100";
 
+
+
     private static String mCacheDir = "";
 
     static public void setMnemonicStr(String mnemonicStr) {
@@ -95,13 +97,6 @@ public class PossUtil {
         return mAddressStr;
     }
 
-    static public String getStorageChiPrice() {
-        return mStorageChiPrice;
-    }
-
-    static public String getDownloadChiPrice() {
-        return mDownloadChiPrice;
-    }
 
     static public String getCacheDir() {
         return mCacheDir;
@@ -247,6 +242,11 @@ public class PossUtil {
                 Poss.initKeyStoreData(keyStoreStr, config.getDir());
 
                 config.setKeyPassphrase(passPhrase);
+
+                config.setFileLogLevel("DEBUG");
+                config.setLogRotationCount(3);
+                config.setLogRotationSize(1024 * 1024 * 50);
+
                 mUser = Poss.createUser(config);
 
                 mUser.initKeyStoreData(keyStoreStr);

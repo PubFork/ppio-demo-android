@@ -123,6 +123,7 @@ public class Constant {
         public static final String WALLET_URL = "https://wallet.testnet.pp.io/";
         public static final String UPDATE_URL = "";
         public static final String FEEDBACK_URL = "https://gitter.im/PPIO/chat?utm_source=share-link&utm_medium=link&utm_campaign=share-link";
+        public static final String JOIN_DISCORD_URL = "https://discord.gg/UesEX2K";
     }
 
     public static class BOOTSTRAP_JSON {
@@ -162,5 +163,10 @@ public class Constant {
             public static final String PHONE_MODEL = "phone_model";
             public static final String PHONE_BRAND = "phone_brand";
         }
+    }
+
+    public static class UploadLog {
+        public static final String UPLOAD_URL_TEST = "https://tly4r5lqmi.execute-api.us-west-2.amazonaws.com/dev/gets3postauth";
+        public static final String UPLOAD_URL_FORMAL = " https://tly4r5lqmi.execute-api.us-west-2.amazonaws.com/production/gets3postauth";
     }
 }

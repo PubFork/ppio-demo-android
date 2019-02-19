@@ -163,6 +163,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.6'
 
     implementation 'com.github.Dovar66:DToast:1.1.2'
+
+    //
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.squareup.okio:okio:1.8.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

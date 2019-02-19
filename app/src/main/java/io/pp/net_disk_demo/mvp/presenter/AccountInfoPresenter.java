@@ -1,6 +1,10 @@
 package io.pp.net_disk_demo.mvp.presenter;
 
+import io.pp.net_disk_demo.service.UploadLogService;
+
 public interface AccountInfoPresenter {
+
+    void bindUploadLogService(UploadLogService uploadLogService);
 
     void requestAddress();
 
@@ -35,6 +39,8 @@ public interface AccountInfoPresenter {
 
 
     void requestOracleChiPrice();
+
+    void uploadLog(String description);
 
 
     void showRecharge();

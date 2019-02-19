@@ -45,6 +45,7 @@ import io.pp.net_disk_demo.data.ObjectStatus;
 import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.dialog.BlockFileOptionsBottomDialog;
 import io.pp.net_disk_demo.dialog.DeleteDialog;
+import io.pp.net_disk_demo.dialog.FeedbackDialog;
 import io.pp.net_disk_demo.dialog.PpioDataUploadGetDialog;
 import io.pp.net_disk_demo.dialog.RemindDialog;
 import io.pp.net_disk_demo.dialog.RenameDialog;
@@ -74,6 +75,7 @@ import io.pp.net_disk_demo.mvp.view.StartRenewView;
 import io.pp.net_disk_demo.mvp.view.StatusView;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.DownloadService;
+import io.pp.net_disk_demo.service.UploadLogService;
 import io.pp.net_disk_demo.service.UploadService;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
@@ -155,6 +157,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private FloatingActionButton mUploadGetBtn = null;
 
     private RemindDialog mRemindDialog = null;
+    private FeedbackDialog mFeedbackDialog = null;
     private BlockFileOptionsBottomDialog mBlockFileOptionsBottomDialog = null;
     private SetChiPriceDialog mSetChiPriceDialog = null;
     private RenameDialog mRenameDialog = null;
@@ -178,9 +181,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private ShowShareCodePresenter mShowShareCodePresenter = null;
     private DeletePresenter mDeletePresenter = null;
 
+    private UploadLogService mUploadLogService = null;
     private UploadService mUploadService = null;
     private DownloadService mDownloadService = null;
 
+    private UploadLogServiceConnection mUploadLogServiceConnection = null;
     private UploadServiceConnection mUploadServiceConnection = null;
     private DownloadServiceConnection mDownloadServiceConnection = null;
 
@@ -227,12 +232,17 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mShowShareCodePresenter = new ShowShareCodePresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
         mDeletePresenter = new DeletePresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
 
+        mUploadLogServiceConnection = new UploadLogServiceConnection(PpioDataActivity.this);
         mUploadServiceConnection = new UploadServiceConnection(PpioDataActivity.this);
         mDownloadServiceConnection = new DownloadServiceConnection(PpioDataActivity.this);
 
+        startService(new Intent(PpioDataActivity.this, UploadLogService.class));
         startService(new Intent(PpioDataActivity.this, UploadService.class));
         startService(new Intent(PpioDataActivity.this, DownloadService.class));
 
+        bindService(new Intent(PpioDataActivity.this, UploadLogService.class),
+                mUploadLogServiceConnection,
+                BIND_AUTO_CREATE);
 
         bindService(new Intent(PpioDataActivity.this, UploadService.class),
                 mUploadServiceConnection,
@@ -367,6 +377,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         //
 
         //dialog
+        if (mFeedbackDialog != null) {
+            mFeedbackDialog.dismiss();
+            mFeedbackDialog = null;
+        }
+
         if (mRemindDialog != null) {
             mRemindDialog.dismiss();
             mRemindDialog = null;
@@ -447,9 +462,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mDeletePresenter = null;
 
         //service
+        unbindService(mUploadLogServiceConnection);
         unbindService(mUploadServiceConnection);
         unbindService(mDownloadServiceConnection);
 
+        mUploadLogService = null;
         mUploadService = null;
         mDownloadService = null;
 
@@ -753,7 +770,34 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     public void showFeedbackView() {
         //ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
         //startActivity(new Intent(PpioDataActivity.this, FeedbackActivity.class));
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL.FEEDBACK_URL)));
+        //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL.FEEDBACK_URL)));
+        if (mFeedbackDialog != null) {
+            mFeedbackDialog.dismiss();
+            mFeedbackDialog = null;
+        }
+
+        mFeedbackDialog = new FeedbackDialog(PpioDataActivity.this, new FeedbackDialog.UploadLogClickListener() {
+            @Override
+            public void onSubmit(String description) {
+                Util.runNetStorageOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
+                    @Override
+                    public void onRunOperation() {
+                        if (mAccountInfoPresenter != null) {
+                            mAccountInfoPresenter.uploadLog(description);
+                        }
+                    }
+
+                    @Override
+                    public void onCanceled() {
+
+                    }
+                });
+            }
+        });
+
+        mFeedbackDialog.setCancelable(false);
+        mFeedbackDialog.setCanceledOnTouchOutside(false);
+        mFeedbackDialog.show();
     }
 
     @Override
@@ -1914,12 +1958,19 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         });
     }
 
+    public void bindUploadLogService(IBinder service) {
+        mUploadLogService = ((UploadLogService.UploadLogServiceBinder) service).getUploadLogService();
+
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.bindUploadLogService(mUploadLogService);
+        }
+    }
+
     public void bindUploadService(IBinder service) {
 
         mUploadService = ((UploadService.UploadServiceBinder) service).getUploadService();
 
         if (mExecuteTaskPresenter != null) {
-
             mExecuteTaskPresenter.bindUploadService(mUploadService);
         }
     }
@@ -1929,10 +1980,30 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mDownloadService = ((DownloadService.DownloadServiceBinder) service).getDownloadService();
 
         if (mExecuteTaskPresenter != null) {
-
             mExecuteTaskPresenter.bindDownloadService(mDownloadService);
 
             mExecuteTaskPresenter.startRefreshTasks();
+        }
+    }
+
+    static class UploadLogServiceConnection implements ServiceConnection {
+
+        final WeakReference<PpioDataActivity> PpioDataActivityWeakReference;
+
+        public UploadLogServiceConnection(PpioDataActivity ppioDataActivity) {
+            PpioDataActivityWeakReference = new WeakReference<>(ppioDataActivity);
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            if (PpioDataActivityWeakReference.get() != null) {
+                PpioDataActivityWeakReference.get().bindUploadLogService(service);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
         }
     }
 
