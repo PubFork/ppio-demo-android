@@ -66,7 +66,7 @@ public class DownloadService extends Service {
 
         mRefreshTaskPool = new CancelFixedThreadPool(1);
         mRefreshTaskListHandler = new Handler();
-        mDownloadNotificationWhen = System.currentTimeMillis();
+        mDownloadNotificationWhen = 1000000000l;
 
         mDownloadingTaskHashMap = new HashMap<>();
     }

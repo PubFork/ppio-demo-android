@@ -63,7 +63,7 @@ public class UploadService extends Service {
         mRefreshTaskPool = new CancelFixedThreadPool(1);
         mRefreshTaskListHandler = new Handler();
 
-        mUploadNotificationWhen = System.currentTimeMillis();
+        mUploadNotificationWhen = 1000005000l;
 
         mUploadingTaskHashMap = new HashMap<>();
     }
