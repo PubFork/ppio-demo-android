@@ -18,6 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -1418,7 +1419,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             mAccountInfoPresenter.checkVersion();
         }
 
-        mDownloadDirectoryTv.setText("download to " + Constant.PPIO_File.DOWNLOAD_DIR );
+        mDownloadDirectoryTv.setText(Html.fromHtml(" download to " + Constant.PPIO_File.DOWNLOAD_DIR +
+                ".<br>" + " <strong><font color='#FF0000'>Delete task will also delete downloaded file!</font></strong>"));
     }
 
     private void initListener() {
@@ -1843,7 +1845,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                         if (isUploading) {
                                             mExecuteTaskPresenter.deleteUploadingTask(bucket, key, taskId);
                                         } else {
-                                            mExecuteTaskPresenter.deleteTask(taskId);
+                                            mExecuteTaskPresenter.deleteTask(taskId, "");
                                         }
                                     }
 
@@ -1888,6 +1890,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     ToastUtil.showToast(PpioDataActivity.this, "the task is running!", Toast.LENGTH_SHORT);
                 } else {
                     final String taskId = taskInfo.getId();
+                    final String downloadPath = taskInfo.getTo();
                     mDeleteDialog = new DeleteDialog(PpioDataActivity.this,
                             "delete task " + taskId,
                             new DeleteDialog.OnDeleteOnClickListener() {
@@ -1899,7 +1902,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                 @Override
                                 public void onDelete() {
                                     if (mExecuteTaskPresenter != null) {
-                                        mExecuteTaskPresenter.deleteTask(taskId);
+                                        mExecuteTaskPresenter.deleteTask(taskId, downloadPath);
                                     }
 
                                     mDeleteDialog.dismiss();
@@ -2025,7 +2028,9 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 //
                 //mDownloadingFileRecyclerView.setVisibility(View.VISIBLE);
                 mDownloadListLayout.setVisibility(View.VISIBLE);
-                mDownloadDirectoryTv.setText("download to " + Constant.PPIO_File.DOWNLOAD_DIR);
+
+                mDownloadDirectoryTv.setText(Html.fromHtml("download to " + Constant.PPIO_File.DOWNLOAD_DIR +
+                        ".<br>" + "<strong><font color='#FF0000'>Delete task will also delete downloaded file!</font></strong>"));
                 //
 
                 mAllFileIv.setBackgroundResource(R.mipmap.allfile_unselected);

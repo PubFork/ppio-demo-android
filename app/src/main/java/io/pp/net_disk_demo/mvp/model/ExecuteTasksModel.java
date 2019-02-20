@@ -14,7 +14,7 @@ public interface ExecuteTasksModel {
 
     void startRefreshTasks();
 
-    void deleteTask(String taskId);
+    void deleteTask(String taskId, String downloadPath);
 
     void deleteUploadingTask(String bucket, String key, String taskId);
 

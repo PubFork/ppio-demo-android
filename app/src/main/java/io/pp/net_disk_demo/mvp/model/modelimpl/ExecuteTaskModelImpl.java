@@ -2,8 +2,10 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -67,8 +69,8 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
-    public void deleteTask(String taskId) {
-        new DeleteTaskAsyncTask(ExecuteTaskModelImpl.this).execute(taskId);
+    public void deleteTask(String taskId, String downloadPath) {
+        new DeleteTaskAsyncTask(ExecuteTaskModelImpl.this).execute(taskId, downloadPath);
     }
 
     @Override
@@ -196,12 +198,26 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
 
         @Override
         protected Boolean doInBackground(String[] values) {
-            return PossUtil.deleteTask(values[0], new PossUtil.DeleteTaskListener() {
+            final String taskId = values[0];
+            final String downloadPath = values[1];
+
+            boolean deleteTask = PossUtil.deleteTask(taskId, new PossUtil.DeleteTaskListener() {
                 @Override
                 public void onDeleteTaskError(String errMsg) {
                     publishProgress(errMsg);
                 }
             });
+
+            if (deleteTask && !TextUtils.isEmpty(downloadPath)) {
+                File downloadFile = new File(downloadPath);
+                if (downloadFile.exists()) {
+                    if (!downloadFile.delete()) {
+                        publishProgress("downloaded file delete failed!");
+                    }
+                }
+            }
+
+            return deleteTask;
         }
 
         @Override
@@ -217,7 +233,7 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         protected void onPostExecute(Boolean succeed) {
             super.onPostExecute(succeed);
 
-            if(succeed) {
+            if (succeed) {
 
             }
 

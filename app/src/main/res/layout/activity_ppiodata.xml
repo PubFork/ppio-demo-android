@@ -125,10 +125,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:maxLines="2"
+                    android:inputType="text|textMultiLine"
                     android:textColor="#757575"
                     android:textSize="12dp" />
-
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"

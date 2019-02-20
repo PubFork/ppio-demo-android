@@ -51,9 +51,9 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     }
 
     @Override
-    public void deleteTask(String taskId) {
+    public void deleteTask(String taskId, String downloadPath) {
         if (mExecuteTaskModel != null) {
-            mExecuteTaskModel.deleteTask(taskId);
+            mExecuteTaskModel.deleteTask(taskId, downloadPath);
         }
     }
 
@@ -202,7 +202,7 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     @Override
     public void showDownloadTaskList(ArrayList<TaskInfo> downloadTaskList, boolean allRefresh) {
         if (mExecuteTaskView != null) {
-            mExecuteTaskView.showDownloadingTasks(downloadTaskList,allRefresh);
+            mExecuteTaskView.showDownloadingTasks(downloadTaskList, allRefresh);
         }
     }
 

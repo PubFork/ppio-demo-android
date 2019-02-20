@@ -20,7 +20,7 @@ public interface ExecuteTaskPresenter {
     void showRefreshTasksError(String errMsg);
 
 
-    void deleteTask(String taskId);
+    void deleteTask(String taskId, String downloadPath);
 
     void deleteUploadingTask(String bucket, String key, String taskId);
 
