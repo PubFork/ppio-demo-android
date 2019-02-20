@@ -442,10 +442,10 @@ public class FileUtil {
                     zipOutputStream.write(buffer, 0, len);
                 }
 
-                zipOutputStream.closeEntry();
-                zipOutputStream.close();
                 fileInputStream.close();
             }
+            zipOutputStream.closeEntry();
+            zipOutputStream.close();
 
             fileOutputStream.close();
         } catch (IOException e) {
