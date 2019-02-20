@@ -113,12 +113,34 @@
                 android:background="#E0E0E0"
                 android:visibility="gone" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/downloadingfile_recyclerview"
+            <LinearLayout
+                android:id="@+id/download_list_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#E0E0E0"
-                android:visibility="gone" />
+                android:background="#00FFFFFF"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/download_directory_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:maxLines="2"
+                    android:textColor="#757575"
+                    android:textSize="12dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#757575"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/downloadingfile_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#E0E0E0"
+                    android:visibility="gone" />
+            </LinearLayout>
 
         </LinearLayout>
 

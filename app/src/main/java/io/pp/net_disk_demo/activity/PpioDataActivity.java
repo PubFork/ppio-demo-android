@@ -159,6 +159,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private SwipeRefreshLayout mSwipeRefreshLayout = null;
     private RecyclerView mMyFileRecyclerView = null;
     private RecyclerView mUploadingFileRecyclerView = null;
+    private LinearLayout mDownloadListLayout = null;
+    private TextView mDownloadDirectoryTv = null;
     private RecyclerView mDownloadingFileRecyclerView = null;
 
     private FloatingActionButton mUploadGetBtn = null;
@@ -1329,6 +1331,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mSwipeRefreshLayout = findViewById(R.id.refresh_layout);
         mMyFileRecyclerView = findViewById(R.id.myfile_recyclerview);
         mUploadingFileRecyclerView = findViewById(R.id.uploadingfile_recyclerview);
+        mDownloadListLayout = findViewById(R.id.download_list_layout);
+        mDownloadDirectoryTv = findViewById(R.id.download_directory_tv);
         mDownloadingFileRecyclerView = findViewById(R.id.downloadingfile_recyclerview);
 
         StatusBarUtil.setColorNoTranslucentForLeftDrawerLayout(this, mLeftDrawerLayout, getResources().getColor(R.color.account_background_blue));
@@ -1413,6 +1417,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         if (mAccountInfoPresenter != null) {
             mAccountInfoPresenter.checkVersion();
         }
+
+        mDownloadDirectoryTv.setText("download to " + Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
     }
 
     private void initListener() {
@@ -1954,7 +1960,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 mUploadingFileRecyclerView.setVisibility(View.GONE);
-                mDownloadingFileRecyclerView.setVisibility(View.GONE);
+                //
+                //mDownloadingFileRecyclerView.setVisibility(View.GONE);
+                mDownloadListLayout.setVisibility(View.GONE);
+                //
 
                 mAllFileIv.setBackgroundResource(R.mipmap.allfile_selected);
                 mUploadingIv.setBackgroundResource(R.mipmap.uploading_unselected);
@@ -1981,7 +1990,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mSwipeRefreshLayout.setVisibility(View.GONE);
                 mUploadingFileRecyclerView.setVisibility(View.VISIBLE);
-                mDownloadingFileRecyclerView.setVisibility(View.GONE);
+                //
+                //mDownloadingFileRecyclerView.setVisibility(View.GONE);
+                mDownloadListLayout.setVisibility(View.GONE);
+                //
 
                 mAllFileIv.setBackgroundResource(R.mipmap.allfile_unselected);
                 mUploadingIv.setBackgroundResource(R.mipmap.uploading_selected);
@@ -2010,7 +2022,11 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                 mSwipeRefreshLayout.setVisibility(View.GONE);
                 mUploadingFileRecyclerView.setVisibility(View.GONE);
-                mDownloadingFileRecyclerView.setVisibility(View.VISIBLE);
+                //
+                //mDownloadingFileRecyclerView.setVisibility(View.VISIBLE);
+                mDownloadListLayout.setVisibility(View.VISIBLE);
+                mDownloadDirectoryTv.setText("download to " + Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
+                //
 
                 mAllFileIv.setBackgroundResource(R.mipmap.allfile_unselected);
                 mUploadingIv.setBackgroundResource(R.mipmap.uploading_unselected);

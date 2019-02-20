@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.channels.FileChannel;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.zip.ZipEntry;
@@ -451,5 +452,39 @@ public class FileUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Get the file size in a human-readable string.
+     *
+     * @param size
+     * @return
+     * @author paulburke
+     */
+    public static String getReadableFileSize(long size) {
+        final long BYTES_IN_KILOBYTES = 1024l;
+        final DecimalFormat dec = new DecimalFormat("###.#");
+        final String BYTES = " B";
+        final String KILOBYTES = " KB";
+        final String MEGABYTES = " MB";
+        final String GIGABYTES = " GB";
+        double fileSize = size;
+        String suffix = BYTES;
+
+        if (size > BYTES_IN_KILOBYTES) {
+            suffix = KILOBYTES;
+            fileSize = size / BYTES_IN_KILOBYTES;
+            if (fileSize > BYTES_IN_KILOBYTES) {
+                fileSize = fileSize / BYTES_IN_KILOBYTES;
+                if (fileSize > BYTES_IN_KILOBYTES) {
+                    fileSize = fileSize / BYTES_IN_KILOBYTES;
+                    suffix = GIGABYTES;
+                } else {
+                    suffix = MEGABYTES;
+                }
+            }
+        }
+
+        return String.valueOf(dec.format(fileSize) + suffix);
     }
 }
