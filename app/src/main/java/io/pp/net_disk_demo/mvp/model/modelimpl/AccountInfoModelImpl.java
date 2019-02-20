@@ -594,7 +594,7 @@ public class AccountInfoModelImpl implements AccountInfoModel {
                 if (checkVersionResponse.code() == 200) {
                     String checkVersionResult = checkVersionResponse.body().string();
                     JSONObject checkVersionJSONObject = new JSONObject(checkVersionResult);
-                    JSONObject demoJSONObject = checkVersionJSONObject.getJSONObject("demo");
+                    JSONObject demoJSONObject = checkVersionJSONObject.getJSONObject("ppio_demo");
                     androidVersionStr = demoJSONObject.getString("android");
                 } else {
                     errStr = "internet request fail: " + checkVersionResponse.code();
