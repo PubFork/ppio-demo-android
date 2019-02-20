@@ -155,9 +155,30 @@ public class AccountInfoPresenterImpl implements AccountInfoPresenter {
     }
 
     @Override
-    public void showCheckVersion() {
+    public void checkVersion() {
+        if (mAccountInfoModel != null) {
+            mAccountInfoModel.checkVersion();
+        }
+    }
+
+    @Override
+    public void showInCheckVersion() {
         if (mAccountInfoView != null) {
             mAccountInfoView.showCheckVersionView();
+        }
+    }
+
+    @Override
+    public void showLatestVersion(String version) {
+        if (mAccountInfoView != null) {
+            mAccountInfoView.showLatestVersionVersion(version);
+        }
+    }
+
+    @Override
+    public void showCheckVersionFail(String errMsg) {
+        if (mAccountInfoView != null) {
+            mAccountInfoView.showCheckVersionFailView(errMsg);
         }
     }
 

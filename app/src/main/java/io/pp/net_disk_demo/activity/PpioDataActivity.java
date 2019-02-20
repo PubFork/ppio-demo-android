@@ -77,6 +77,7 @@ import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.UploadLogService;
 import io.pp.net_disk_demo.service.UploadService;
+import io.pp.net_disk_demo.util.SystemUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.util.XPermissionUtils;
@@ -132,10 +133,16 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private RotateAnimation mRequestUsedRotateAnimation = null;
     private RotateAnimation mRequestBalanceRotateAnimation = null;
     private RotateAnimation mRequestFundRotateAnimation = null;
+    private RotateAnimation mCheckVersionRotateAnimation = null;
 
     private RelativeLayout mRechargeLayout = null;
     private RelativeLayout mRecordLayout = null;
+
     private RelativeLayout mCheckVersionLayout = null;
+    private TextView mVersionValueTv = null;
+    private ImageView mCheckVersionStatusIv = null;
+    private TextView mCheckVersionStatusTv = null;
+
     private RelativeLayout mFeedbackLayout = null;
     private TextView mLogoutBtv = null;
 
@@ -202,6 +209,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private boolean mShowSide = false;
     private boolean mBackFromUpload = false;
     private boolean mBackFromDownload = false;
+
+    private static String mAppVersionStr = "";
 
     @Override
     public void recreate() {
@@ -761,9 +770,54 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     public void showCheckVersionView() {
-        ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
+        //ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
         //startActivity(new Intent(PpioDataActivity.this, VersionActivity.class));
         //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL.UPDATE_URL)));
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mCheckVersionStatusTv.setText("");
+                mCheckVersionStatusTv.setVisibility(View.VISIBLE);
+
+                mCheckVersionStatusIv.setVisibility(View.VISIBLE);
+                mCheckVersionStatusIv.setBackgroundResource(R.mipmap.blue_loading);
+                mCheckVersionStatusIv.startAnimation(mRequestFundRotateAnimation);
+            }
+        });
+    }
+
+    @Override
+    public void showLatestVersionVersion(String version) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (version.equals(mAppVersionStr)) {
+                    mCheckVersionStatusTv.setText("the current is latest");
+                } else {
+                    mCheckVersionStatusTv.setText("v" + version + "is available");
+                }
+                mCheckVersionStatusTv.setVisibility(View.VISIBLE);
+
+                mCheckVersionStatusIv.clearAnimation();
+                mCheckVersionStatusIv.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void showCheckVersionFailView(String errMsg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mCheckVersionStatusTv.setVisibility(View.VISIBLE);
+                mCheckVersionStatusTv.setText("check fail");
+
+                mCheckVersionStatusIv.setVisibility(View.VISIBLE);
+                mCheckVersionStatusIv.setBackgroundResource(R.mipmap.task_error_icon);
+                mCheckVersionStatusIv.clearAnimation();
+            }
+        });
     }
 
     @Override
@@ -1251,7 +1305,12 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
         mRechargeLayout = findViewById(R.id.recharge_layout);
         mRecordLayout = findViewById(R.id.record_layout);
+
         mCheckVersionLayout = findViewById(R.id.checkversion_layout);
+        mVersionValueTv = findViewById(R.id.version_value_tv);
+        mCheckVersionStatusIv = findViewById(R.id.check_version_status_iv);
+        mCheckVersionStatusTv = findViewById(R.id.check_version_status_tv);
+
         mFeedbackLayout = findViewById(R.id.feedback_layout);
         mLogoutBtv = findViewById(R.id.logout_tv);
 
@@ -1341,7 +1400,19 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mRequestFundRotateAnimation.setRepeatCount(Animation.INFINITE);
         mRequestFundRotateAnimation.setRepeatMode(Animation.RESTART);
 
+        mCheckVersionRotateAnimation = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        mCheckVersionRotateAnimation.setInterpolator(new LinearInterpolator());
+        mCheckVersionRotateAnimation.setDuration(1000l);
+        mCheckVersionRotateAnimation.setRepeatCount(Animation.INFINITE);
+        mCheckVersionRotateAnimation.setRepeatMode(Animation.RESTART);
+
         mDecimalFormat = new DecimalFormat("0.000000000000000000");
+
+        mAppVersionStr = SystemUtil.getAppVersion(PpioDataActivity.this);
+        mVersionValueTv.setText("v" + mAppVersionStr);
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.checkVersion();
+        }
     }
 
     private void initListener() {
@@ -1452,7 +1523,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             @Override
             public void onClick(View v) {
                 if (mAccountInfoPresenter != null) {
-                    mAccountInfoPresenter.showCheckVersion();
+                    mAccountInfoPresenter.checkVersion();
                 }
             }
         });

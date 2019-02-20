@@ -30,7 +30,14 @@ public interface AccountInfoView {
 
     void showRecordView();
 
+
     void showCheckVersionView();
+
+    void showLatestVersionVersion(String version);
+
+    void showCheckVersionFailView(String errMsg);
+
+
 
     void showFeedbackView();
 

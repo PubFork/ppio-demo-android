@@ -16,6 +16,8 @@ public interface AccountInfoModel {
 
     void requestOracleChiPrice();
 
+    void checkVersion();
+
     void uploadLog(String description);
 
     void logOut();

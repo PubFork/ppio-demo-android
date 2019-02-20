@@ -5,7 +5,11 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.data.OracleChiPrice;
@@ -17,6 +21,9 @@ import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.ppio.RpcUtil;
 import io.pp.net_disk_demo.service.UploadLogService;
 import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class AccountInfoModelImpl implements AccountInfoModel {
 
@@ -26,6 +33,7 @@ public class AccountInfoModelImpl implements AccountInfoModel {
     private CancelFixedThreadPool mRequestUsedPool;
     private CancelFixedThreadPool mRequestBalancePool;
     private CancelFixedThreadPool mRequestFundPool;
+    private CancelFixedThreadPool mCheckVersionPool;
 
     private UploadLogService mUploadLogService = null;
 
@@ -37,6 +45,7 @@ public class AccountInfoModelImpl implements AccountInfoModel {
         mRequestUsedPool = new CancelFixedThreadPool(1);
         mRequestBalancePool = new CancelFixedThreadPool(1);
         mRequestFundPool = new CancelFixedThreadPool(1);
+        mCheckVersionPool = new CancelFixedThreadPool(1);
     }
 
     @Override
@@ -72,6 +81,11 @@ public class AccountInfoModelImpl implements AccountInfoModel {
     @Override
     public void requestOracleChiPrice() {
         new RequestOracleChiPriceAsyncTask(AccountInfoModelImpl.this).execute();
+    }
+
+    @Override
+    public void checkVersion() {
+        mCheckVersionPool.execute(new CheckVersionRunnable(AccountInfoModelImpl.this));
     }
 
     @Override
@@ -158,6 +172,24 @@ public class AccountInfoModelImpl implements AccountInfoModel {
     private void showLogOutPrepare() {
         if (mAccountInfoPresenter != null) {
             mAccountInfoPresenter.showLogOutPrepare();
+        }
+    }
+
+    private void showInCheckVersion() {
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.showInCheckVersion();
+        }
+    }
+
+    private void showLatestVersion(String version) {
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.showLatestVersion(version);
+        }
+    }
+
+    private void showCheckVersionFail(String errMsg) {
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.showCheckVersionFail(errMsg);
         }
     }
 
@@ -526,6 +558,61 @@ public class AccountInfoModelImpl implements AccountInfoModel {
 
             if (!TextUtils.isEmpty(fund) && mModelImplWeakReference.get() != null) {
                 mModelImplWeakReference.get().showFund(fund);
+            }
+        }
+    }
+
+    static class CheckVersionRunnable implements Runnable {
+        final WeakReference<AccountInfoModelImpl> mModelImplWeakReference;
+
+        public CheckVersionRunnable(AccountInfoModelImpl accountInfoModelImpl) {
+            mModelImplWeakReference = new WeakReference<>(accountInfoModelImpl);
+        }
+
+        @Override
+        public void run() {
+            if (mModelImplWeakReference.get() != null) {
+                mModelImplWeakReference.get().showInCheckVersion();
+            }
+
+            String androidVersionStr = "";
+            String errStr = "";
+
+            try {
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(50, TimeUnit.SECONDS)
+                        .readTimeout(50, TimeUnit.SECONDS)
+                        .writeTimeout(50, TimeUnit.SECONDS)
+                        .build();
+
+                Request checkVersionRequest = new Request.Builder()
+                        .url("https://resource.testnet.pp.io/version.json")
+                        .build();
+
+                Response checkVersionResponse = client.newCall(checkVersionRequest).execute();
+
+                if (checkVersionResponse.code() == 200) {
+                    String checkVersionResult = checkVersionResponse.body().string();
+                    JSONObject checkVersionJSONObject = new JSONObject(checkVersionResult);
+                    JSONObject demoJSONObject = checkVersionJSONObject.getJSONObject("demo");
+                    androidVersionStr = demoJSONObject.getString("android");
+                } else {
+                    errStr = "internet request fail: " + checkVersionResponse.code();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                errStr = e.getMessage();
+            } catch (Exception e) {
+                e.printStackTrace();
+                errStr = e.getMessage();
+            }
+
+            if (mModelImplWeakReference.get() != null) {
+                if (!TextUtils.isEmpty(androidVersionStr)) {
+                    mModelImplWeakReference.get().showLatestVersion(androidVersionStr);
+                } else {
+                    mModelImplWeakReference.get().showCheckVersionFail(errStr);
+                }
             }
         }
     }

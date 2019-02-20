@@ -47,7 +47,15 @@ public interface AccountInfoPresenter {
 
     void showRecord();
 
-    void showCheckVersion();
+
+    void checkVersion();
+
+    void showInCheckVersion();
+
+    void showLatestVersion(String version);
+
+    void showCheckVersionFail(String errMsg);
+
 
     void showFeedback();
 
