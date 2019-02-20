@@ -1418,7 +1418,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             mAccountInfoPresenter.checkVersion();
         }
 
-        mDownloadDirectoryTv.setText("download to " + Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
+        mDownloadDirectoryTv.setText("download to " + Constant.PPIO_File.DOWNLOAD_DIR );
     }
 
     private void initListener() {
@@ -2025,7 +2025,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 //
                 //mDownloadingFileRecyclerView.setVisibility(View.VISIBLE);
                 mDownloadListLayout.setVisibility(View.VISIBLE);
-                mDownloadDirectoryTv.setText("download to " + Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
+                mDownloadDirectoryTv.setText("download to " + Constant.PPIO_File.DOWNLOAD_DIR);
                 //
 
                 mAllFileIv.setBackgroundResource(R.mipmap.allfile_unselected);

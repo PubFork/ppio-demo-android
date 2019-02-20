@@ -287,11 +287,11 @@ public class DownloadService extends Service {
                 directoryExists = downloadDir.mkdir();
             }
 
-            File downloadAccountDir = new File(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
-            directoryExists = downloadAccountDir.exists();
-            if (!directoryExists) {
-                directoryExists = downloadAccountDir.mkdir();
-            }
+//            File downloadAccountDir = new File(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
+//            directoryExists = downloadAccountDir.exists();
+//            if (!directoryExists) {
+//                directoryExists = downloadAccountDir.mkdir();
+//            }
 
             if (directoryExists) {
                 final String bucket = downloadInfos[0].getBucket();
@@ -308,7 +308,7 @@ public class DownloadService extends Service {
                     }
 
                     int max = 0;
-                    File[] downloadedFiles = downloadAccountDir.listFiles();
+                    File[] downloadedFiles = downloadDir.listFiles();
                     if (downloadedFiles != null) {
                         for (int i = 0; i < downloadedFiles.length; i++) {
                             String name = downloadedFiles[i].getName();
@@ -341,7 +341,7 @@ public class DownloadService extends Service {
                         fileName = prefixNameStr + "(" + max + ")" + typeSuffixStr;
                     }
 
-                    String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount() + "/" + fileName;
+                    String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + fileName;
 
                     return PossUtil.getObject(bucket, key, file, chiPrice, new PossUtil.GetObjectListener() {
                         @Override
@@ -399,11 +399,11 @@ public class DownloadService extends Service {
                 directoryExists = downloadDir.mkdir();
             }
 
-            File downloadAccountDir = new File(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
-            directoryExists = downloadAccountDir.exists();
-            if (!directoryExists) {
-                directoryExists = downloadAccountDir.mkdir();
-            }
+//            File downloadAccountDir = new File(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
+//            directoryExists = downloadAccountDir.exists();
+//            if (!directoryExists) {
+//                directoryExists = downloadAccountDir.mkdir();
+//            }
 
             if (directoryExists) {
                 final String shareCode = downloadInfos[0].getShareCode();
@@ -435,7 +435,7 @@ public class DownloadService extends Service {
                     }
 
                     int max = 0;
-                    File[] downloadedFiles = downloadAccountDir.listFiles();
+                    File[] downloadedFiles = downloadDir.listFiles();
                     if (downloadedFiles != null) {
                         for (int i = 0; i < downloadedFiles.length; i++) {
                             String name = downloadedFiles[i].getName();
@@ -466,7 +466,7 @@ public class DownloadService extends Service {
                         fileName = prefixNameStr + "(" + max + ")" + typeSuffixStr;
                     }
 
-                    final String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount() + "/" + fileName;
+                    final String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + fileName;
 
                     return PossUtil.getObjectShared(shareCode, file, chiPrice, new PossUtil.GetObjectListener() {
                         @Override
