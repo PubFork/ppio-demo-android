@@ -48,6 +48,7 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
         boolean can_listen_internet = false;
         boolean can_use_camera = false;
         boolean can_set_foreground_service = false;
+        boolean can_open_apk = false;
 
         for (int i = 0; i < permissions.length; i++) {
             if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permissions[i])) {
@@ -104,6 +105,16 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                 try {
                     if (grantResults[i] == PERMISSION_GRANTED) {
                         can_set_foreground_service = true;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (Manifest.permission.REQUEST_INSTALL_PACKAGES.equals(permissions[i])) {
+                try {
+                    if (grantResults[i] == PERMISSION_GRANTED) {
+                        can_open_apk = true;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -215,7 +226,8 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                         Manifest.permission.INTERNET,
                         Manifest.permission.ACCESS_NETWORK_STATE,
                         Manifest.permission.CAMERA,
-                        Manifest.permission.FOREGROUND_SERVICE})) {
+                        Manifest.permission.FOREGROUND_SERVICE,
+                        Manifest.permission.REQUEST_INSTALL_PACKAGES})) {
 
             //If there are permissions not given, apply for these permissions
             XPermissionUtils.requestPermissionsForActivity(CheckHasKeyStoreActivity.this,
@@ -225,7 +237,8 @@ public class CheckHasKeyStoreActivity extends BaseActivity implements CheckHasKe
                             Manifest.permission.INTERNET,
                             Manifest.permission.ACCESS_NETWORK_STATE,
                             Manifest.permission.CAMERA,
-                            Manifest.permission.FOREGROUND_SERVICE},
+                            Manifest.permission.FOREGROUND_SERVICE,
+                            Manifest.permission.REQUEST_INSTALL_PACKAGES},
                     new XPermissionUtils.OnPermissionListener() {
                         @Override
                         public void onPermissionGranted() {

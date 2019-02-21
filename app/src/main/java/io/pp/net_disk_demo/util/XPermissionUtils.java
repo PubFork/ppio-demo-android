@@ -58,7 +58,7 @@ public class XPermissionUtils {
 
     public static boolean checkPermissions(Context context, @NonNull String[] permissions) {
         for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED) {
+            if (ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED) {
                 return false;
             }
         }

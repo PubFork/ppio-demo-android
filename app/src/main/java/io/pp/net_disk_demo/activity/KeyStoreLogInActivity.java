@@ -192,7 +192,7 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
         //hidePassPhraseEditKeyBoard();
         hideSoftKeyboard(view);
 
-        Util.runCamaraOperation(KeyStoreLogInActivity.this, new Util.RunNetOperationCallBack() {
+        Util.runCameraOperation(KeyStoreLogInActivity.this, new Util.RunNetOperationCallBack() {
             @Override
             public void onRunOperation() {
                 if (!mHasStartScanCode) {

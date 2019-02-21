@@ -97,7 +97,7 @@ public class Util {
         }
     }
 
-    static public void runCamaraOperation(@NonNull Context context, @NonNull RunNetOperationCallBack runNetOperationCallBack) {
+    static public void runCameraOperation(@NonNull Context context, @NonNull RunNetOperationCallBack runNetOperationCallBack) {
         if (XPermissionUtils.checkPermissions(context, new String[]{Manifest.permission.CAMERA})) {
             runNetOperationCallBack.onRunOperation();
         } else {

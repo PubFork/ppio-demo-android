@@ -1,5 +1,6 @@
 package io.pp.net_disk_demo.widget.recyclerview;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -30,7 +32,10 @@ import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.ppio.PossUtil;
+import io.pp.net_disk_demo.util.FileUtil;
+import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
+import io.pp.net_disk_demo.util.XPermissionUtils;
 
 public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapter.DownloadTaskItemHolder> {
 
@@ -260,28 +265,64 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
                     if (mTaskInfo != null &&
                             Constant.TaskType.GET.equals(mTaskInfo.getType()) &&
                             Constant.TaskState.FINISHED.equals(mTaskInfo.getState())) {
-                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                        try {
-                            File downloadedFile = new File(mTaskInfo.getTo());
-                            File parentFile = downloadedFile.getParentFile();
+//                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                        try {
+//                            File downloadedFile = new File(mTaskInfo.getTo());
+//                            File parentFile = downloadedFile.getParentFile();
+//
+//                            if (Build.VERSION.SDK_INT >= 24) {
+//                                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+//                                StrictMode.setVmPolicy(builder.build());
+//                            }
+//                            Uri uri = Uri.fromFile(parentFile);
+//
+//                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            intent.setDataAndType(uri, "*/*");
+//                            mContext.startActivity(intent);
+//
+//                            Log.e(TAG, "uri = " + uri);
+//                        } catch (Exception e) {
+//                            Log.e(TAG, "start Activity for scan file failed!:" + e.getMessage());
+//                            e.printStackTrace();
+//                        }
 
-                            if (Build.VERSION.SDK_INT >= 24) {
-                                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-                                StrictMode.setVmPolicy(builder.build());
+                        String filePath = mTaskInfo.getTo();
+                        File file = new File(filePath);
+                        if (file.exists()) {
+//                            if (filePath.endsWith(".apk")
+//                                    && !XPermissionUtils.checkPermissions(mContext, new String[]{
+//                                    Manifest.permission.REQUEST_INSTALL_PACKAGES})
+//                                    ) {
+//                                ToastUtil.showToast(mContext, "not has request install packages permission!", Toast.LENGTH_LONG);
+//                            } else
+                                {
+                                try {
+                                    Intent intent = new Intent();
+                                    //his is a more rogue method,
+                                    // bypassing the file permission check of 7.0
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                                        StrictMode.setVmPolicy(builder.build());
+                                    }
+
+                                    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//set flag
+                                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    intent.setAction(Intent.ACTION_VIEW);//action, view
+                                    intent.setDataAndType(Uri.fromFile(file), FileUtil.getMIMEType(file));//set type
+                                    mContext.startActivity(intent);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    ToastUtil.showToast(mContext, "fail to open the file!", Toast.LENGTH_LONG);
+                                }
+                                //
                             }
-                            Uri uri = Uri.fromFile(parentFile);
-
-                            intent.addCategory(Intent.CATEGORY_OPENABLE);
-                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intent.setDataAndType(uri, "*/*");
-                            mContext.startActivity(intent);
-
-                            Log.e(TAG, "uri = " + uri);
-                        } catch (Exception e) {
-                            Log.e(TAG, "start Activity for scan file failed!:" + e.getMessage());
-                            e.printStackTrace();
+                        } else {
+                            ToastUtil.showToast(mContext, "file does not exist!", Toast.LENGTH_LONG);
                         }
+
+                        file = null;
                     }
                 }
             });
