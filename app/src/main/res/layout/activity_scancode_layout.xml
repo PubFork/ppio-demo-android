@@ -6,10 +6,17 @@
 
     <!--app:qrcv_customScanLineDrawable="@drawable/scan_icon_scanline"-->
 
+    <include
+        android:id="@+id/scancode_toolbar_layout"
+        layout="@layout/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <cn.bingoogolapple.qrcode.zxing.ZXingView
         android:id="@+id/zxingview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/scancode_toolbar_layout"
         android:layout_centerInParent="true"
         app:qrcv_animTime="1000"
         app:qrcv_barCodeTipText="Put the barcode into the box to automatically scan"
@@ -41,12 +48,6 @@
         app:qrcv_toolbarHeight="56dp"
         app:qrcv_topOffset="65dp"
         app:qrcv_verticalBias="-1" />
-
-    <include
-        android:id="@+id/scancode_toolbar_layout"
-        layout="@layout/toolbar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
