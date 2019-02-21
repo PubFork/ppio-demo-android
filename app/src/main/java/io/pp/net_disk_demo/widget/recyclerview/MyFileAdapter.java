@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,6 @@ import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.data.DeletingInfo;
 import io.pp.net_disk_demo.data.FileInfo;
-import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.util.FileUtil;
 import io.pp.net_disk_demo.util.Util;
 
@@ -54,7 +52,7 @@ public class MyFileAdapter extends RecyclerView.Adapter<MyFileAdapter.MyFileItem
         if (!payloads.isEmpty()) {
             FileInfo fileInfo = mMyFileList.get(position);
 
-            String stateStr = "";
+            String stateStr = "expired: " + fileInfo.getExpiredTime().substring(0, 10);
 
             DeletingInfo deletingInfo = mDeletingInfoHashMap.get(fileInfo.getBucketName() + fileInfo.getName());
             if (Constant.ProgressState.ERROR.equals(deletingInfo.getState())) {
