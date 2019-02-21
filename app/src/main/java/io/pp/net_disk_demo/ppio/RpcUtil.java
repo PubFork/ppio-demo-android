@@ -14,6 +14,7 @@ import java.util.Calendar;
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.data.OracleChiPrice;
 import io.pp.net_disk_demo.data.RecordInfo;
+import io.pp.net_disk_demo.util.TimeConverterUtil;
 
 public class RpcUtil {
 
@@ -328,7 +329,7 @@ public class RpcUtil {
 
             if (transferRecordJSONOArray != null) {
                 Calendar calendar = Calendar.getInstance();
-                DateFormat format1 = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+                DateFormat format1 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
                 String accountId = PossUtil.getAccount();
 
@@ -341,7 +342,9 @@ public class RpcUtil {
                     calendar.clear();
                     calendar.add(Calendar.SECOND, (int) time);
 
-                    transferRecordList.add(new RecordInfo(comment, format1.format(calendar.getTime()), amountWei, isInCome));
+                    transferRecordList.add(new RecordInfo(comment,
+                            TimeConverterUtil.utc2Local(format1.format(calendar.getTime()), "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss"),
+                            amountWei, isInCome));
                 }
             }
         } catch (Exception e) {
