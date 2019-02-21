@@ -1,13 +1,10 @@
 package io.pp.net_disk_demo.widget.recyclerview;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
@@ -35,7 +32,6 @@ import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.util.FileUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
-import io.pp.net_disk_demo.util.XPermissionUtils;
 
 public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapter.DownloadTaskItemHolder> {
 
@@ -302,15 +298,21 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
                                     Intent intent = new Intent();
                                     //his is a more rogue method,
                                     // bypassing the file permission check of 7.0
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-                                        StrictMode.setVmPolicy(builder.build());
+//                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                                        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+//                                        StrictMode.setVmPolicy(builder.build());
+//                                    }
+
+                                    Uri contentUri = Uri.fromFile(file);
+                                    if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.N) {
+                                        contentUri = FileProvider.getUriForFile(context,"io.pp.net_disk_demo.fileProvider",file);
+                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     }
 
                                     //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//set flag
                                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     intent.setAction(Intent.ACTION_VIEW);//action, view
-                                    intent.setDataAndType(Uri.fromFile(file), FileUtil.getMIMEType(file));//set type
+                                    intent.setDataAndType(contentUri, FileUtil.getMIMEType(file));//set type
                                     mContext.startActivity(intent);
                                 } catch (Exception e) {
                                     e.printStackTrace();

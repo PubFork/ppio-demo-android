@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path path="PPIO_Download" name="ppio_download"/>
+
+    <external-path path="." name="external_storage_root"/>
+</paths>

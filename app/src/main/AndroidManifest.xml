@@ -149,6 +149,17 @@
 
         <service android:name=".service.UploadLogService" />
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="io.pp.net_disk_demo.fileProvider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+
         <!--Configure APP ID-->
         <meta-data
             android:name="BUGLY_APPID"
