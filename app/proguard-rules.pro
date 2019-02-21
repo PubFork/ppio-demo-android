@@ -83,3 +83,7 @@
 -dontwarn okhttp3
 -keep class okhttp3.*
 -keep class okhttp3.**{*;}
+
+-dontwarn com.dovar.dtoast
+-keep class com.dovar.dtoast.*
+-keep class com.dovar.dtoast.**{*;}

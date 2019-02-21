@@ -1,5 +1,6 @@
 package io.pp.net_disk_demo.widget.recyclerview;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -293,7 +294,7 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
 //                                    ) {
 //                                ToastUtil.showToast(mContext, "not has request install packages permission!", Toast.LENGTH_LONG);
 //                            } else
-                                {
+                            {
                                 try {
                                     Intent intent = new Intent();
                                     //his is a more rogue method,
@@ -304,8 +305,8 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
 //                                    }
 
                                     Uri contentUri = Uri.fromFile(file);
-                                    if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.N) {
-                                        contentUri = FileProvider.getUriForFile(context,"io.pp.net_disk_demo.fileProvider",file);
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        contentUri = FileProvider.getUriForFile(context, "io.pp.net_disk_demo.fileProvider", file);
                                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     }
 
@@ -314,6 +315,9 @@ public class DownloadTaskAdapter extends RecyclerView.Adapter<DownloadTaskAdapte
                                     intent.setAction(Intent.ACTION_VIEW);//action, view
                                     intent.setDataAndType(contentUri, FileUtil.getMIMEType(file));//set type
                                     mContext.startActivity(intent);
+                                } catch (ActivityNotFoundException e) {
+                                    e.printStackTrace();
+                                    ToastUtil.showToast(mContext, "There are no apps that can open this file!", Toast.LENGTH_LONG);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     ToastUtil.showToast(mContext, "fail to open the file!", Toast.LENGTH_LONG);
