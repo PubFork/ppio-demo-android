@@ -169,10 +169,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
 
     @Override
     protected void onDestroy() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-        }
+        hideProgressDialog();
 
         if (mSetCopiesDialog != null) {
             mSetCopiesDialog.dismiss();
@@ -340,15 +337,20 @@ public class UploadActivity extends BaseActivity implements UploadView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
                 mProgressDialog = new ProgressDialog(UploadActivity.this);
                 mProgressDialog.setCancelable(false);
                 mProgressDialog.setCanceledOnTouchOutside(false);
 
+                String message = "Processing file for uploading, please wait";
+                if (mFileSize >= 500 * 1024 * 1024) {
+                    message = "Processing file for uploading, file is very large, please be patient";
+                } else if (mFileSize >= 200 * 1024 * 1024) {
+                    message = "Processing file for uploading, file is large, please wait";
+                }
+
+                mProgressDialog.setMessage(message);
                 mProgressDialog.show();
             }
         });
@@ -359,10 +361,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
                 ToastUtil.showToast(UploadActivity.this, "upload fail : " + errMsg, Toast.LENGTH_SHORT);
             }
@@ -374,10 +373,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
                 setResult(Constant.Code.RESULT_UPLOAD_OK);
 
@@ -642,6 +638,13 @@ public class UploadActivity extends BaseActivity implements UploadView {
 
         if (mUploadPresenter != null) {
             mUploadPresenter.bindUploadService(mUploadService);
+        }
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
         }
     }
 
