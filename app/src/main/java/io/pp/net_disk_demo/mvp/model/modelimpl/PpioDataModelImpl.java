@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
@@ -16,6 +17,7 @@ import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.database.AccountDatabaseManager;
 import io.pp.net_disk_demo.mvp.model.PpioDataModel;
 import io.pp.net_disk_demo.mvp.presenter.PpioDataPresenter;
+import io.pp.net_disk_demo.ppio.KeyStoreUtil;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
 import poss.Progress;
@@ -121,35 +123,40 @@ public class PpioDataModelImpl implements PpioDataModel {
         @Override
         protected Boolean doInBackground(String... params) {
             if (mModelImplWeakReference.get() != null) {
-                boolean hasLogin = AccountDatabaseManager.hasLogin(mModelImplWeakReference.get().getContext(), new AccountDatabaseManager.CheckHasLoginListener() {
-                    @Override
-                    public void onCheckFail(String failMessage) {
-                        publishProgress(failMessage);
-                    }
-                });
+                if (KeyStoreUtil.checkHasRememberKeyStore(mModelImplWeakReference.get().getContext(),
+                        new KeyStoreUtil.CheckHasKeyStoreListener() {
+                            @Override
+                            public void onCheckFail(String errMsg) {
+                                publishProgress(errMsg);
+                            }
+                        })) {
+                    final String keyStoreStr = KeyStoreUtil.getPrivateKeyStore(mModelImplWeakReference.get().getContext());
+                    final String passPhrase = PossUtil.getPasswordStr();
 
-                if (hasLogin) {
-                    if (PossUtil.getUser() == null) {
-                        HashMap<String, String> privateParams = AccountDatabaseManager.getPrivateParams(mModelImplWeakReference.get().getContext());
-                        PossUtil.setMnemonicStr(privateParams.get(Constant.Data.MNEMONIC));
-                        PossUtil.setPasswordStr(privateParams.get(Constant.Data.PASSWORD));
-                        PossUtil.setPrivateKeyStr(privateParams.get(Constant.Data.PRIVATE_KEY));
-                        PossUtil.setAddressStr(privateParams.get(Constant.Data.ADDRESS));
+                    final String address = KeyStoreUtil.checkKeyStoreAndPassPhrase(keyStoreStr, passPhrase);
 
-                        hasLogin = PossUtil.logIn(PossUtil.getPrivateKeyStr(),
-                                new PossUtil.LogInListener() {
-                                    @Override
-                                    public void onLogInError(String errMsg) {
-                                        publishProgress(errMsg);
-                                    }
-                                });
+                    if (TextUtils.isEmpty(address)) {
+                        publishProgress("link failed!");
+                        return false;
                     }
+
+                    if (PossUtil.logInFromKeyStore(keyStoreStr, passPhrase, address, new PossUtil.LogInListener() {
+                        @Override
+                        public void onLogInError(final String errMsg) {
+                            publishProgress(errMsg);
+                        }
+                    })) {
+                        PossUtil.setPasswordStr(passPhrase);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
                 }
-
-                return hasLogin;
+            } else {
+                return false;
             }
-
-            return false;
         }
 
         @Override
@@ -263,7 +270,7 @@ public class PpioDataModelImpl implements PpioDataModel {
                 });
 
                 ArrayList<FileInfo> mFileList = new ArrayList<FileInfo>();
-                for(int i = 0;i<myFileList.size();i++) {
+                for (int i = 0; i < myFileList.size(); i++) {
                     FileInfo fileInfo = myFileList.get(i);
                     if (!uploadingTaskHashMap.containsKey(fileInfo.getBucketName() + "/" + fileInfo.getName()) &&
                             !mUploadFailedInfoHashMap.containsKey(fileInfo.getBucketName() + fileInfo.getName())) {

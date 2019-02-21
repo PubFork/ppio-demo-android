@@ -21,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -290,6 +291,14 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         //
         Log.e(TAG, "onRestoreInstanceState");
         //
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //
+        Log.e(TAG, "onResume()");
+        //
 
         if (PossUtil.getUser() == null) {
             Util.runStorageOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
@@ -320,11 +329,12 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        //
-        Log.e(TAG, "onResume()");
-        //
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

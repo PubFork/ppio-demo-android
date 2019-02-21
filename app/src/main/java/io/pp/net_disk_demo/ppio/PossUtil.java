@@ -45,8 +45,6 @@ public class PossUtil {
     private static String mStorageChiPrice = "100";
     private static String mDownloadChiPrice = "100";
 
-
-
     private static String mCacheDir = "";
 
     static public void setMnemonicStr(String mnemonicStr) {
@@ -100,14 +98,6 @@ public class PossUtil {
 
     static public String getCacheDir() {
         return mCacheDir;
-    }
-
-    static boolean register() {
-        return true;
-    }
-
-    public static boolean logIn(final String keyStoreStr, LogInListener logInListener) {
-        return true;
     }
 
     public static boolean logInFromKeyStore(final String keyStoreStr, final String passPhrase, final String address, LogInListener logInListener) {
