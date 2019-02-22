@@ -1,6 +1,5 @@
 package io.pp.net_disk_demo.activity;
 
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,6 +14,7 @@ import android.widget.Toast;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.dialog.CustomProgressDialog;
 import io.pp.net_disk_demo.dialog.RemindDialog;
 import io.pp.net_disk_demo.mvp.presenter.InputPassPhrasePresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.InputPassPhrasePresenterImpl;
@@ -30,7 +29,7 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
     private Button mConfirmBtn = null;
     private TextView mImportKeyStoreTv = null;
 
-    private ProgressDialog mProgressDialog = null;
+    private CustomProgressDialog mCustomProgressDialog = null;
     private RemindDialog mRemindDialog = null;
 
     private InputPassPhrasePresenter mInputPassPhrasePresenter = null;
@@ -175,7 +174,6 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
         mImportKeyStoreTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //hidePassPhraseEditKeyBoard();
                 hideSoftKeyboard(v);
 
                 startActivity(new Intent(InputPassPhraseActivity.this, KeyStoreLogInActivity.class));
@@ -199,16 +197,18 @@ public class InputPassPhraseActivity extends BaseActivity implements InputPassPh
     private void showProgressDialog() {
         hideProgressDialog();
 
-        mProgressDialog = new ProgressDialog(InputPassPhraseActivity.this);
-        mProgressDialog.setCanceledOnTouchOutside(false);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        mCustomProgressDialog = new CustomProgressDialog(InputPassPhraseActivity.this, "Logging in...");
+
+        mCustomProgressDialog.setCancelable(false);
+        mCustomProgressDialog.setCanceledOnTouchOutside(false);
+
+        mCustomProgressDialog.show();
     }
 
     private void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
         }
     }
 }

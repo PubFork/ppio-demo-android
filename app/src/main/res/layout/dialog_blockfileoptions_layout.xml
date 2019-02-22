@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
+    android:background="@android:color/transparent"
     android:gravity="center"
     android:orientation="vertical">
 
@@ -10,7 +10,7 @@
         android:id="@+id/blockfile_detail_btn"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="#FFFFFF"
+        android:background="@drawable/background_dialog_header"
         android:text="Detail"
         android:textAllCaps="false"
         android:textColor="#606266"
@@ -20,14 +20,15 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#DCEFE6" />
+        android:background="#DCEFE6"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/blockfile_download_btn"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="#FFFFFF"
         android:text="Download"
+        android:background="@drawable/background_dialog_header"
         android:textAllCaps="false"
         android:textColor="#606266"
         android:textSize="16dp" />
@@ -103,7 +104,7 @@
         android:id="@+id/blockfile_cancel_btn"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="#FFFFFF"
+        android:background="@drawable/background_dialog_footer"
         android:text="Cancel"
         android:textAllCaps="false"
         android:textColor="#1989FA"

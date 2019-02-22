@@ -79,9 +79,9 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     }
 
     @Override
-    public void showOperateTaskPrepare() {
+    public void showOperateTaskPrepare(String message) {
         if (mExecuteTaskView != null) {
-            mExecuteTaskView.showOperateTaskPrepareView();
+            mExecuteTaskView.showOperateTaskPrepareView(message);
         }
     }
 

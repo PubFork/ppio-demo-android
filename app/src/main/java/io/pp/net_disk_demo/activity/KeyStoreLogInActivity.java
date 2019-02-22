@@ -1,6 +1,5 @@
 package io.pp.net_disk_demo.activity;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,6 +14,7 @@ import android.widget.Toast;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.dialog.CustomProgressDialog;
 import io.pp.net_disk_demo.dialog.RemindDialog;
 import io.pp.net_disk_demo.mvp.presenter.KeyStoreLogInPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.KeyStoreLogInPresenterImpl;
@@ -29,7 +29,7 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     private static EditText mKeyStoreEdit = null;
     private static EditText mPassPhraseEdit = null;
 
-    private ProgressDialog mProgressDialog = null;
+    private CustomProgressDialog mCustomProgressDialog = null;
     private RemindDialog mRemindDialog = null;
 
     private KeyStoreLogInPresenter mKeyStoreLogInPresenter = null;
@@ -220,17 +220,18 @@ public class KeyStoreLogInActivity extends BaseActivity implements KeyStoreLogIn
     private void showProgressDialog() {
         hideProgressDialog();
 
-        mProgressDialog = new ProgressDialog(KeyStoreLogInActivity.this);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setCanceledOnTouchOutside(false);
+        mCustomProgressDialog = new CustomProgressDialog(KeyStoreLogInActivity.this, "Logging in...");
 
-        mProgressDialog.show();
+        mCustomProgressDialog.setCancelable(false);
+        mCustomProgressDialog.setCanceledOnTouchOutside(false);
+
+        mCustomProgressDialog.show();
     }
 
     private void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
         }
     }
 

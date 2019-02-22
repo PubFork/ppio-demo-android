@@ -1,7 +1,6 @@
 package io.pp.net_disk_demo.activity;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -46,6 +45,7 @@ import io.pp.net_disk_demo.data.FileInfo;
 import io.pp.net_disk_demo.data.ObjectStatus;
 import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.dialog.BlockFileOptionsBottomDialog;
+import io.pp.net_disk_demo.dialog.CustomProgressDialog;
 import io.pp.net_disk_demo.dialog.DeleteDialog;
 import io.pp.net_disk_demo.dialog.FeedbackDialog;
 import io.pp.net_disk_demo.dialog.PpioDataUploadGetDialog;
@@ -176,7 +176,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private ShowShareCodeDialog mShowShareCodeDialog = null;
     private DeleteDialog mDeleteDialog = null;
 
-    private ProgressDialog mProgressDialog = null;
+    private CustomProgressDialog mCustomProgressDialog = null;
     private PpioDataUploadGetDialog mPpioDataUploadGetDialog = null;
 
     private MyFileAdapter mMyFileAdapter = null;
@@ -330,7 +330,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             moveTaskToBack(true);
             return true;
         }
@@ -439,10 +439,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             mDeleteDialog = null;
         }
 
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-        }
+        hideProgressDialog();
 
         if (mPpioDataUploadGetDialog != null) {
             mPpioDataUploadGetDialog.dismiss();
@@ -500,7 +497,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
      */
     @Override
     public void showLinkingView() {
-        showNetWorkingView();
+        showNetWorkingView("Connecting...");
     }
 
     @Override
@@ -523,7 +520,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     public void showRefreshingAllFileListView() {
-        showNetWorkingView();
+        showNetWorkingView("Refreshing file list...");
     }
 
     @Override
@@ -869,7 +866,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     public void showLogOutPrepareView() {
-        showNetWorkingView();
+        showNetWorkingView("Logging out...");
     }
 
     @Override
@@ -986,8 +983,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showOperateTaskPrepareView() {
-        showNetWorkingView();
+    public void showOperateTaskPrepareView(String message) {
+        showNetWorkingView(message);
     }
 
     @Override
@@ -1026,7 +1023,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
      */
     @Override
     public void showGettingStatusView() {
-        showNetWorkingView();
+        showNetWorkingView("Getting file details...");
     }
 
     @Override
@@ -1059,7 +1056,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
      */
     @Override
     public void showStartingRenewView() {
-        showNetWorkingView();
+        showNetWorkingView("Be going to renew file...");
     }
 
     @Override
@@ -1082,7 +1079,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
      */
     @Override
     public void showGettingShareCodeView() {
-        showNetWorkingView();
+        showNetWorkingView("Getting share code...");
     }
 
     @Override
@@ -1115,7 +1112,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
      */
     @Override
     public void onDeletePrepare() {
-        showNetWorkingView();
+        showNetWorkingView("Deleting file...");
     }
 
     @Override
@@ -1151,19 +1148,16 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mUploadFailedInfoHashMap.remove(bucket + key);
     }
 
-    public void showNetWorkingView() {
+    public void showNetWorkingView(String message) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
-                mProgressDialog = new ProgressDialog(PpioDataActivity.this);
-                mProgressDialog.setCancelable(false);
-                mProgressDialog.setCanceledOnTouchOutside(false);
-                mProgressDialog.show();
+                mCustomProgressDialog = new CustomProgressDialog(PpioDataActivity.this, message);
+                mCustomProgressDialog.setCancelable(false);
+                mCustomProgressDialog.setCanceledOnTouchOutside(false);
+                mCustomProgressDialog.show();
             }
         });
     }
@@ -1172,10 +1166,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
             }
         });
     }
@@ -1184,10 +1175,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
                 ToastUtil.showToast(PpioDataActivity.this, functionStr + errMsg, Toast.LENGTH_SHORT);
             }
@@ -1234,6 +1222,13 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mUploadGetBtn.getHeight() + Util.dp2px(PpioDataActivity.this, 70));
 
         mPpioDataUploadGetDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
+        }
     }
 
     @Override

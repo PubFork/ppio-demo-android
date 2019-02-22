@@ -1,10 +1,8 @@
 package io.pp.net_disk_demo.activity;
 
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -28,8 +26,8 @@ import java.util.Date;
 
 import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
 import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
-import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.dialog.CustomProgressDialog;
 import io.pp.net_disk_demo.dialog.VerifyPassPhraseDialog;
 import io.pp.net_disk_demo.ppio.KeyStoreUtil;
 import io.pp.net_disk_demo.ppio.PossUtil;
@@ -58,7 +56,7 @@ public class TestActivity extends BaseActivity {
     private Button mExportNewKeyStoreCodeBtn = null;
 
     private VerifyPassPhraseDialog mVerifyPassPhraseDialog = null;
-    private ProgressDialog mProgressDialog = null;
+    private CustomProgressDialog mCustomProgressDialog = null;
 
     private int mScreenWidth;
     private int mScreenHeight;
@@ -125,7 +123,7 @@ public class TestActivity extends BaseActivity {
         mExportNewKeyStoreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showProgressDialog();
+                showProgressDialog("Exporting keystore file...");
 
                 new Thread(new Runnable() {
                     @Override
@@ -179,7 +177,7 @@ public class TestActivity extends BaseActivity {
         mExportNewKeyStoreCodeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showProgressDialog();
+                showProgressDialog("Generating keystore QR code...");
 
                 new Thread(new Runnable() {
                     @Override
@@ -308,20 +306,20 @@ public class TestActivity extends BaseActivity {
         });
     }
 
-    private void showProgressDialog() {
+    private void showProgressDialog(String message) {
         hideProgressDialog();
 
-        mProgressDialog = new ProgressDialog(TestActivity.this);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setCanceledOnTouchOutside(false);
+        mCustomProgressDialog = new CustomProgressDialog(TestActivity.this, message);
+        mCustomProgressDialog.setCancelable(false);
+        mCustomProgressDialog.setCanceledOnTouchOutside(false);
 
-        mProgressDialog.show();
+        mCustomProgressDialog.show();
     }
 
     private void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
         }
     }
 

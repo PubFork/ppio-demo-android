@@ -155,9 +155,9 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         mDownloadService = null;
     }
 
-    public void showPrepareOperateTask() {
+    public void showPrepareOperateTask(String message) {
         if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showOperateTaskPrepare();
+            mExecuteTasksPresenter.showOperateTaskPrepare(message);
         }
     }
 
@@ -192,7 +192,7 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
             super.onPreExecute();
 
             if (mExecuteTaskModelImplWeakReference.get() != null) {
-                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask();
+                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask("Deleting task, For large file, it will take a while");
             }
         }
 
@@ -260,7 +260,7 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
             super.onPreExecute();
 
             if (mExecuteTaskModelImplWeakReference.get() != null) {
-                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask();
+                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask("Deleting task, For large file, it will take a while");
             }
         }
 
@@ -307,7 +307,7 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
             super.onPreExecute();
 
             if (mExecuteTaskModelImplWeakReference.get() != null) {
-                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask();
+                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask("Pausing task...");
             }
         }
 
@@ -353,7 +353,7 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
             super.onPreExecute();
 
             if (mExecuteTaskModelImplWeakReference.get() != null) {
-                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask();
+                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask("Resuming task...");
             }
         }
 

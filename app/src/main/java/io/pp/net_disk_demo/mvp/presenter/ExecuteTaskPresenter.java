@@ -28,7 +28,7 @@ public interface ExecuteTaskPresenter {
 
     void resumeTask(String taskId);
 
-    void showOperateTaskPrepare();
+    void showOperateTaskPrepare(String message);
 
     void showOperateFinished();
 

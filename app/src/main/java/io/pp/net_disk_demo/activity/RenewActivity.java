@@ -1,7 +1,6 @@
 package io.pp.net_disk_demo.activity;
 
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +27,7 @@ import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.FileInfo;
+import io.pp.net_disk_demo.dialog.CustomProgressDialog;
 import io.pp.net_disk_demo.dialog.SetChiPriceDialog;
 import io.pp.net_disk_demo.dialog.SetCopiesDialog;
 import io.pp.net_disk_demo.mvp.presenter.RenewPresenter;
@@ -72,7 +72,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
 
     private SetCopiesDialog mSetCopiesDialog = null;
     private SetChiPriceDialog mSetChiPriceDialog = null;
-    private ProgressDialog mProgressDialog = null;
+    private CustomProgressDialog mCustomProgressDialog = null;
 
     private RotateAnimation mRequestProphecyTotalChiRotateAnimation = null;
 
@@ -125,10 +125,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-        }
+        hideProgressDialog();
 
         if (mSetCopiesDialog != null) {
             mSetCopiesDialog.dismiss();
@@ -286,15 +283,12 @@ public class RenewActivity extends BaseActivity implements RenewView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
-                mProgressDialog = new ProgressDialog(RenewActivity.this);
-                mProgressDialog.setCancelable(false);
-                mProgressDialog.setCanceledOnTouchOutside(false);
-                mProgressDialog.show();
+                mCustomProgressDialog = new CustomProgressDialog(RenewActivity.this, "Renewing file...");
+                mCustomProgressDialog.setCancelable(false);
+                mCustomProgressDialog.setCanceledOnTouchOutside(false);
+                mCustomProgressDialog.show();
             }
         });
     }
@@ -304,10 +298,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
                 ToastUtil.showToast(RenewActivity.this, "" + errMsg, Toast.LENGTH_SHORT);
             }
@@ -319,10 +310,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+
 
                 setResult(Constant.Code.RESULT_RENEW_OK);
 
@@ -531,6 +519,13 @@ public class RenewActivity extends BaseActivity implements RenewView {
             }
         } else {
             Log.e(TAG, "init() if (mFileInfo == null)");
+        }
+    }
+
+    private void hideProgressDialog() {
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
         }
     }
 }

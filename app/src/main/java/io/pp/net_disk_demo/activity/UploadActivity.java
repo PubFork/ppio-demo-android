@@ -3,7 +3,6 @@ package io.pp.net_disk_demo.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,6 +35,7 @@ import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
 import io.pp.net_disk_demo.data.DateInfo;
 import io.pp.net_disk_demo.data.UploadInfo;
+import io.pp.net_disk_demo.dialog.CustomProgressDialog;
 import io.pp.net_disk_demo.dialog.SetChiPriceDialog;
 import io.pp.net_disk_demo.dialog.SetCopiesDialog;
 import io.pp.net_disk_demo.mvp.presenter.UploadPresenter;
@@ -86,7 +86,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
 
     private SetCopiesDialog mSetCopiesDialog = null;
     private SetChiPriceDialog mSetChiPriceDialog = null;
-    private ProgressDialog mProgressDialog = null;
+    private CustomProgressDialog mCustomProgressDialog = null;
 
     private RotateAnimation mRequestProphecyTotalChiRotateAnimation = null;
 
@@ -339,10 +339,6 @@ public class UploadActivity extends BaseActivity implements UploadView {
             public void run() {
                 hideProgressDialog();
 
-                mProgressDialog = new ProgressDialog(UploadActivity.this);
-                mProgressDialog.setCancelable(false);
-                mProgressDialog.setCanceledOnTouchOutside(false);
-
                 String message = "Processing file for uploading, please wait";
                 if (mFileSize >= 500 * 1024 * 1024) {
                     message = "Processing file for uploading, file is very large, please be patient";
@@ -350,8 +346,11 @@ public class UploadActivity extends BaseActivity implements UploadView {
                     message = "Processing file for uploading, file is large, please wait";
                 }
 
-                mProgressDialog.setMessage(message);
-                mProgressDialog.show();
+                mCustomProgressDialog = new CustomProgressDialog(UploadActivity.this, message);
+                mCustomProgressDialog.setCancelable(false);
+                mCustomProgressDialog.setCanceledOnTouchOutside(false);
+
+                mCustomProgressDialog.show();
             }
         });
     }
@@ -642,9 +641,9 @@ public class UploadActivity extends BaseActivity implements UploadView {
     }
 
     private void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
         }
     }
 

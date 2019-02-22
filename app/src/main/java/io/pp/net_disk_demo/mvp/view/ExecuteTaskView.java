@@ -26,7 +26,7 @@ public interface ExecuteTaskView {
     void showRefreshFileListView();
 
 
-    void showOperateTaskPrepareView();
+    void showOperateTaskPrepareView(String message);
 
     void showOperateTaskErrorView(String errMsg);
 

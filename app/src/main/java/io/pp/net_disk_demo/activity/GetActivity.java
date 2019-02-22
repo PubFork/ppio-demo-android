@@ -1,6 +1,5 @@
 package io.pp.net_disk_demo.activity;
 
-import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +19,7 @@ import java.lang.ref.WeakReference;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.dialog.CustomProgressDialog;
 import io.pp.net_disk_demo.dialog.SetChiPriceDialog;
 import io.pp.net_disk_demo.mvp.presenter.GetPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.GetPresenterImpl;
@@ -33,7 +33,7 @@ public class GetActivity extends BaseActivity implements GetView {
 
     private final String TAG = "GetActivity";
 
-    private ProgressDialog mProgressDialog = null;
+    private CustomProgressDialog mCustomProgressDialog = null;
     private SetChiPriceDialog mSetChiPriceDialog = null;
 
     private Toolbar mGetToolBar = null;
@@ -140,14 +140,11 @@ public class GetActivity extends BaseActivity implements GetView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
-                mProgressDialog = new ProgressDialog(GetActivity.this);
-                mProgressDialog.setCancelable(false);
-                mProgressDialog.setCanceledOnTouchOutside(false);
+                mCustomProgressDialog = new CustomProgressDialog(GetActivity.this, "Processing for download, please wait a moment");
+                mCustomProgressDialog.setCancelable(false);
+                mCustomProgressDialog.setCanceledOnTouchOutside(false);
             }
         });
     }
@@ -157,10 +154,7 @@ public class GetActivity extends BaseActivity implements GetView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
                 ToastUtil.showToast(GetActivity.this, "download shared file error: " + errMsg, Toast.LENGTH_SHORT);
             }
@@ -172,10 +166,7 @@ public class GetActivity extends BaseActivity implements GetView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                    mProgressDialog = null;
-                }
+                hideProgressDialog();
 
                 setResult(Constant.Code.RESULT_DOWNLOAD_OK);
 
@@ -223,6 +214,12 @@ public class GetActivity extends BaseActivity implements GetView {
         mGetPresenter = new GetPresenterImpl(GetActivity.this, GetActivity.this);
     }
 
+    private void hideProgressDialog() {
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
+        }
+    }
 
     private void bindDownloadService(IBinder service) {
         mDownloadService = ((DownloadService.DownloadServiceBinder) service).getDownloadService();

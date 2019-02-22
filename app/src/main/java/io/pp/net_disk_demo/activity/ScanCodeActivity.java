@@ -1,7 +1,6 @@
 package io.pp.net_disk_demo.activity;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -19,6 +18,7 @@ import cn.bingoogolapple.qrcode.core.QRCodeView;
 import cn.bingoogolapple.qrcode.zxing.ZXingView;
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.dialog.CustomProgressDialog;
 import io.pp.net_disk_demo.dialog.RemindDialog;
 import io.pp.net_disk_demo.mvp.presenter.ScanCodePresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.ScanCodePresenterImpl;
@@ -44,7 +44,7 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
     private TextView mBrowseCodeBitmapTv = null;
     private TextView mRetryTv = null;
 
-    private ProgressDialog mProgressDialog = null;
+    private CustomProgressDialog mCustomProgressDialog = null;
     private RemindDialog mRemindDialog = null;
 
     private ScanCodePresenter mScanCodePresenter = null;
@@ -286,17 +286,17 @@ public class ScanCodeActivity extends BaseActivity implements QRCodeView.Delegat
     private void showProgressDialog() {
         hideProgressDialog();
 
-        mProgressDialog = new ProgressDialog(ScanCodeActivity.this);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setCanceledOnTouchOutside(false);
+        mCustomProgressDialog = new CustomProgressDialog(ScanCodeActivity.this, "Decoding code...");
+        mCustomProgressDialog.setCancelable(false);
+        mCustomProgressDialog.setCanceledOnTouchOutside(false);
 
-        mProgressDialog.show();
+        mCustomProgressDialog.show();
     }
 
     private void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
+        if (mCustomProgressDialog != null) {
+            mCustomProgressDialog.dismiss();
+            mCustomProgressDialog = null;
         }
     }
 }
