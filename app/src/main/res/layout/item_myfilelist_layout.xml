@@ -29,15 +29,6 @@
                 android:background="@mipmap/wangpan_wenjian"
                 android:contentDescription="@string/app_name" />
 
-            <ImageView
-                android:id="@+id/file_status_iv"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:background="@mipmap/jiami"
-                android:contentDescription="@string/app_name" />
-
         </RelativeLayout>
 
         <LinearLayout
@@ -66,14 +57,13 @@
                 android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:maxLines="1"
-                android:text="Modified: Jun 26, 2013 Modified: Jun 26, 2013"
+                android:text="Modified: Jun 26, 2013"
                 android:textColor="#757575"
                 android:textSize="14dp" />
 
         </LinearLayout>
 
     </LinearLayout>
-
 
     <LinearLayout
         android:id="@+id/footer_layout"
