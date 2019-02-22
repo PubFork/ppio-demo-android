@@ -2,6 +2,7 @@ package io.pp.net_disk_demo.mvp.model.modelimpl;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
@@ -13,7 +14,6 @@ import io.pp.net_disk_demo.data.DeletingInfo;
 import io.pp.net_disk_demo.mvp.model.DeleteModel;
 import io.pp.net_disk_demo.mvp.presenter.DeletePresenter;
 import io.pp.net_disk_demo.ppio.PossUtil;
-import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
 import poss.Progress;
 
 public class DeleteModelImpl implements DeleteModel {
@@ -37,9 +37,6 @@ public class DeleteModelImpl implements DeleteModel {
 
     @Override
     public void deleteSilently(String bucket, String key) {
-        //
-        Log.e(TAG, "++++++ deleteSilently() " + bucket + key);
-        //
         mFixedThreadPool.execute(new DeleteSilentRunnable(bucket, key, DeleteModelImpl.this));
     }
 
@@ -104,7 +101,11 @@ public class DeleteModelImpl implements DeleteModel {
                 }
             });
 
-            return new DeletingInfo(name, taskId);
+            if (!TextUtils.isEmpty(taskId)) {
+                return new DeletingInfo(name, taskId);
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -120,7 +121,7 @@ public class DeleteModelImpl implements DeleteModel {
         protected void onPostExecute(DeletingInfo deletingInfo) {
             super.onPostExecute(deletingInfo);
 
-            if (mDeleteModelWeakReference.get() != null) {
+            if (mDeleteModelWeakReference.get() != null && deletingInfo != null) {
                 mDeleteModelWeakReference.get().showDeleteFinish(deletingInfo);
             }
         }
@@ -140,13 +141,8 @@ public class DeleteModelImpl implements DeleteModel {
 
         @Override
         public void run() {
-            Log.e(TAG, "++++++ DeleteSilentRunnable");
+
             if (mDeleteModelWeakReference.get() != null) {
-//                SharedPreferences sharedPreferences = mDeleteModelWeakReference.get().getContext().getSharedPreferences(Constant.Cache.Table.UPLOAD_FAILED_OBJECT, Context.MODE_PRIVATE);
-//                SharedPreferences.Editor editor = sharedPreferences.edit();
-//                if (TextUtils.isEmpty(sharedPreferences.getString(mBucket + mKey, ""))) {
-//                    editor.putString(mBucket + mKey, mBucket + mKey);
-//                }
             }
 
             String taskId = PossUtil.deleteObject(mBucket, mKey, new PossUtil.DeleteObjectListener() {
@@ -181,16 +177,9 @@ public class DeleteModelImpl implements DeleteModel {
                 }
             }
 
-            Log.e(TAG, "++++++ DeleteSilentRunnable deleteState = " + deleteState);
-
             if (Constant.ProgressState.FINISHED.equals(deleteState)) {
                 if (mDeleteModelWeakReference.get() != null) {
                     mDeleteModelWeakReference.get().deleteSilentlyFinish(mBucket, mKey);
-//                    SharedPreferences sharedPreferences = mDeleteModelWeakReference.get().getContext().getSharedPreferences(Constant.Cache.Table.UPLOAD_FAILED_OBJECT, Context.MODE_PRIVATE);
-//                    SharedPreferences.Editor editor = sharedPreferences.edit();
-//                    if (TextUtils.isEmpty(sharedPreferences.getString(mBucket + mKey, ""))) {
-//                        editor.remove(mBucket + mKey);
-//                    }
                 }
             }
         }
