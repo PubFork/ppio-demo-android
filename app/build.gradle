@@ -6,8 +6,8 @@ android {
         applicationId "io.pp.net_disk_demo"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 2
-        versionName "0.1.1"
+        versionCode 3
+        versionName "0.1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
@@ -67,29 +67,28 @@ android {
     }
 
     def bugly_appid = "9527"
-    def bugly_app_version = "9527"
     def bugly_app_channel = "9527"
     def bugly_enable_debug = true
+    def bugly_app_debug_version = "9527"
+    def bugly_app_release_version = "9527"
 
     Properties buglyProps = new Properties()
     def buglyPropFile = new File('bugly.properties')
     if (buglyPropFile.canRead()) {
         buglyProps.load(new FileInputStream(buglyPropFile))
 
-        if (buglyProps != null && buglyProps.containsKey('BUGLY_APPID') && buglyProps.containsKey('BUGLY_APP_VERSION') &&
-                buglyProps.containsKey('BUGLY_APP_CHANNEL') && buglyProps.containsKey('BUGLY_ENABLE_DEBUG')) {
+        if (buglyProps != null && buglyProps.containsKey('BUGLY_APPID') &&
+                buglyProps.containsKey('BUGLY_APP_DEBUG_VERSION') &&
+                buglyProps.containsKey('BUGLY_APP_RELEASE_VERSION') &&
+                buglyProps.containsKey('BUGLY_APP_CHANNEL') &&
+                buglyProps.containsKey('BUGLY_ENABLE_DEBUG')) {
             println 'bugly.properties found and entries found'
             bugly_appid = buglyProps['BUGLY_APPID']
             bugly_app_channel = buglyProps['BUGLY_APP_CHANNEL']
             bugly_enable_debug = buglyProps['BUGLY_ENABLE_DEBUG']
 
-            if (variant.buildType.name.equals('debug')) {
-                bugly_app_version = buglyProps['BUGLY_APP_DEBUG_VERSION']
-            }
-
-            if (variant.buildType.name.equals('release')) {
-                bugly_app_version = buglyProps['BUGLY_APP_RELEASE_VERSION']
-            }
+            bugly_app_debug_version = buglyProps['BUGLY_APP_DEBUG_VERSION']
+            bugly_app_release_version = buglyProps['BUGLY_APP_RELEASE_VERSION']
         } else {
             println 'bugly.properties found but some entries are missing'
         }
@@ -107,7 +106,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [BUGLY_APPID       : bugly_appid,
-                                    BUGLY_APP_VERSION : bugly_app_version,
+                                    BUGLY_APP_VERSION : bugly_app_release_version,
                                     BUGLY_APP_CHANNEL : bugly_app_channel,
                                     BUGLY_ENABLE_DEBUG: bugly_enable_debug]
         }
@@ -121,7 +120,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [BUGLY_APPID       : bugly_appid,
-                                    BUGLY_APP_VERSION : bugly_app_version,
+                                    BUGLY_APP_VERSION : bugly_app_debug_version,
                                     BUGLY_APP_CHANNEL : bugly_app_channel,
                                     BUGLY_ENABLE_DEBUG: bugly_enable_debug]
         }
