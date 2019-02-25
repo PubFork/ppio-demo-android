@@ -150,7 +150,9 @@ public class UploadLogService extends Service {
             uploadTime = System.currentTimeMillis() - uploadTime;
             Log.e(TAG, "upload time = " + uploadTime + "millisecond, upload to server error: " + e.getMessage());
         } finally {
-            uploadFile.delete();
+            if (!SystemUtil.isApkInDebug(mContext)) {
+                uploadFile.delete();
+            }
         }
 
         return uploadSuccess;

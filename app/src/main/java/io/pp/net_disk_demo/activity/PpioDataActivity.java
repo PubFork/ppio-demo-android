@@ -805,7 +805,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 if (version.equals(mAppVersionStr)) {
                     mCheckVersionStatusTv.setText("the current is latest");
                 } else {
-                    mCheckVersionStatusTv.setText("v" + version + "is available");
+                    mCheckVersionStatusTv.setText("v" + version + " is available");
                 }
                 mCheckVersionStatusTv.setVisibility(View.VISIBLE);
 

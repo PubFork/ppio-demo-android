@@ -80,9 +80,16 @@ android {
                 buglyProps.containsKey('BUGLY_APP_CHANNEL') && buglyProps.containsKey('BUGLY_ENABLE_DEBUG')) {
             println 'bugly.properties found and entries found'
             bugly_appid = buglyProps['BUGLY_APPID']
-            bugly_app_version = buglyProps['BUGLY_APP_VERSION']
             bugly_app_channel = buglyProps['BUGLY_APP_CHANNEL']
             bugly_enable_debug = buglyProps['BUGLY_ENABLE_DEBUG']
+
+            if (variant.buildType.name.equals('debug')) {
+                bugly_app_version = buglyProps['BUGLY_APP_DEBUG_VERSION']
+            }
+
+            if (variant.buildType.name.equals('release')) {
+                bugly_app_version = buglyProps['BUGLY_APP_RELEASE_VERSION']
+            }
         } else {
             println 'bugly.properties found but some entries are missing'
         }
