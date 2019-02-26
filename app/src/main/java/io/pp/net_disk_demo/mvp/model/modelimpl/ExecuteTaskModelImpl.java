@@ -58,13 +58,13 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
-    public void startRefreshTasks() {
+    public void refreshAllTasks() {
         if (mUploadService != null) {
-            mUploadService.startShowUploadTaskList();
+            mUploadService.refreshAllUploadTaskList();
         }
 
         if (mDownloadService != null) {
-            mDownloadService.startShowDownloadTaskList();
+            mDownloadService.refreshAllDownloadTaskList();
         }
     }
 

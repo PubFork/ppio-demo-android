@@ -44,9 +44,9 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     }
 
     @Override
-    public void startRefreshTasks() {
+    public void refreshAllTasks() {
         if (mExecuteTaskModel != null) {
-            mExecuteTaskModel.startRefreshTasks();
+            mExecuteTaskModel.refreshAllTasks();
         }
     }
 

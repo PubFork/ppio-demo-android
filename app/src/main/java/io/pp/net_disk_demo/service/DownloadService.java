@@ -58,6 +58,8 @@ public class DownloadService extends Service {
     private int mDownloadingCount;
     private long mDownloadNotificationWhen;
 
+    private static boolean mAllRefresh = true;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -70,6 +72,9 @@ public class DownloadService extends Service {
         mDownloadNotificationWhen = 1000000000l;
 
         mDownloadingTaskHashMap = new HashMap<>();
+
+        mAllRefresh = true;
+        startShowDownloadTaskList();
     }
 
     @Override
@@ -95,7 +100,6 @@ public class DownloadService extends Service {
     private Notification getDownloadingNotification(int downloadingCount, double progress) {
         progress = progress <= 1.00d ? progress : 1.00d;
 
-        //Log.e(TAG, "progress = " + progress);
         double progress2digits;
         if (progress != 0) {
             progress2digits = new BigDecimal(progress * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
@@ -140,9 +144,6 @@ public class DownloadService extends Service {
     }
 
     public void download(DownloadInfo downloadInfo) {
-        //
-        Log.e(TAG, "download download()");
-        //
         if (downloadInfo != null) {
             new DownloadAsyncTask(DownloadService.this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, downloadInfo);
         } else {
@@ -203,19 +204,20 @@ public class DownloadService extends Service {
 
 
     public void startShowDownloadTaskList() {
-        reFreshAllDownloadTaskList();
+        //refreshAllDownloadTaskList();
 
-        mRefreshTaskListHandler.postDelayed(new Runnable() {
+        mRefreshTaskListHandler.post(new Runnable() {
             @Override
             public void run() {
                 mRefreshTaskPool.execute(new RefreshDownloadTaskRunnable(DownloadService.this));
             }
-        }, 1000);
+        });
 
     }
 
-    public void reFreshAllDownloadTaskList() {
-        new Thread(new RefreshAllDownloadTaskRunnable(DownloadService.this)).start();
+    public void refreshAllDownloadTaskList() {
+        mAllRefresh = true;
+        //new Thread(new RefreshAllDownloadTaskRunnable(DownloadService.this)).start();
     }
 
     private void showDownloadTaskList(ArrayList<TaskInfo> taskInfList) {
@@ -228,7 +230,7 @@ public class DownloadService extends Service {
             public void run() {
                 mRefreshTaskPool.execute(new RefreshDownloadTaskRunnable(DownloadService.this));
             }
-        }, 1000l);
+        }, 500l);
     }
 
     private void showRefreshAllDownloadTaskList(ArrayList<TaskInfo> taskInfList) {
@@ -241,7 +243,7 @@ public class DownloadService extends Service {
             public void run() {
                 mRefreshTaskPool.execute(new RefreshDownloadTaskRunnable(DownloadService.this));
             }
-        }, 1000l);
+        }, 500l);
     }
 
     private void showDownloadListTaskError(String error) {
@@ -271,28 +273,16 @@ public class DownloadService extends Service {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            //
-            Log.e(TAG, "download onPreExecute()");
-            //
         }
 
         @Override
         protected Boolean doInBackground(DownloadInfo[] downloadInfos) {
-            //
-            Log.e(TAG, "download DownloadAsyncTask()");
-            //
+
             File downloadDir = new File(Constant.PPIO_File.DOWNLOAD_DIR);
             boolean directoryExists = downloadDir.exists();
             if (!directoryExists) {
                 directoryExists = downloadDir.mkdir();
             }
-
-//            File downloadAccountDir = new File(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
-//            directoryExists = downloadAccountDir.exists();
-//            if (!directoryExists) {
-//                directoryExists = downloadAccountDir.mkdir();
-//            }
 
             if (directoryExists) {
                 final String bucket = downloadInfos[0].getBucket();
@@ -373,7 +363,7 @@ public class DownloadService extends Service {
             super.onPostExecute(succeed);
 
             if (mExecuteTasksServiceWeakReference.get() != null && succeed) {
-                mExecuteTasksServiceWeakReference.get().reFreshAllDownloadTaskList();
+                mExecuteTasksServiceWeakReference.get().refreshAllDownloadTaskList();
                 mExecuteTasksServiceWeakReference.get().showDownloadStartSucceed();
             }
         }
@@ -399,12 +389,6 @@ public class DownloadService extends Service {
             if (!directoryExists) {
                 directoryExists = downloadDir.mkdir();
             }
-
-//            File downloadAccountDir = new File(Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + PossUtil.getAccount());
-//            directoryExists = downloadAccountDir.exists();
-//            if (!directoryExists) {
-//                directoryExists = downloadAccountDir.mkdir();
-//            }
 
             if (directoryExists) {
                 final String shareCode = downloadInfos[0].getShareCode();
@@ -504,7 +488,7 @@ public class DownloadService extends Service {
             super.onPostExecute(succeed);
 
             if (mDownloadServiceWeakReference.get() != null && succeed) {
-                mDownloadServiceWeakReference.get().reFreshAllDownloadTaskList();
+                mDownloadServiceWeakReference.get().refreshAllDownloadTaskList();
                 mDownloadServiceWeakReference.get().showDownloadSharedStartSucceed();
             }
         }
@@ -575,80 +559,84 @@ public class DownloadService extends Service {
                 }
 
                 mDownloadServiceWeakReference.get().updateNotification(downloadingCount, progress);
-                mDownloadServiceWeakReference.get().showDownloadTaskList(uploadTaskList);
-            }
-        }
-    }
-
-    static class RefreshAllDownloadTaskRunnable implements Runnable {
-        final WeakReference<DownloadService> mDownloadServiceWeakReference;
-
-        public RefreshAllDownloadTaskRunnable(DownloadService downloadService) {
-            mDownloadServiceWeakReference = new WeakReference<>(downloadService);
-        }
-
-        @Override
-        public void run() {
-            LinkedHashMap<String, TaskInfo> taskInfoHashMap = PossUtil.listTaskForHashMap(new PossUtil.ListTaskListener() {
-                @Override
-                public void onListTaskError(String errMsg) {
-                    if (mDownloadServiceWeakReference.get() != null) {
-                        mDownloadServiceWeakReference.get().showDownloadListTaskError(errMsg);
-                    }
-                }
-            });
-
-            int downloadingCount = 0;
-            double finishedDownload = 0;
-            double totalDownload = 0;
-
-            HashMap<String, String> lastDownloadingTaskHashMap = new HashMap<>();
-            lastDownloadingTaskHashMap.putAll(mDownloadingTaskHashMap);
-            mDownloadingTaskHashMap.clear();
-
-            ArrayList<TaskInfo> uploadTaskList = new ArrayList<>();
-
-            for (Map.Entry entry : taskInfoHashMap.entrySet()) {
-                TaskInfo taskInfo = (TaskInfo) entry.getValue();
-
-                if (Constant.TaskType.GET.equals(taskInfo.getType())) {
-                    if (Constant.TaskState.PENDING.equals(taskInfo.getState()) ||
-                            Constant.TaskState.RUNNING.equals(taskInfo.getState()) ||
-                            Constant.TaskState.PAUSED.equals(taskInfo.getState())) {
-                        downloadingCount++;
-
-                        Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
-                        if (progress.getTotalBytes() != 0l) {
-                            taskInfo.setFinished(progress.getFinishedBytes());
-                            finishedDownload = finishedDownload + taskInfo.getFinished();
-                            totalDownload = totalDownload + taskInfo.getTotal();
-
-                            taskInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
-                        }
-                        mDownloadingTaskHashMap.put(taskInfo.getId(), taskInfo.getId());
-                    } else {
-                        if (lastDownloadingTaskHashMap.containsKey(taskInfo.getId())) {
-                            taskInfo.setChanged();
-                        }
-                    }
-                    uploadTaskList.add(taskInfo);
-                }
-            }
-
-            if (mDownloadServiceWeakReference.get() != null) {
-                double progress;
-                if (totalDownload == 0) {
-                    progress = 0;
+                if (mAllRefresh) {
+                    mAllRefresh = false;
+                    mDownloadServiceWeakReference.get().showRefreshAllDownloadTaskList(uploadTaskList);
                 } else {
-                    progress = (double) finishedDownload / totalDownload;
+                    mDownloadServiceWeakReference.get().showDownloadTaskList(uploadTaskList);
                 }
-
-                mDownloadServiceWeakReference.get().updateNotification(downloadingCount, progress);
-                mDownloadServiceWeakReference.get().showRefreshAllDownloadTaskList(uploadTaskList);
             }
         }
     }
 
+//    static class RefreshAllDownloadTaskRunnable implements Runnable {
+//        final WeakReference<DownloadService> mDownloadServiceWeakReference;
+//
+//        public RefreshAllDownloadTaskRunnable(DownloadService downloadService) {
+//            mDownloadServiceWeakReference = new WeakReference<>(downloadService);
+//        }
+//
+//        @Override
+//        public void run() {
+//            LinkedHashMap<String, TaskInfo> taskInfoHashMap = PossUtil.listTaskForHashMap(new PossUtil.ListTaskListener() {
+//                @Override
+//                public void onListTaskError(String errMsg) {
+//                    if (mDownloadServiceWeakReference.get() != null) {
+//                        mDownloadServiceWeakReference.get().showDownloadListTaskError(errMsg);
+//                    }
+//                }
+//            });
+//
+//            int downloadingCount = 0;
+//            double finishedDownload = 0;
+//            double totalDownload = 0;
+//
+//            HashMap<String, String> lastDownloadingTaskHashMap = new HashMap<>();
+//            lastDownloadingTaskHashMap.putAll(mDownloadingTaskHashMap);
+//            mDownloadingTaskHashMap.clear();
+//
+//            ArrayList<TaskInfo> uploadTaskList = new ArrayList<>();
+//
+//            for (Map.Entry entry : taskInfoHashMap.entrySet()) {
+//                TaskInfo taskInfo = (TaskInfo) entry.getValue();
+//
+//                if (Constant.TaskType.GET.equals(taskInfo.getType())) {
+//                    if (Constant.TaskState.PENDING.equals(taskInfo.getState()) ||
+//                            Constant.TaskState.RUNNING.equals(taskInfo.getState()) ||
+//                            Constant.TaskState.PAUSED.equals(taskInfo.getState())) {
+//                        downloadingCount++;
+//
+//                        Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
+//                        if (progress.getTotalBytes() != 0l) {
+//                            taskInfo.setFinished(progress.getFinishedBytes());
+//                            finishedDownload = finishedDownload + taskInfo.getFinished();
+//                            totalDownload = totalDownload + taskInfo.getTotal();
+//
+//                            taskInfo.setProgress((double) progress.getFinishedBytes() / progress.getTotalBytes());
+//                        }
+//                        mDownloadingTaskHashMap.put(taskInfo.getId(), taskInfo.getId());
+//                    } else {
+//                        if (lastDownloadingTaskHashMap.containsKey(taskInfo.getId())) {
+//                            taskInfo.setChanged();
+//                        }
+//                    }
+//                    uploadTaskList.add(taskInfo);
+//                }
+//            }
+//
+//            if (mDownloadServiceWeakReference.get() != null) {
+//                double progress;
+//                if (totalDownload == 0) {
+//                    progress = 0;
+//                } else {
+//                    progress = (double) finishedDownload / totalDownload;
+//                }
+//
+//                mDownloadServiceWeakReference.get().updateNotification(downloadingCount, progress);
+//                mDownloadServiceWeakReference.get().showRefreshAllDownloadTaskList(uploadTaskList);
+//            }
+//        }
+//    }
 
     public class DownloadServiceBinder extends Binder {
         public DownloadService getDownloadService() {

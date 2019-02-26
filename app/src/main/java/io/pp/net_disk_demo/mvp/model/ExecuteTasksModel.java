@@ -12,7 +12,7 @@ public interface ExecuteTasksModel {
     void bindDownloadService(DownloadService downloadService);
 
 
-    void startRefreshTasks();
+    void refreshAllTasks();
 
     void deleteTask(String taskId, String downloadPath);
 

@@ -15,7 +15,7 @@ public interface ExecuteTaskPresenter {
     void bindDownloadService(DownloadService downloadService);
 
 
-    void startRefreshTasks();
+    void refreshAllTasks();
 
     void showRefreshTasksError(String errMsg);
 

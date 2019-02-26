@@ -348,7 +348,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
             if (mExecuteTaskPresenter != null) {
                 mExecuteTaskPresenter.showRequestUploadFinished();
-                mExecuteTaskPresenter.startRefreshTasks();
+                //mExecuteTaskPresenter.refreshAllTasks();
             }
         }
 
@@ -358,7 +358,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
             if (mExecuteTaskPresenter != null) {
                 mExecuteTaskPresenter.showRequestDownloadFinished();
-                mExecuteTaskPresenter.startRefreshTasks();
+                //mExecuteTaskPresenter.refreshAllTasks();
             }
         }
     }
@@ -954,9 +954,9 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     public void showRequestUploadFinishedView() {
         showUploadView();
 
-        if (mExecuteTaskPresenter != null) {
-            mExecuteTaskPresenter.startRefreshTasks();
-        }
+//        if (mExecuteTaskPresenter != null) {
+//            mExecuteTaskPresenter.refreshAllTasks();
+//        }
 
         if (mAccountInfoPresenter != null) {
             mAccountInfoPresenter.requestUsed();
@@ -998,7 +998,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         stopShowNetWorkingView();
 
         if (mExecuteTaskPresenter != null) {
-            mExecuteTaskPresenter.startRefreshTasks();
+            mExecuteTaskPresenter.refreshAllTasks();
         }
     }
 
@@ -1015,7 +1015,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         }
 
         if (mExecuteTaskPresenter != null) {
-            mExecuteTaskPresenter.startRefreshTasks();
+            mExecuteTaskPresenter.refreshAllTasks();
         }
     }
 
@@ -2088,7 +2088,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         if (mExecuteTaskPresenter != null) {
             mExecuteTaskPresenter.bindDownloadService(mDownloadService);
 
-            mExecuteTaskPresenter.startRefreshTasks();
+            mExecuteTaskPresenter.refreshAllTasks();
         }
     }
 
