@@ -289,6 +289,15 @@ public class PossUtil {
         }
     }
 
+    public static String getPossVersion() {
+        try {
+            return Poss.getVersionString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "?";
+        }
+    }
+
     public static boolean logOut(LogOutListener logOutListener) {
         if (mUser != null) {
             try {
@@ -410,7 +419,7 @@ public class PossUtil {
         }
 
         //
-        Log.e(TAG, "listObject() listObjectStr = " + listBucketStr);
+        //Log.e(TAG, "listObject() listObjectStr = " + listBucketStr);
         //
 
         return bucketList;
