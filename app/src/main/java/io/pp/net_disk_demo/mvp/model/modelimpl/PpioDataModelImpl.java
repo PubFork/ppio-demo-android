@@ -273,7 +273,7 @@ public class PpioDataModelImpl implements PpioDataModel {
                 for (int i = 0; i < myFileList.size(); i++) {
                     FileInfo fileInfo = myFileList.get(i);
                     if (!uploadingTaskHashMap.containsKey(fileInfo.getBucketName() + "/" + fileInfo.getName()) &&
-                            !mUploadFailedInfoHashMap.containsKey(fileInfo.getBucketName() + fileInfo.getName())) {
+                            !mUploadFailedInfoHashMap.containsKey(fileInfo.getBucketName() + "/" + fileInfo.getName())) {
                         mFileList.add(fileInfo);
                     }
                 }

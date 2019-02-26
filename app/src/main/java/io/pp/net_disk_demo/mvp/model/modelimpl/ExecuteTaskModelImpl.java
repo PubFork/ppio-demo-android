@@ -260,7 +260,7 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
             super.onPreExecute();
 
             if (mExecuteTaskModelImplWeakReference.get() != null) {
-                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask("Deleting task, For large file, it will take a while");
+                mExecuteTaskModelImplWeakReference.get().showPrepareOperateTask("Deleting task, for large file, it will take a while");
             }
         }
 

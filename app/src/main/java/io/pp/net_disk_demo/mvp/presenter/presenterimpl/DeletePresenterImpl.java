@@ -24,9 +24,9 @@ public class DeletePresenterImpl implements DeletePresenter {
     }
 
     @Override
-    public void delete(String bucket, String key) {
+    public void delete(String bucket, String key, String status) {
         if (mDeleteModel != null) {
-            mDeleteModel.delete(bucket, key);
+            mDeleteModel.delete(bucket, key, status);
         }
     }
 

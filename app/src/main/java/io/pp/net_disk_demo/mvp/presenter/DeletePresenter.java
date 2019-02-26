@@ -4,7 +4,7 @@ import io.pp.net_disk_demo.data.DeletingInfo;
 
 public interface DeletePresenter {
 
-    void delete(String bucket, String key);
+    void delete(String bucket, String key, String status);
 
     void deleteSilently(String bucket, String key);
 

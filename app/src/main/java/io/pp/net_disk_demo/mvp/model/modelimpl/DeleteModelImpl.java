@@ -31,8 +31,8 @@ public class DeleteModelImpl implements DeleteModel {
     }
 
     @Override
-    public void delete(String bucket, String key) {
-        new DeleteAsyncTask(DeleteModelImpl.this).execute(bucket, key);
+    public void delete(String bucket, String key, String status) {
+        new DeleteAsyncTask(DeleteModelImpl.this).execute(bucket, key, status);
     }
 
     @Override
@@ -94,6 +94,7 @@ public class DeleteModelImpl implements DeleteModel {
         @Override
         protected DeletingInfo doInBackground(String... strings) {
             String name = strings[0] + strings[1];
+            String status = strings[2];
             String taskId = PossUtil.deleteObject(strings[0], strings[1], new PossUtil.DeleteObjectListener() {
                 @Override
                 public void onDeleteObjectError(String errMsg) {
@@ -101,7 +102,8 @@ public class DeleteModelImpl implements DeleteModel {
                 }
             });
 
-            if (!TextUtils.isEmpty(taskId)) {
+            if (!TextUtils.isEmpty(taskId) &&
+                    !Constant.TaskState.PENDING.equals(status)) {
                 return new DeletingInfo(name, taskId);
             } else {
                 return null;
@@ -152,28 +154,63 @@ public class DeleteModelImpl implements DeleteModel {
                 }
             });
 
+            if (TextUtils.isEmpty(taskId)) {
+                taskId = PossUtil.deleteObject(mBucket, mKey, new PossUtil.DeleteObjectListener() {
+                    @Override
+                    public void onDeleteObjectError(String errMsg) {
+                        Log.e(TAG, "DeleteSilentRunnable deleteObject error: " + errMsg);
+                    }
+                });
+
+                if (TextUtils.isEmpty(taskId)) {
+                    if (mDeleteModelWeakReference.get() != null) {
+                        mDeleteModelWeakReference.get().deleteSilentlyFinish(mBucket, mKey);
+                    }
+
+                    return;
+                }
+            }
+
             String deleteState = Constant.ProgressState.RUNNING;
             while (!Constant.ProgressState.ERROR.equals(deleteState) &&
                     !Constant.ProgressState.FINISHED.equals(deleteState)) {
-                Progress progress = PossUtil.getTaskProgress(taskId);
+                try {
+                    Progress progress = PossUtil.getTaskProgress(taskId);
+                    deleteState = progress.getJobState();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                deleteState = progress.getJobState();
+                try {
+                    Thread.sleep(1000l);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             if (Constant.ProgressState.ERROR.equals(deleteState)) {
                 taskId = PossUtil.deleteObject(mBucket, mKey, new PossUtil.DeleteObjectListener() {
                     @Override
                     public void onDeleteObjectError(String errMsg) {
-                        Log.e(TAG, "");
+                        Log.e(TAG, "DeleteSilentRunnable deleteObject error: " + errMsg);
                     }
                 });
 
                 deleteState = Constant.ProgressState.RUNNING;
                 while (!Constant.ProgressState.ERROR.equals(deleteState) &&
                         !Constant.ProgressState.FINISHED.equals(deleteState)) {
-                    Progress progress = PossUtil.getTaskProgress(taskId);
+                    try {
+                        Progress progress = PossUtil.getTaskProgress(taskId);
+                        deleteState = progress.getJobState();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-                    deleteState = progress.getJobState();
+                    try {
+                        Thread.sleep(1000l);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 

@@ -1767,6 +1767,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                 String fileHash = mMyFileAdapter.getFileHash(position);
                                 String bucket = mMyFileAdapter.getFileInfoBucket(position);
                                 String key = mMyFileAdapter.getFileInfoKey(position);
+                                String taskStatus = mMyFileAdapter.getFileInfo(position).getStatus();
                                 if (!TextUtils.isEmpty(fileHash) &&
                                         !TextUtils.isEmpty(bucket) &&
                                         !TextUtils.isEmpty(key)) {
@@ -1782,7 +1783,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                                 public void onDelete() {
 
                                                     if (mDeletePresenter != null) {
-                                                        mDeletePresenter.delete(bucket, key);
+                                                        mDeletePresenter.delete(bucket, key, taskStatus);
                                                     }
 
                                                     mDeleteDialog.dismiss();
@@ -1831,7 +1832,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     final String taskId = taskInfo.getId();
                     final String bucket = Constant.Data.DEFAULT_BUCKET;
                     String str = taskInfo.getTo().replaceFirst(bucket, "");
-                    if (str.startsWith("//")) {
+                    if (str.startsWith("/")) {
                         str = str.replaceFirst("/", "");
                     }
                     final String key = str;
