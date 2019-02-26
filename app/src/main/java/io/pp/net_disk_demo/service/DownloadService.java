@@ -33,6 +33,7 @@ import io.pp.net_disk_demo.data.DownloadInfo;
 import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
+import io.pp.net_disk_demo.util.StorageUtil;
 import poss.Progress;
 
 public class DownloadService extends Service {
@@ -410,11 +411,13 @@ public class DownloadService extends Service {
                 final String chiPrice = downloadInfos[0].getChiPrice();
 
                 String fileName = "";
+                long fileSize = 0l;
                 try {
                     String jsonStr = new String(Base64.decode((shareCode.replaceFirst("poss://", "")).getBytes(), Base64.DEFAULT));
 
                     JSONObject jsonObject = new JSONObject(jsonStr);
                     fileName = jsonObject.getString("name");
+                    fileSize = jsonObject.getLong("length");
                 } catch (JSONException e) {
                     Log.e(TAG, "" + e.getMessage());
 
@@ -425,6 +428,10 @@ public class DownloadService extends Service {
                     return false;
                 }
 
+                if (StorageUtil.getAvailableStorage() <= (2.2 * fileSize)) {
+                    publishProgress("Downloading requires extra space, there is not enough current space to download!");
+                    return false;
+                }
 
                 if (!TextUtils.isEmpty(fileName)) {
                     String prefixNameStr = fileName;

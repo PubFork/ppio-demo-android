@@ -44,6 +44,7 @@ import io.pp.net_disk_demo.mvp.view.UploadView;
 import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.UploadService;
 import io.pp.net_disk_demo.util.FileUtil;
+import io.pp.net_disk_demo.util.StorageUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
 import io.pp.net_disk_demo.util.XPermissionUtils;
@@ -539,8 +540,14 @@ public class UploadActivity extends BaseActivity implements UploadView {
                 Util.runNetStorageOperation(UploadActivity.this, new Util.RunNetOperationCallBack() {
                     @Override
                     public void onRunOperation() {
-                        if (mUploadPresenter != null) {
-                            mUploadPresenter.confirm();
+                        if (StorageUtil.getAvailableStorage() >= (mFileSize * 1.1)) {
+                            if (mUploadPresenter != null) {
+                                mUploadPresenter.confirm();
+                            }
+                        } else {
+                            ToastUtil.showToast(UploadActivity.this,
+                                    "Uploading requires extra space, there is not enough current space to upload!",
+                                    Toast.LENGTH_LONG);
                         }
                     }
 

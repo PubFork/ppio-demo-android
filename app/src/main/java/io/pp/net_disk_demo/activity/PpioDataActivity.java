@@ -79,6 +79,7 @@ import io.pp.net_disk_demo.ppio.PossUtil;
 import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.UploadLogService;
 import io.pp.net_disk_demo.service.UploadService;
+import io.pp.net_disk_demo.util.StorageUtil;
 import io.pp.net_disk_demo.util.SystemUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.Util;
@@ -1664,17 +1665,24 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                         Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
                                             @Override
                                             public void onRunOperation() {
-                                                if (mExecuteTaskPresenter != null) {
-                                                    String bucket = mMyFileAdapter.getFileInfoBucket(position);
-                                                    String key = mMyFileAdapter.getFileInfoKey(position);
-                                                    if (!TextUtils.isEmpty(bucket) && !TextUtils.isEmpty(key)) {
-                                                        DownloadInfo downloadInfo = new DownloadInfo();
-                                                        downloadInfo.setBucket(bucket);
-                                                        downloadInfo.setKey(key);
-                                                        downloadInfo.setChiPrice("" + chiPrice);
+                                                long fileSize = mMyFileAdapter.getFileInfo(position).getLength();
+                                                if (StorageUtil.getAvailableStorage() >= (fileSize * 2.2)) {
+                                                    if (mExecuteTaskPresenter != null) {
+                                                        String bucket = mMyFileAdapter.getFileInfoBucket(position);
+                                                        String key = mMyFileAdapter.getFileInfoKey(position);
+                                                        if (!TextUtils.isEmpty(bucket) && !TextUtils.isEmpty(key)) {
+                                                            DownloadInfo downloadInfo = new DownloadInfo();
+                                                            downloadInfo.setBucket(bucket);
+                                                            downloadInfo.setKey(key);
+                                                            downloadInfo.setChiPrice("" + chiPrice);
 
-                                                        mExecuteTaskPresenter.startDownload(downloadInfo);
+                                                            mExecuteTaskPresenter.startDownload(downloadInfo);
+                                                        }
                                                     }
+                                                } else {
+                                                    ToastUtil.showToast(PpioDataActivity.this,
+                                                            "Downloading requires extra space, there is not enough current space to download!",
+                                                            Toast.LENGTH_LONG);
                                                 }
                                             }
 
