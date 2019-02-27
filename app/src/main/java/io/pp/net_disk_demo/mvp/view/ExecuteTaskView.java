@@ -18,11 +18,6 @@ public interface ExecuteTaskView {
     void showDownloadTaskError(String errMsg);
 
 
-    void showRequestUploadFinishedView();
-
-    void showRequestDownloadFinishedView();
-
-
     void showRefreshFileListView();
 
 

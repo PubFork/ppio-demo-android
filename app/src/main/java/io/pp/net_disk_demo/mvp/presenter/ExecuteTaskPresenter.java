@@ -37,24 +37,7 @@ public interface ExecuteTaskPresenter {
     void showDeleteUploadingTaskFinished(String bucket, String key);
 
 
-    void startUpload(UploadInfo uploadInfo);
-
-    void showUploadingTasks(ArrayList<TaskInfo> uploadingTaskList);
-
-    void showUploadTaskError(String errMsg);
-
-    void showRequestUploadFinished();
-
     void refreshFileList();
-
-
-    void startDownload(DownloadInfo downloadInfo);
-
-    void showDownloadingTasks(ArrayList<TaskInfo> downloadingTaskList);
-
-    void showRequestDownloadError(String errMsg);
-
-    void showRequestDownloadFinished();
 
 
     void stopAllTask();

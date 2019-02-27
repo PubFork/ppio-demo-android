@@ -452,7 +452,7 @@ public class PossUtil {
 
                     fileInfos[i] = fileInfo;
 
-                    //Log.e(TAG, "listObject() star = " + jsonObject.toString());
+                    //Log.e(TAG, "listObject() str = " + jsonObject.toString());
                 }
 
                 for (int i = 0; i < length - 1; i++) {

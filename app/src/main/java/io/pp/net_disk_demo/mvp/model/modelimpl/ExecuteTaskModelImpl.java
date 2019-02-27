@@ -9,9 +9,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import io.pp.net_disk_demo.data.DownloadInfo;
 import io.pp.net_disk_demo.data.TaskInfo;
-import io.pp.net_disk_demo.data.UploadInfo;
 import io.pp.net_disk_demo.mvp.model.ExecuteTasksModel;
 import io.pp.net_disk_demo.mvp.presenter.ExecuteTaskPresenter;
 import io.pp.net_disk_demo.ppio.PossUtil;
@@ -19,7 +17,6 @@ import io.pp.net_disk_demo.service.DownloadService;
 import io.pp.net_disk_demo.service.UploadService;
 
 public class ExecuteTaskModelImpl implements ExecuteTasksModel,
-        DownloadService.DownloadListener,
         UploadService.ShowUploadTaskListListener,
         DownloadService.ShowDownloadTaskListListener,
         UploadService.ShowUploadedListener {
@@ -54,7 +51,6 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
         mDownloadService = downloadService;
 
         mDownloadService.setShowDownloadTaskListListener(ExecuteTaskModelImpl.this);
-        mDownloadService.setDownloadListener(ExecuteTaskModelImpl.this);
     }
 
     @Override
@@ -89,41 +85,10 @@ public class ExecuteTaskModelImpl implements ExecuteTasksModel,
     }
 
     @Override
-    public void startUpload(UploadInfo uploadInfo) {
-        if (mUploadService != null) {
-            mUploadService.upload(uploadInfo);
-        }
-    }
-
-    @Override
-    public void startDownload(DownloadInfo downloadInfo) {
-        if (mDownloadService != null) {
-            mDownloadService.download(downloadInfo);
-        }
-    }
-
-    @Override
     public void stopAllTask() {
 //        if (mExecuteTasksService != null) {
 //            mExecuteTasksService.stopAllTask();
 //        }
-    }
-
-    @Override
-    public void onStartingDownload() {
-
-    }
-
-    @Override
-    public void onDownloadStartSucceed() {
-        if (mExecuteTasksPresenter != null) {
-            mExecuteTasksPresenter.showRequestDownloadFinished();
-        }
-    }
-
-    @Override
-    public void onDownloadStartFailed(String errMsg) {
-
     }
 
     @Override

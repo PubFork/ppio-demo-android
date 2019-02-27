@@ -5,9 +5,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import io.pp.net_disk_demo.data.DownloadInfo;
 import io.pp.net_disk_demo.data.TaskInfo;
-import io.pp.net_disk_demo.data.UploadInfo;
 import io.pp.net_disk_demo.mvp.model.ExecuteTasksModel;
 import io.pp.net_disk_demo.mvp.model.modelimpl.ExecuteTaskModelImpl;
 import io.pp.net_disk_demo.mvp.presenter.ExecuteTaskPresenter;
@@ -114,76 +112,11 @@ public class ExecuteTaskPresenterImpl implements ExecuteTaskPresenter {
     }
 
     @Override
-    public void startUpload(UploadInfo uploadInfo) {
-        if (mExecuteTaskModel != null) {
-            mExecuteTaskModel.startUpload(uploadInfo);
-        }
-    }
-
-    @Override
-    public void showUploadingTasks(ArrayList<TaskInfo> uploadingTaskList) {
-        if (mExecuteTaskView != null) {
-            //mExecuteTaskView.showUploadingTasks(uploadingTaskList);
-        }
-    }
-
-    @Override
-    public void showUploadTaskError(String errMsg) {
-        if (mExecuteTaskView != null) {
-            mExecuteTaskView.showUploadTaskError(errMsg);
-        }
-    }
-
-    @Override
-    public void showRequestUploadFinished() {
-        if (mExecuteTaskView != null) {
-            mExecuteTaskView.showRequestUploadFinishedView();
-        }
-    }
-
-    @Override
     public void refreshFileList() {
         if (mExecuteTaskView != null) {
             mExecuteTaskView.showRefreshFileListView();
         }
     }
-
-    @Override
-    public void startDownload(DownloadInfo downloadInfo) {
-        //
-        Log.e(TAG, "download startDownload()");
-        //
-
-        if (mExecuteTaskModel != null) {
-            //
-            Log.e(TAG, "download startDownload() if (mExecuteTaskModel != null) ");
-            //
-
-            mExecuteTaskModel.startDownload(downloadInfo);
-        }
-    }
-
-    @Override
-    public void showDownloadingTasks(ArrayList<TaskInfo> downloadingTaskList) {
-        if (mExecuteTaskView != null) {
-            //mExecuteTaskView.showDownloadingTasks(downloadingTaskList);
-        }
-    }
-
-    @Override
-    public void showRequestDownloadError(String errMsg) {
-        if (mExecuteTaskView != null) {
-            mExecuteTaskView.showDownloadTaskError(errMsg);
-        }
-    }
-
-    @Override
-    public void showRequestDownloadFinished() {
-        if (mExecuteTaskView != null) {
-            mExecuteTaskView.showRequestDownloadFinishedView();
-        }
-    }
-
 
     @Override
     public void stopAllTask() {

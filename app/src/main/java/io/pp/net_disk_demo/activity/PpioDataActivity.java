@@ -56,6 +56,7 @@ import io.pp.net_disk_demo.dialog.ShowDetailDialog;
 import io.pp.net_disk_demo.dialog.ShowShareCodeDialog;
 import io.pp.net_disk_demo.mvp.presenter.AccountInfoPresenter;
 import io.pp.net_disk_demo.mvp.presenter.DeletePresenter;
+import io.pp.net_disk_demo.mvp.presenter.DownloadPresenter;
 import io.pp.net_disk_demo.mvp.presenter.ExecuteTaskPresenter;
 import io.pp.net_disk_demo.mvp.presenter.PpioDataPresenter;
 import io.pp.net_disk_demo.mvp.presenter.ShowShareCodePresenter;
@@ -63,6 +64,7 @@ import io.pp.net_disk_demo.mvp.presenter.ShowStatusPresenter;
 import io.pp.net_disk_demo.mvp.presenter.StartRenewPresenter;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.AccountInfoPresenterImpl;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.DeletePresenterImpl;
+import io.pp.net_disk_demo.mvp.presenter.presenterimpl.DownloadPresenterImpl;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.ExecuteTaskPresenterImpl;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.PpioDataPresenterImpl;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.ShowShareCodePresenterImpl;
@@ -70,6 +72,7 @@ import io.pp.net_disk_demo.mvp.presenter.presenterimpl.ShowStatusPresenterImpl;
 import io.pp.net_disk_demo.mvp.presenter.presenterimpl.StartRenewPresenterImpl;
 import io.pp.net_disk_demo.mvp.view.AccountInfoView;
 import io.pp.net_disk_demo.mvp.view.DeleteView;
+import io.pp.net_disk_demo.mvp.view.DownloadView;
 import io.pp.net_disk_demo.mvp.view.ExecuteTaskView;
 import io.pp.net_disk_demo.mvp.view.PpioDataView;
 import io.pp.net_disk_demo.mvp.view.ShareCodeView;
@@ -94,7 +97,11 @@ import io.pp.net_disk_demo.widget.recyclerview.UploadTaskAdapter;
 public class PpioDataActivity extends BaseActivity implements PpioDataView,
         AccountInfoView,
         ExecuteTaskView,
-        StatusView, StartRenewView, ShareCodeView, DeleteView {
+        StatusView,
+        StartRenewView,
+        ShareCodeView,
+        DownloadView,
+        DeleteView {
 
     private static final String TAG = "PpioDataActivity";
 
@@ -187,6 +194,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     private PpioDataPresenter mPpioDataPresenter = null;
     private AccountInfoPresenter mAccountInfoPresenter = null;
     private ExecuteTaskPresenter mExecuteTaskPresenter = null;
+    private DownloadPresenter mDownloadPresenter = null;
 
     private ShowStatusPresenter mShowStatusPresenter = null;
     private StartRenewPresenter mStartRenewPresenter = null;
@@ -241,6 +249,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mPpioDataPresenter = new PpioDataPresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
         mAccountInfoPresenter = new AccountInfoPresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
         mExecuteTaskPresenter = new ExecuteTaskPresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
+        mDownloadPresenter = new DownloadPresenterImpl(PpioDataActivity.this);
         mShowStatusPresenter = new ShowStatusPresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
         mStartRenewPresenter = new StartRenewPresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
         mShowShareCodePresenter = new ShowShareCodePresenterImpl(PpioDataActivity.this, PpioDataActivity.this);
@@ -346,20 +355,14 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 resultCode == Constant.Code.RESULT_UPLOAD_OK)) {
             mBackFromUpload = true;
 
-            if (mExecuteTaskPresenter != null) {
-                mExecuteTaskPresenter.showRequestUploadFinished();
-                //mExecuteTaskPresenter.refreshAllTasks();
-            }
+            showRequestUploadFinishedView();
         }
 
         if (requestCode == Constant.Code.REQUEST_DOWNLOAD &&
                 resultCode == Constant.Code.RESULT_DOWNLOAD_OK) {
             mBackFromDownload = true;
 
-            if (mExecuteTaskPresenter != null) {
-                mExecuteTaskPresenter.showRequestDownloadFinished();
-                //mExecuteTaskPresenter.refreshAllTasks();
-            }
+            showRequestDownloadFinishedView();
         }
     }
 
@@ -461,6 +464,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             mExecuteTaskPresenter.onDestroy();
         }
 
+        if (mDownloadPresenter != null) {
+            mDownloadPresenter.onDestroy();
+        }
+
         if (mShowStatusPresenter != null) {
             mShowStatusPresenter.onDestroy();
         }
@@ -476,6 +483,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mPpioDataPresenter = null;
         mAccountInfoPresenter = null;
         mExecuteTaskPresenter = null;
+        mDownloadPresenter = null;
 
         mShowStatusPresenter = null;
         mStartRenewPresenter = null;
@@ -567,7 +575,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mSwipeRefreshLayout.setRefreshing(false);
 
                 if (allRefresh) {
-                    //mMyFileAdapter.refreshDeletingInfoHashMap(mDeletingInfoHashMap);
                     mMyFileAdapter.refreshFileList(mDeletingInfoHashMap, mMyFileInfoList);
                 } else {
                     mMyFileAdapter.updateDeletingFileList(mDeletingInfoHashMap, mMyFileInfoList);
@@ -758,26 +765,16 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     public void showRechargeView() {
-        //Uri uri = Uri.parse("http://chain-web-wallet.s3-website-us-west-2.amazonaws.com:80");
-//        Uri uri = Uri.parse(Constant.URL.WALLET_URL);
-//        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-//        startActivity(intent);
-
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL.WALLET_URL)));
     }
 
     @Override
     public void showRecordView() {
-        //ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
         startActivity(new Intent(PpioDataActivity.this, RecordActivity.class));
     }
 
     @Override
     public void showCheckVersionView() {
-        //ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
-        //startActivity(new Intent(PpioDataActivity.this, VersionActivity.class));
-        //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL.UPDATE_URL)));
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -826,9 +823,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     public void showFeedbackView() {
-        //ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
-        //startActivity(new Intent(PpioDataActivity.this, FeedbackActivity.class));
-        //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL.FEEDBACK_URL)));
         if (mFeedbackDialog != null) {
             mFeedbackDialog.dismiss();
             mFeedbackDialog = null;
@@ -871,15 +865,12 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     public void showLogOutFinishView() {
-        //
         if (mExecuteTaskPresenter != null) {
             mExecuteTaskPresenter.stopAllTask();
         }
-        //
 
         ToastUtil.showToast(PpioDataActivity.this, "log out!", Toast.LENGTH_SHORT);
 
-        //startActivity(new Intent(PpioDataActivity.this, LogInOrRegisterActivity.class));
         startActivity(new Intent(PpioDataActivity.this, KeyStoreLogInActivity.class));
         finish();
     }
@@ -944,35 +935,9 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
-    public void showRequestUploadFinishedView() {
-        showUploadView();
-
-//        if (mExecuteTaskPresenter != null) {
-//            mExecuteTaskPresenter.refreshAllTasks();
-//        }
-
-        if (mAccountInfoPresenter != null) {
-            mAccountInfoPresenter.requestUsed();
-            mAccountInfoPresenter.requestBalance();
-            mAccountInfoPresenter.requestFund();
-        }
-    }
-
-    @Override
     public void showRefreshFileListView() {
         if (mPpioDataPresenter != null) {
             mPpioDataPresenter.refreshAllFileList(mDeletingInfoHashMap, mUploadFailedInfoHashMap, true);
-        }
-    }
-
-    @Override
-    public void showRequestDownloadFinishedView() {
-        showDownloadView();
-
-        if (mAccountInfoPresenter != null) {
-            mAccountInfoPresenter.requestUsed();
-            mAccountInfoPresenter.requestBalance();
-            mAccountInfoPresenter.requestFund();
         }
     }
 
@@ -1096,6 +1061,40 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mShowShareCodeDialog.show();
             }
         });
+    }
+
+
+    public void showRequestUploadFinishedView() {
+        showUploadView(true);
+
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.requestUsed();
+            mAccountInfoPresenter.requestBalance();
+            mAccountInfoPresenter.requestFund();
+        }
+    }
+
+    @Override
+    public void showRequestingDownloadView() {
+        showNetWorkingView("start download");
+    }
+
+    @Override
+    public void showRequestDownloadFinishedView() {
+        stopShowNetWorkingView();
+
+        showDownloadView(true);
+
+        if (mAccountInfoPresenter != null) {
+            mAccountInfoPresenter.requestUsed();
+            mAccountInfoPresenter.requestBalance();
+            mAccountInfoPresenter.requestFund();
+        }
+    }
+
+    @Override
+    public void showDownloadFailView(String errMsg) {
+        showNetWorkingErrorView("download", errMsg);
     }
 
     /**
@@ -1594,14 +1593,14 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         mUploadLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showUploadView();
+                showUploadView(false);
             }
         });
 
         mDownloadLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDownloadView();
+                showDownloadView(false);
             }
         });
 
@@ -1657,7 +1656,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                             public void onRunOperation() {
                                                 long fileSize = mMyFileAdapter.getFileInfo(position).getLength();
                                                 if (StorageUtil.getAvailableStorage() >= (fileSize * 2.2)) {
-                                                    if (mExecuteTaskPresenter != null) {
+                                                    if (mDownloadPresenter != null) {
                                                         String bucket = mMyFileAdapter.getFileInfoBucket(position);
                                                         String key = mMyFileAdapter.getFileInfoKey(position);
                                                         if (!TextUtils.isEmpty(bucket) && !TextUtils.isEmpty(key)) {
@@ -1666,7 +1665,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                                                             downloadInfo.setKey(key);
                                                             downloadInfo.setChiPrice("" + chiPrice);
 
-                                                            mExecuteTaskPresenter.startDownload(downloadInfo);
+                                                            mDownloadPresenter.startDownload(downloadInfo);
                                                         }
                                                     }
                                                 } else {
@@ -1987,7 +1986,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         });
     }
 
-    private void showUploadView() {
+    private void showUploadView(final boolean locateBottom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -2014,12 +2013,20 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     mUploadingFileRecyclerView.setVisibility(View.INVISIBLE);
                 } else {
                     mUploadingFileRecyclerView.setVisibility(View.VISIBLE);
+
+                    if (locateBottom) {
+                        try {
+                            mUploadingFileRecyclerView.scrollToPosition(mUploadTaskAdapter.getItemCount() - 1);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         });
     }
 
-    private void showDownloadView() {
+    private void showDownloadView(final boolean locateBottom) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -2049,6 +2056,13 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     mDownloadingFileRecyclerView.setVisibility(View.INVISIBLE);
                 } else {
                     mDownloadingFileRecyclerView.setVisibility(View.VISIBLE);
+                    if (locateBottom) {
+                        try {
+                            mDownloadingFileRecyclerView.scrollToPosition(mDownloadTaskAdapter.getItemCount() - 1);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         });
@@ -2079,6 +2093,10 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             mExecuteTaskPresenter.bindDownloadService(mDownloadService);
 
             mExecuteTaskPresenter.refreshAllTasks();
+        }
+
+        if (mDownloadPresenter != null) {
+            mDownloadPresenter.bindDownloadService(mDownloadService);
         }
     }
 
