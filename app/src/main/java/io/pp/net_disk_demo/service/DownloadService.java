@@ -3,6 +3,7 @@ package io.pp.net_disk_demo.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 import io.pp.net_disk_demo.Constant;
 import io.pp.net_disk_demo.R;
+import io.pp.net_disk_demo.activity.PpioDataActivity;
 import io.pp.net_disk_demo.data.DownloadInfo;
 import io.pp.net_disk_demo.data.TaskInfo;
 import io.pp.net_disk_demo.ppio.PossUtil;
@@ -43,6 +45,7 @@ public class DownloadService extends Service {
     private final DownloadServiceBinder mBinder = new DownloadServiceBinder();
 
     private NotificationManager mNotificationManager;
+    private PendingIntent contentIntent = null;
 
     private CancelFixedThreadPool mRefreshTaskPool = null;
 
@@ -72,6 +75,13 @@ public class DownloadService extends Service {
         mDownloadNotificationWhen = 1000000000l;
 
         mDownloadingTaskHashMap = new HashMap<>();
+
+        contentIntent = PendingIntent.getActivity(DownloadService.this,
+                0,
+                new Intent(getApplicationContext(), PpioDataActivity.class)
+                        .setAction(Constant.Intent.DOWNLOAD_NOTIFICATION_ENTER_ACTION)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+                PendingIntent.FLAG_CANCEL_CURRENT);
 
         mAllRefresh = true;
         startShowDownloadTaskList();
@@ -127,6 +137,7 @@ public class DownloadService extends Service {
 
             mNotificationManager.createNotificationChannel(mChannel);
             notification = new Notification.Builder(this, "ppio")
+                    .setContentIntent(contentIntent)
                     .setChannelId("ppio")
                     .setContentTitle("Downloading")
                     .setContentText(contentStr)
@@ -134,6 +145,7 @@ public class DownloadService extends Service {
                     .setSmallIcon(R.mipmap.ic_launcher).build();
         } else {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "ppio")
+                    .setContentIntent(contentIntent)
                     .setContentTitle("Uploading")
                     .setContentText(contentStr)
                     .setSmallIcon(R.mipmap.ic_launcher)

@@ -386,6 +386,10 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
         });
     }
 
+    public View getChiPriceEdit() {
+        return mChiPriceEt;
+    }
+
     public interface OnSetChiPriceOnClickListener {
         void onCancel();
 

@@ -286,6 +286,32 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        Log.e(TAG, "onNewIntent()");
+
+        hideRemindDialog();
+        hideFeedBackDialog();
+        hideBlockFileOptionsBottomDialog();
+        hideSetChiPriceDialog();
+        hideShowShareCodeDialog();
+        hideDeleteDialog();
+
+        if (intent != null && !TextUtils.isEmpty(intent.getAction())) {
+            if (Constant.Intent.UPLOAD_NOTIFICATION_ENTER_ACTION.equals(intent.getAction())) {
+                mLeftDrawerLayout.closeDrawer();
+                showUploadView(false);
+            }
+
+            if (Constant.Intent.DOWNLOAD_NOTIFICATION_ENTER_ACTION.equals(intent.getAction())) {
+                mLeftDrawerLayout.closeDrawer();
+                showDownloadView(false);
+            }
+        }
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
@@ -403,25 +429,25 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         //
 
         //dialog
-        if (mFeedbackDialog != null) {
-            mFeedbackDialog.dismiss();
-            mFeedbackDialog = null;
-        }
+//        if (mFeedbackDialog != null) {
+//            mFeedbackDialog.dismiss();
+//            mFeedbackDialog = null;
+//        }
 
-        if (mRemindDialog != null) {
-            mRemindDialog.dismiss();
-            mRemindDialog = null;
-        }
+//        if (mRemindDialog != null) {
+//            mRemindDialog.dismiss();
+//            mRemindDialog = null;
+//        }
 
-        if (mBlockFileOptionsBottomDialog != null) {
-            mBlockFileOptionsBottomDialog.dismiss();
-            mBlockFileOptionsBottomDialog = null;
-        }
+//        if (mBlockFileOptionsBottomDialog != null) {
+//            mBlockFileOptionsBottomDialog.dismiss();
+//            mBlockFileOptionsBottomDialog = null;
+//        }
 
-        if (mSetChiPriceDialog != null) {
-            mSetChiPriceDialog.dismiss();
-            mSetChiPriceDialog = null;
-        }
+//        if (mSetChiPriceDialog != null) {
+//            mSetChiPriceDialog.dismiss();
+//            mSetChiPriceDialog = null;
+//        }
 
         if (mRenameDialog != null) {
             mRenameDialog.dismiss();
@@ -433,15 +459,22 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
             mShowDetailDialog = null;
         }
 
-        if (mShowShareCodeDialog != null) {
-            mShowShareCodeDialog.dismiss();
-            mShowShareCodeDialog = null;
-        }
+//        if (mShowShareCodeDialog != null) {
+//            mShowShareCodeDialog.dismiss();
+//            mShowShareCodeDialog = null;
+//        }
 
-        if (mDeleteDialog != null) {
-            mDeleteDialog.dismiss();
-            mDeleteDialog = null;
-        }
+//        if (mDeleteDialog != null) {
+//            mDeleteDialog.dismiss();
+//            mDeleteDialog = null;
+//        }
+
+        hideRemindDialog();
+        hideFeedBackDialog();
+        hideBlockFileOptionsBottomDialog();
+        hideSetChiPriceDialog();
+        hideShowShareCodeDialog();
+        hideDeleteDialog();
 
         hideProgressDialog();
 
@@ -1218,6 +1251,50 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         if (mCustomProgressDialog != null) {
             mCustomProgressDialog.dismiss();
             mCustomProgressDialog = null;
+        }
+    }
+
+    private void hideRemindDialog() {
+        if (mRemindDialog != null) {
+            mRemindDialog.dismiss();
+            mRemindDialog = null;
+        }
+    }
+
+    private void hideFeedBackDialog() {
+        if (mFeedbackDialog != null) {
+            hideSoftKeyboard(mFeedbackDialog.getDiscriptionEditText());
+            mFeedbackDialog.dismiss();
+            mFeedbackDialog = null;
+        }
+    }
+
+    private void hideBlockFileOptionsBottomDialog() {
+        if (mBlockFileOptionsBottomDialog != null) {
+            mBlockFileOptionsBottomDialog.dismiss();
+            mBlockFileOptionsBottomDialog = null;
+        }
+    }
+
+    private void hideSetChiPriceDialog() {
+        if (mSetChiPriceDialog != null) {
+            hideSoftKeyboard(mSetChiPriceDialog.getChiPriceEdit());
+            mSetChiPriceDialog.dismiss();
+            mSetChiPriceDialog = null;
+        }
+    }
+
+    private void hideShowShareCodeDialog() {
+        if (mShowShareCodeDialog != null) {
+            mShowShareCodeDialog.dismiss();
+            mShowShareCodeDialog = null;
+        }
+    }
+
+    private void hideDeleteDialog() {
+        if (mDeleteDialog != null) {
+            mDeleteDialog.dismiss();
+            mDeleteDialog = null;
         }
     }
 

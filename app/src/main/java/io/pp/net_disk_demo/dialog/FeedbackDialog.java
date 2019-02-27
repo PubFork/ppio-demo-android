@@ -24,6 +24,7 @@ public class FeedbackDialog extends Dialog {
 
     private static final String TAG = "FeedbackDialog";
     private Context mContext = null;
+    private EditText mDescriptionEt = null;
     private UploadLogClickListener mUploadLogClickListener = null;
 
     public FeedbackDialog(Context context, UploadLogClickListener uploadLogClickListner) {
@@ -46,7 +47,7 @@ public class FeedbackDialog extends Dialog {
 
         setContentView(mLayoutView);
 
-        final EditText mDescriptionEt = mLayoutView.findViewById(R.id.description_edittext);
+        mDescriptionEt = mLayoutView.findViewById(R.id.description_edittext);
         mLinkTv = mLayoutView.findViewById(R.id.link_tv);
         mCancelTv = mLayoutView.findViewById(R.id.cancel_tv);
         mSubmitTv = mLayoutView.findViewById(R.id.submit_tv);
@@ -92,6 +93,10 @@ public class FeedbackDialog extends Dialog {
                 dismiss();
             }
         });
+    }
+
+    public View getDiscriptionEditText() {
+        return mDescriptionEt;
     }
 
     public interface UploadLogClickListener {

@@ -10,6 +10,9 @@ public class Constant {
         public static final String LOCAL_UPLOAD_ACTION = "io.pp.net_disk_demo.UPLOAD_LOCAL_FILE";
         public static final String RENEW_ACTION = "io.pp.net_disk_demo.RENEW_FILE";
         public static final String COPY_ACTION = "io.pp.net_disk_demo.COPY_FILE";
+
+        public static final String UPLOAD_NOTIFICATION_ENTER_ACTION = "io.pp.net_disk_demo.UPLOAD_NOTIFICATION_ENTER_ACTION";
+        public static final String DOWNLOAD_NOTIFICATION_ENTER_ACTION = "io.pp.net_disk_demo.DOWNLOAD_NOTIFICATION_ENTER_ACTION";
     }
 
     public static class Data {
