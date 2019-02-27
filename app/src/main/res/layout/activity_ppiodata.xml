@@ -124,14 +124,14 @@
                     android:id="@+id/download_directory_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
+                    android:layout_margin="2dp"
                     android:inputType="text|textMultiLine"
-                    android:textColor="#757575"
+                    android:textColor="#373737"
                     android:textSize="12dp" />
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#E0E0E0" />
+                    android:background="#373737" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/downloadingfile_recyclerview"

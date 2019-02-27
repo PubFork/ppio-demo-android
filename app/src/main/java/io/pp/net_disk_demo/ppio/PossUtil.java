@@ -337,7 +337,7 @@ public class PossUtil {
     public static String putObject(String bucket, String key, String file, String meta, String
             chiPrice, long copies, String expires, boolean encrypt, String fileCode, PutObjectListener
                                            putObjectListener) {
-        Log.e(TAG, "putObject() chiPrice = " + chiPrice);
+        //Log.e(TAG, "putObject() chiPrice = " + chiPrice);
 
         String taskId;
 
@@ -451,6 +451,8 @@ public class PossUtil {
                     jsonObject.getString((Constant.ObjectKey.SYNCHRONIZED));
 
                     fileInfos[i] = fileInfo;
+
+                    //Log.e(TAG, "listObject() star = " + jsonObject.toString());
                 }
 
                 for (int i = 0; i < length - 1; i++) {
@@ -477,7 +479,7 @@ public class PossUtil {
         }
 
         //
-        Log.e(TAG, "listObject() ++++++ listObjectStr = " + listObjectStr);
+        //Log.e(TAG, "listObject() ++++++ listObjectStr = " + listObjectStr);
         //
 
         return fileInfoList;
@@ -510,7 +512,7 @@ public class PossUtil {
 
         }
 
-        Log.e(TAG, "getObjectStatus() objectStatusStr = " + objectStatusStr);
+        //Log.e(TAG, "getObjectStatus() objectStatusStr = " + objectStatusStr);
 
         objectStatus.setBucketStr(bucket);
         objectStatus.setKeyStr(key);

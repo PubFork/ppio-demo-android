@@ -94,6 +94,10 @@ public class DownloadService extends Service {
 
     @Override
     public void onDestroy() {
+        if (mRefreshTaskListHandler != null) {
+            mRefreshTaskListHandler.removeCallbacksAndMessages(null);
+        }
+
         super.onDestroy();
     }
 

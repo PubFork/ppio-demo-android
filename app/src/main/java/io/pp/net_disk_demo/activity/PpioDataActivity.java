@@ -685,9 +685,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     public void showGetBalanceFailView(String errMsg) {
-        String functionStr = "get balance error: ";
-        //showNetWorkingErrorView(functionStr, errMsg);
-        Log.e(TAG, "showGetBalanceFailView()");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -746,10 +743,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
     @Override
     public void showGetFundFailView(String errMsg) {
-        String functionStr = "get fund error: ";
-        //showNetWorkingErrorView(functionStr, errMsg);
-        Log.e(TAG, "showGetFundFailView");
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -1007,9 +1000,6 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         stopShowNetWorkingView();
 
         if (mDeletePresenter != null) {
-            //
-            Log.e(TAG, "++++++ mUploadFailedInfoHashMap.put() " + bucket + key);
-            //
             mUploadFailedInfoHashMap.put(bucket + key, bucket + key);
             mDeletePresenter.deleteSilently(bucket, key);
         }
@@ -2044,7 +2034,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                 mDownloadListLayout.setVisibility(View.VISIBLE);
 
                 mDownloadDirectoryTv.setText(Html.fromHtml("download to " + Constant.PPIO_File.DOWNLOAD_DIR +
-                        ".<br>" + "<strong><font color='#FF0000'>Delete task will also delete downloaded file!</font></strong>"));
+                        ".<br>" + "<strong><bold><font color='#FF0000'>Delete task will also delete downloaded file!</font></bold></strong>"));
                 //
 
                 mAllFileIv.setBackgroundResource(R.mipmap.allfile_unselected);
