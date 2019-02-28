@@ -200,7 +200,7 @@ public class UploadPresenterImpl implements UploadPresenter {
     }
 
     @Override
-    public void showGetTotalChi(int totalChi) {
+    public void showGetTotalChi(long totalChi) {
         if (mUploadView != null) {
             mUploadView.showGetTotalChiView(totalChi);
         }

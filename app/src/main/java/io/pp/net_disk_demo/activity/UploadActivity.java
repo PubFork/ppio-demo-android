@@ -398,7 +398,7 @@ public class UploadActivity extends BaseActivity implements UploadView {
     }
 
     @Override
-    public void showGetTotalChiView(int totalChi) {
+    public void showGetTotalChiView(long totalChi) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

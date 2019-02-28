@@ -177,7 +177,7 @@ public class RenewPresenterImpl implements RenewPresenter {
     }
 
     @Override
-    public void showGetTotalChi(int totalChi) {
+    public void showGetTotalChi(long totalChi) {
         if (mRenewView != null) {
             mRenewView.showGetTotalChiView(totalChi);
         }

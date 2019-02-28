@@ -152,7 +152,7 @@ public class RpcUtil {
         }
     }
 
-    public static int getStorageChi(long chunkSize, long duration, QueryAccountListener queryAccountListener) {
+    public static long getStorageChi(long chunkSize, long duration, QueryAccountListener queryAccountListener) {
         //> curl -X POST -H 'content-type:text/json;' --data '{"id":1,"jsonrpc":"2.0","method":"StorageChi","params":[{"chunkSize":1024,"duration":120,"chiPrice":"100"}]}' http://127.0.0.1:18030/rpc
         mStorageRpcClient = new JSONRPCHttpClient(mRpcUrlStr);
         mStorageRpcClient.setDebug(true);
@@ -178,8 +178,8 @@ public class RpcUtil {
 
             JSONObject storageChiJSONObject = new JSONObject(putObjectFundsResultStr);
 
-            int storageFundsChi = Integer.parseInt(storageChiJSONObject.getString("StorageFundsChi"));
-            int serviceFundsChi = Integer.parseInt(storageChiJSONObject.getString("ServiceChi"));
+            long storageFundsChi = Long.parseLong(storageChiJSONObject.getString("StorageFundsChi"));
+            long serviceFundsChi = Long.parseLong(storageChiJSONObject.getString("ServiceChi"));
 
             return (storageFundsChi + serviceFundsChi);
         } catch (Exception e) {
@@ -192,11 +192,11 @@ public class RpcUtil {
             Log.e(TAG, "putObjectFunds() err = " + e.getMessage());
             e.printStackTrace();
 
-            return 0;
+            return 0l;
         }
     }
 
-    public static int getDownloadChi(long chunkSize, QueryAccountListener queryAccountListener) {
+    public static long getDownloadChi(long chunkSize, QueryAccountListener queryAccountListener) {
         //> curl -X POST -H 'content-type:text/json;' --data '{"id":1,"jsonrpc":"2.0","method":"DownloadChi","params":[{"chunkSize":1024,"chiPrice":"100"}]}' http://127.0.0.1:18030/rpc
         mDownloadRpcClient = new JSONRPCHttpClient(mRpcUrlStr);
         mDownloadRpcClient.setDebug(true);
@@ -219,8 +219,8 @@ public class RpcUtil {
 
             JSONObject downloadChiJSONObject = new JSONObject(putObjectFundsResultStr);
 
-            int downloadFundsChi = Integer.parseInt(downloadChiJSONObject.getString("DownloadFundsChi"));
-            int serviceFundsChi = Integer.parseInt(downloadChiJSONObject.getString("ServiceChi"));
+            long downloadFundsChi = Long.parseLong(downloadChiJSONObject.getString("DownloadFundsChi"));
+            long serviceFundsChi = Long.parseLong(downloadChiJSONObject.getString("ServiceChi"));
 
             return (downloadFundsChi + serviceFundsChi);
         } catch (Exception e) {
@@ -232,7 +232,7 @@ public class RpcUtil {
             Log.e(TAG, "getObjectFunds() err = " + e.getMessage());
             e.printStackTrace();
 
-            return 0;
+            return 0l;
         }
     }
 

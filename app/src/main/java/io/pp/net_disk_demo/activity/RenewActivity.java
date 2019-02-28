@@ -335,7 +335,7 @@ public class RenewActivity extends BaseActivity implements RenewView {
     }
 
     @Override
-    public void showGetTotalChiView(int totalChi) {
+    public void showGetTotalChiView(long totalChi) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

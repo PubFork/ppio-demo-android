@@ -51,7 +51,7 @@ public interface RenewPresenter {
 
     void showRequestTotalChi();
 
-    void showGetTotalChi(int totalChi);
+    void showGetTotalChi(long totalChi);
 
     void showGetTotalChiFailed(String errMsg);
 

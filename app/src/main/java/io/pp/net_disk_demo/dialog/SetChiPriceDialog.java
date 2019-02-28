@@ -346,7 +346,7 @@ public class SetChiPriceDialog extends Dialog implements ProphecyView {
     }
 
     @Override
-    public void showGetTotalChiView(int totalChi) {
+    public void showGetTotalChiView(long totalChi) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {

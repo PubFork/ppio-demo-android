@@ -50,7 +50,7 @@ public class ProphecyPresenterImpl implements ProphecyPresenter {
     }
 
     @Override
-    public void showGetTotalChi(int totalChi) {
+    public void showGetTotalChi(long totalChi) {
         if (mProphecyView != null) {
             mProphecyView.showGetTotalChiView(totalChi);
         }

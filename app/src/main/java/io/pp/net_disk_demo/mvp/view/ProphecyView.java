@@ -4,7 +4,7 @@ public interface ProphecyView {
 
     void showRequestTotalChiView();
 
-    void showGetTotalChiView(int totalChi);
+    void showGetTotalChiView(long totalChi);
 
     void showGetTotalChiFailedView(String errMsg);
 

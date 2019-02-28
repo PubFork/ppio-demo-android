@@ -201,7 +201,7 @@ public class RenewModelImpl implements RenewModel {
         }
     }
 
-    private void showGetTotalChi(int totalChi, String chiPrice) {
+    private void showGetTotalChi(long totalChi, String chiPrice) {
         if (mRenewPresenter != null) {
             mRenewPresenter.showGetTotalChi(totalChi);
         }
@@ -335,7 +335,7 @@ public class RenewModelImpl implements RenewModel {
                 final long chunkSize1 = 1024 * 1024 * 16;
                 final long chunkSize2 = mFileSize - chunkSize1 * (chunkCount - 1);
 
-                int chunkChi1 = RpcUtil.getStorageChi(chunkSize1, mDuration, new RpcUtil.QueryAccountListener() {
+                long chunkChi1 = RpcUtil.getStorageChi(chunkSize1, mDuration, new RpcUtil.QueryAccountListener() {
                     @Override
                     public void onQueryAccountError(String errMsg) {
                         Log.e(TAG, "getStorageChi error : " + errMsg);
@@ -346,7 +346,7 @@ public class RenewModelImpl implements RenewModel {
                 });
 
                 if (chunkChi1 > 0) {
-                    int chunkChi2 = RpcUtil.getStorageChi(chunkSize2, mDuration, new RpcUtil.QueryAccountListener() {
+                    long chunkChi2 = RpcUtil.getStorageChi(chunkSize2, mDuration, new RpcUtil.QueryAccountListener() {
                         @Override
                         public void onQueryAccountError(String errMsg) {
                             Log.e(TAG, "getStorageChi error : " + errMsg);
@@ -356,14 +356,14 @@ public class RenewModelImpl implements RenewModel {
                         }
                     });
 
-                    int totalChi = chunkChi1 * (chunkCount - 1) + chunkChi2;
+                    long totalChi = chunkChi1 * (chunkCount - 1) + chunkChi2;
 
                     if (totalChi > 0 && mModelImplWeakReference.get() != null) {
                         mModelImplWeakReference.get().showGetTotalChi(totalChi, mChiPrice);
                     }
                 }
             } else {
-                int totalChi = RpcUtil.getStorageChi(mFileSize, mDuration, new RpcUtil.QueryAccountListener() {
+                long totalChi = RpcUtil.getStorageChi(mFileSize, mDuration, new RpcUtil.QueryAccountListener() {
                     @Override
                     public void onQueryAccountError(String errMsg) {
                         Log.e(TAG, "getStorageChi error : " + errMsg);

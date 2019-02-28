@@ -32,7 +32,7 @@ public interface UploadView {
 
     void showRequestTotalChiView();
 
-    void showGetTotalChiView(int totalChi);
+    void showGetTotalChiView(long totalChi);
 
     void showGetTotalChiFailedView(String errMsg);
 }
