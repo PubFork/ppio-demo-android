@@ -1688,206 +1688,156 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
                     return;
                 }
 
-                mBlockFileOptionsBottomDialog = null;
+                final FileInfo fileInfo = mMyFileAdapter.getFileInfo(position);
+                if (fileInfo != null) {
+                    mBlockFileOptionsBottomDialog = null;
 
-                mBlockFileOptionsBottomDialog = new BlockFileOptionsBottomDialog(PpioDataActivity.this,
-                        new BlockFileOptionsBottomDialog.OnBlockFileOptionsOnClickListener() {
+                    mBlockFileOptionsBottomDialog = new BlockFileOptionsBottomDialog(PpioDataActivity.this,
+                            new BlockFileOptionsBottomDialog.OnBlockFileOptionsOnClickListener() {
 
-                            @Override
-                            public void onDetail() {
-                                mBlockFileOptionsBottomDialog.dismiss();
+                                @Override
+                                public void onDetail() {
+                                }
 
-                                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                    @Override
-                                    public void onRunOperation() {
-                                        if (mShowStatusPresenter != null) {
-                                            String fileHash = mMyFileAdapter.getFileHash(position);
-                                            if (!TextUtils.isEmpty(fileHash)) {
-                                                mShowStatusPresenter.startStatus(Constant.Data.DEFAULT_BUCKET, fileHash);
-                                            }
+                                @Override
+                                public void onDownload() {
+                                    mBlockFileOptionsBottomDialog.dismiss();
+                                    long fileSize = fileInfo.getLength();
+
+                                    mSetChiPriceDialog = new SetChiPriceDialog(PpioDataActivity.this, Constant.DEFAULT.CHI_PRICE, new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
+                                        @Override
+                                        public void onCancel() {
+                                            mSetChiPriceDialog.dismiss();
                                         }
-                                    }
 
-                                    @Override
-                                    public void onCanceled() {
+                                        @Override
+                                        public void onSet(int chiPrice) {
+                                            Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
+                                                @Override
+                                                public void onRunOperation() {
+                                                    if (StorageUtil.getAvailableStorage() >= (fileSize * 2.2)) {
+                                                        if (mDownloadPresenter != null) {
+                                                            String bucket = fileInfo.getBucketName();
+                                                            String key = fileInfo.getName();
+                                                            if (!TextUtils.isEmpty(bucket) && !TextUtils.isEmpty(key)) {
+                                                                DownloadInfo downloadInfo = new DownloadInfo();
+                                                                downloadInfo.setBucket(bucket);
+                                                                downloadInfo.setKey(key);
+                                                                downloadInfo.setChiPrice("" + chiPrice);
 
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onDownload() {
-                                mBlockFileOptionsBottomDialog.dismiss();
-
-                                mSetChiPriceDialog = new SetChiPriceDialog(PpioDataActivity.this, Constant.DEFAULT.CHI_PRICE, new SetChiPriceDialog.OnSetChiPriceOnClickListener() {
-                                    @Override
-                                    public void onCancel() {
-                                        mSetChiPriceDialog.dismiss();
-                                    }
-
-                                    @Override
-                                    public void onSet(int chiPrice) {
-
-                                        Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-                                            @Override
-                                            public void onRunOperation() {
-                                                long fileSize = mMyFileAdapter.getFileInfo(position).getLength();
-                                                if (StorageUtil.getAvailableStorage() >= (fileSize * 2.2)) {
-                                                    if (mDownloadPresenter != null) {
-                                                        String bucket = mMyFileAdapter.getFileInfoBucket(position);
-                                                        String key = mMyFileAdapter.getFileInfoKey(position);
-                                                        if (!TextUtils.isEmpty(bucket) && !TextUtils.isEmpty(key)) {
-                                                            DownloadInfo downloadInfo = new DownloadInfo();
-                                                            downloadInfo.setBucket(bucket);
-                                                            downloadInfo.setKey(key);
-                                                            downloadInfo.setChiPrice("" + chiPrice);
-
-                                                            mDownloadPresenter.startDownload(downloadInfo);
+                                                                mDownloadPresenter.startDownload(downloadInfo);
+                                                            }
                                                         }
+                                                    } else {
+                                                        ToastUtil.showToast(PpioDataActivity.this,
+                                                                "Downloading requires extra space, there is not enough current space to download!",
+                                                                Toast.LENGTH_LONG);
                                                     }
-                                                } else {
-                                                    ToastUtil.showToast(PpioDataActivity.this,
-                                                            "Downloading requires extra space, there is not enough current space to download!",
-                                                            Toast.LENGTH_LONG);
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCanceled() {
-
-                                            }
-                                        });
-
-                                        mSetChiPriceDialog.dismiss();
-                                    }
-                                }, new DialogInterface.OnDismissListener() {
-                                    @Override
-                                    public void onDismiss(DialogInterface dialog) {
-
-                                    }
-                                }, 0, mMyFileAdapter.getFileInfo(position).getLength());
-
-                                mSetChiPriceDialog.show();
-                            }
-
-                            @Override
-                            public void onShareUnShare() {
-                                mBlockFileOptionsBottomDialog.dismiss();
-
-                                if (mShowShareCodePresenter != null) {
-                                    String fileHash = mMyFileAdapter.getFileHash(position);
-                                    if (!TextUtils.isEmpty(fileHash)) {
-                                        mShowShareCodePresenter.getShareCode(Constant.Data.DEFAULT_BUCKET, fileHash);
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onRename() {
-                                mBlockFileOptionsBottomDialog.dismiss();
-
-                                //
-                                ToastUtil.showToast(PpioDataActivity.this, "Not implemented!", Toast.LENGTH_SHORT);
-//                                mRenameDialog = new RenameDialog(PpioDataActivity.this,
-//                                        new RenameDialog.OnRenameOnClickListener() {
-//                                            @Override
-//                                            public void onCancel() {
-//                                                mRenameDialog.dismiss();
-//                                            }
-//
-//                                            @Override
-//                                            public void onRename(String name) {
-//                                                Util.runNetOperation(PpioDataActivity.this, new Util.RunNetOperationCallBack() {
-//                                                    @Override
-//                                                    public void onRunOperation() {
-//
-//                                                    }
-//                                                });
-//
-//                                                mRenameDialog.dismiss();
-//                                            }
-//                                        },
-//                                        new DialogInterface.OnDismissListener() {
-//                                            @Override
-//                                            public void onDismiss(DialogInterface dialog) {
-//                                                mRenameDialog = null;
-//                                            }
-//                                        });
-//
-//                                mRenameDialog.show();
-                                //
-                            }
-
-                            @Override
-                            public void onRenew() {
-                                mBlockFileOptionsBottomDialog.dismiss();
-
-                                FileInfo fileInfo = mMyFileAdapter.getFileInfo(position);
-
-                                startActivityForResult(new Intent(PpioDataActivity.this, RenewActivity.class)
-                                        .setAction(Constant.Intent.RENEW_ACTION)
-                                        .putExtra(Constant.Data.RENEW_FILE, fileInfo), Constant.Code.REQUEST_RENEW);
-                            }
-
-                            @Override
-                            public void onDelete() {
-                                mBlockFileOptionsBottomDialog.dismiss();
-
-                                if (mDeleteDialog != null) {
-                                    mDeleteDialog.dismiss();
-                                    mDeleteDialog = null;
-                                }
-
-                                String fileHash = mMyFileAdapter.getFileHash(position);
-                                String bucket = mMyFileAdapter.getFileInfoBucket(position);
-                                String key = mMyFileAdapter.getFileInfoKey(position);
-                                String taskStatus = mMyFileAdapter.getFileInfo(position).getStatus();
-                                if (!TextUtils.isEmpty(fileHash) &&
-                                        !TextUtils.isEmpty(bucket) &&
-                                        !TextUtils.isEmpty(key)) {
-                                    mDeleteDialog = new DeleteDialog(PpioDataActivity.this,
-                                            fileHash,
-                                            new DeleteDialog.OnDeleteOnClickListener() {
-                                                @Override
-                                                public void onCancel() {
-                                                    mDeleteDialog.dismiss();
                                                 }
 
                                                 @Override
-                                                public void onDelete() {
-
-                                                    if (mDeletePresenter != null) {
-                                                        mDeletePresenter.delete(bucket, key, taskStatus);
-                                                    }
-
-                                                    mDeleteDialog.dismiss();
-                                                }
-                                            },
-                                            new DialogInterface.OnDismissListener() {
-                                                @Override
-                                                public void onDismiss(DialogInterface dialog) {
+                                                public void onCanceled() {
 
                                                 }
                                             });
 
-                                    mDeleteDialog.show();
+                                            mSetChiPriceDialog.dismiss();
+                                        }
+                                    }, new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+
+                                        }
+                                    }, 0, fileSize);
+
+                                    mSetChiPriceDialog.show();
+                                }
+
+                                @Override
+                                public void onShareUnShare() {
+                                    mBlockFileOptionsBottomDialog.dismiss();
+
+                                    if (mShowShareCodePresenter != null) {
+                                        String fileHash = fileInfo.getName();
+                                        if (!TextUtils.isEmpty(fileHash)) {
+                                            mShowShareCodePresenter.getShareCode(Constant.Data.DEFAULT_BUCKET, fileHash);
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onRename() {
+                                }
+
+                                @Override
+                                public void onRenew() {
+                                    mBlockFileOptionsBottomDialog.dismiss();
+                                    startActivityForResult(new Intent(PpioDataActivity.this, RenewActivity.class)
+                                            .setAction(Constant.Intent.RENEW_ACTION)
+                                            .putExtra(Constant.Data.RENEW_FILE, fileInfo), Constant.Code.REQUEST_RENEW);
+                                }
+
+                                @Override
+                                public void onDelete() {
+                                    mBlockFileOptionsBottomDialog.dismiss();
+
+                                    if (mDeleteDialog != null) {
+                                        mDeleteDialog.dismiss();
+                                        mDeleteDialog = null;
+                                    }
+
+                                    String fileHash = fileInfo.getName();
+                                    String bucket = fileInfo.getBucketName();
+                                    String key  = fileInfo.getName();
+                                    String taskStatus = fileInfo.getStatus();
+
+                                    if (!TextUtils.isEmpty(fileHash) &&
+                                            !TextUtils.isEmpty(bucket) &&
+                                            !TextUtils.isEmpty(key)) {
+                                        mDeleteDialog = new DeleteDialog(PpioDataActivity.this,
+                                                fileHash,
+                                                new DeleteDialog.OnDeleteOnClickListener() {
+                                                    @Override
+                                                    public void onCancel() {
+                                                        mDeleteDialog.dismiss();
+                                                    }
+
+                                                    @Override
+                                                    public void onDelete() {
+
+                                                        if (mDeletePresenter != null) {
+                                                            mDeletePresenter.delete(bucket, key, taskStatus);
+                                                        }
+
+                                                        mDeleteDialog.dismiss();
+                                                    }
+                                                },
+                                                new DialogInterface.OnDismissListener() {
+                                                    @Override
+                                                    public void onDismiss(DialogInterface dialog) {
+
+                                                    }
+                                                });
+
+                                        mDeleteDialog.show();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancel() {
+                                    mBlockFileOptionsBottomDialog.dismiss();
+                                }
+                            },
+                            new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    mBlockFileOptionsBottomDialog = null;
                                 }
                             }
+                    );
 
-                            @Override
-                            public void onCancel() {
-                                mBlockFileOptionsBottomDialog.dismiss();
-                            }
-                        },
-                        new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                mBlockFileOptionsBottomDialog = null;
-                            }
-                        }
-                );
-
-                mBlockFileOptionsBottomDialog.show();
+                    mBlockFileOptionsBottomDialog.show();
+                }
             }
         });
 
