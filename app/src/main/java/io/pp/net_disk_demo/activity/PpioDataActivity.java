@@ -998,7 +998,8 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
         stopShowNetWorkingView();
 
         if (mDeletePresenter != null) {
-            mUploadFailedInfoHashMap.put(bucket + key, bucket + key);
+            mUploadFailedInfoHashMap.put(bucket + "/" + key, bucket + "/" + key);
+
             mDeletePresenter.deleteSilently(bucket, key);
         }
 
@@ -1788,7 +1789,7 @@ public class PpioDataActivity extends BaseActivity implements PpioDataView,
 
                                     String fileHash = fileInfo.getName();
                                     String bucket = fileInfo.getBucketName();
-                                    String key  = fileInfo.getName();
+                                    String key = fileInfo.getName();
                                     String taskStatus = fileInfo.getStatus();
 
                                     if (!TextUtils.isEmpty(fileHash) &&
