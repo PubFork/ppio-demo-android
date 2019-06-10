@@ -43,6 +43,7 @@ import io.pp.net_disk_demo.threadpool.CancelFixedThreadPool;
 import io.pp.net_disk_demo.util.DateUtil;
 import io.pp.net_disk_demo.util.ToastUtil;
 import io.pp.net_disk_demo.util.XPermissionUtils;
+import poss.Progress;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -51,25 +52,19 @@ public class TestActivity extends BaseActivity {
     private static final String TAG = TestActivity.class.getSimpleName();
 
     private static final int LOG_IN = 0x01;
-    private static final int SCAN_UPLOAD_FILE = 0x02;
+    //private static final int SCAN_UPLOAD_FILE = 0x02;
     private static final int UPLOAD_IN = 0x03;
-    private static final int SCAN_DOWNLOAD_FILE = 0x04;
+    //private static final int SCAN_DOWNLOAD_FILE = 0x04;
     private static final int DOWNLOAD_IN = 0x05;
 
-    private Button mUploadBtn = null;
-    private Button mDownloadBtn = null;
+    private Button mStartBtn = null;
     private Button mExitBtn = null;
 
     private TextView mStatusTv = null;
 
     private int mOperate = -1;
 
-    private ArrayList<File> mUploadFileList = null;
-    private int mCurrentUploadIndex = 0;
-    
-    private ArrayList<FileInfo> mDownloadFileList = null;
-    private int mCurrentDownloadIndex = 0;
-
+    private String mCurrentFileKey = null;
     private CancelFixedThreadPool mLoopThreadPool = null;
     private LoopRunnable mLoopRunnable = null;
     private LoopHandler mHandler = null;
@@ -237,26 +232,17 @@ public class TestActivity extends BaseActivity {
     }
 
     private void initView() {
-        mUploadBtn = findViewById(R.id.upload_btn);
-        mDownloadBtn = findViewById(R.id.download_btn);
+        mStartBtn = findViewById(R.id.start_btn);
         mExitBtn = findViewById(R.id.exit_btn);
         mStatusTv = findViewById(R.id.status_tv);
     }
 
     private void initListener() {
-        mUploadBtn.setOnClickListener(new View.OnClickListener() {
+        mStartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mOperate = SCAN_UPLOAD_FILE;
-                mHandler.sendEmptyMessageDelayed(SCAN_UPLOAD_FILE, 0);
-            }
-        });
-
-        mDownloadBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mOperate = SCAN_DOWNLOAD_FILE;
-                mHandler.sendEmptyMessageDelayed(SCAN_DOWNLOAD_FILE, 0);
+                mStartBtn.setEnabled(false);
+                mHandler.sendEmptyMessageDelayed(UPLOAD_IN, 0);
             }
         });
 
@@ -273,8 +259,7 @@ public class TestActivity extends BaseActivity {
         mLoopRunnable = new LoopRunnable(TestActivity.this);
         mHandler = new LoopHandler();
 
-        mUploadFileList = new ArrayList<>();
-        mDownloadFileList = new ArrayList<>();
+        mCurrentFileKey = "";
     }
 
     protected void checkPermissions() {
@@ -361,27 +346,15 @@ public class TestActivity extends BaseActivity {
 
                 break;
 
-            case SCAN_UPLOAD_FILE:
-
-                scanUploadFile();
-
-                break;
-
             case UPLOAD_IN:
 
-                upload();
-
-                break;
-
-            case SCAN_DOWNLOAD_FILE:
-
-                scanDownloadFile();
+                uploadScan();
 
                 break;
 
             case DOWNLOAD_IN:
 
-                download();
+                downloadScan();
 
                 break;
 
@@ -450,62 +423,7 @@ public class TestActivity extends BaseActivity {
         });
     }
 
-    private void scanUploadFile() {
-        //
-        Log.e(TAG, "scanUploadFile()");
-        //
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                disableAllBtn();
-
-                mUploadBtn.setText("uploading...");
-                mStatusTv.setText("scan files to upload");
-            }
-        });
-
-        mUploadFileList.clear();
-
-        ergodicAllFiles(Environment.getExternalStorageDirectory().getAbsolutePath());
-        //ergodicAllFiles(Constant.PPIO_File.APP_CACHE_DIR);
-
-        mOperate = UPLOAD_IN;
-        mHandler.sendEmptyMessageDelayed(UPLOAD_IN, 2000l);
-    }
-
-    private void scanDownloadFile() {
-        //
-        Log.e(TAG, "scanDownloadFile()");
-        //
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                disableAllBtn();
-
-                mDownloadBtn.setText("Downloading...");
-                mStatusTv.setText("scan files to download");
-            }
-        });
-
-        mDownloadFileList = PossUtil.listObject(Constant.Data.DEFAULT_BUCKET, new PossUtil.ListObjectListener() {
-            @Override
-            public void onListObjectError(String errMsg) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mStatusTv.setText("get file list error: " + errMsg);
-                    }
-                });
-            }
-        });
-
-        mOperate = DOWNLOAD_IN;
-        mHandler.sendEmptyMessageDelayed(DOWNLOAD_IN, 2000l);
-    }
-
-    private boolean hasRunningTask() {
+    private boolean hasRunningTask(String taskId) {
         //
         Log.e(TAG, " hasRunningTask()");
         //
@@ -518,202 +436,197 @@ public class TestActivity extends BaseActivity {
 
         for (int i = 0; i < taskInfoList.size(); i++) {
             TaskInfo taskInfo = taskInfoList.get(i);
-            Log.e(TAG, "loopUpload() Id: " + taskInfo.getId() + "\n" +
-                    "type: " + taskInfo.getType() + "\n" +
-                    "form: " + taskInfo.getFrom() + "\n" +
-                    "to: " + taskInfo.getTo() + "\n" +
-                    "state: " + taskInfo.getState() + "\n" +
-                    "progress: " + taskInfo.getProgress());
 
-            if ((Constant.TaskType.PUT.equals(taskInfo.getType()) ||
-                    Constant.TaskType.GET.equals(taskInfo.getType())) &&
-                    (Constant.TaskState.PENDING.equals(taskInfo.getState()) ||
-                            Constant.TaskState.RUNNING.equals(taskInfo.getState()))) {
+
+            //if (taskId.equals(taskInfo.getId())) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
+                    double progressPercent = 0;
+                    if (progress.getTotalBytes() != 0) {
+                        progressPercent = (double) progress.getFinishedBytes() / progress.getTotalBytes();
+                    }
+
+                    mStatusTv.setText("hasRunningTask() Id: " + taskInfo.getId() + "\n" +
+                            "type: " + taskInfo.getType() + "\n" +
+                            "form: " + taskInfo.getFrom() + "\n" +
+                            "to: " + taskInfo.getTo() + "\n" +
+                            "state: " + taskInfo.getState() + "\n" +
+                            "error: " + taskInfo.getError() + "\n" +
+                            "progress: " + progressPercent);
+
+                    Log.e(TAG, "hasRunningTask()() Id: " + taskInfo.getId() + "\n" +
+                            "type: " + taskInfo.getType() + "\n" +
+                            "form: " + taskInfo.getFrom() + "\n" +
+                            "to: " + taskInfo.getTo() + "\n" +
+                            "state: " + taskInfo.getState() + "\n" +
+                            "error: " + taskInfo.getError() + "\n" +
+                            "progress: " + progressPercent);
+                }
+            });
+
+            if ((Constant.TaskState.PENDING.equals(taskInfo.getState()) ||
+                    Constant.TaskState.RUNNING.equals(taskInfo.getState()))) {
+
                 return true;
             }
+            //}
         }
 
         return false;
     }
 
-    private void upload() {
-        //
-        Log.e(TAG, " upload()");
-        //
-        if (hasRunningTask()) {
-            //
-            Log.e(TAG, " upload() if (hasRunningTask())");
-            //
-            mHandler.sendEmptyMessageDelayed(UPLOAD_IN, 3000l);
-        } else {
-            //
-            Log.e(TAG, " upload() if (!hasRunningTask())");
-            //
-            if (mCurrentUploadIndex < mUploadFileList.size()) {
-                File file = mUploadFileList.get(mCurrentUploadIndex);
+    private void uploadScan() {
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "ppio_upload_file");
 
-                UploadInfo uploadInfo = new UploadInfo();
-                uploadInfo.setFileName(file.getName());
-                uploadInfo.setFile(file.getAbsolutePath());
+        UploadInfo uploadInfo = new UploadInfo();
+        final String key = DateUtil.getCurrentTimeStr() + file.getName();
+        mCurrentFileKey = key;
+        uploadInfo.setFileName(key);
+        uploadInfo.setFile(file.getAbsolutePath());
 
-                Calendar calendar = Calendar.getInstance();
-                //default expired date is a month later
-                calendar.add(Calendar.MONTH, 1);
-                calendar.set(Calendar.HOUR_OF_DAY, 8);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                DateInfo dateInfo = new DateInfo(calendar.get(Calendar.YEAR)
-                        , calendar.get(Calendar.MONTH)
-                        , calendar.get(Calendar.DAY_OF_MONTH));
+        Calendar calendar = Calendar.getInstance();
+        //default expired date is a month later
+        calendar.add(Calendar.MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        DateInfo dateInfo = new DateInfo(calendar.get(Calendar.YEAR)
+                , calendar.get(Calendar.MONTH)
+                , calendar.get(Calendar.DAY_OF_MONTH));
 
-                uploadInfo.setExpiredTime(dateInfo.getDate());
+        uploadInfo.setExpiredTime(dateInfo.getDate());
 
-                uploadInfo.setFileSize(file.length());
-                uploadInfo.setChiPrice("" + 100);
-                uploadInfo.setCopiesCount(5);
+        uploadInfo.setFileSize(file.length());
+        uploadInfo.setChiPrice("" + 100);
+        uploadInfo.setCopiesCount(5);
 
-                if (possUploadObject(uploadInfo)) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mStatusTv.setText("uploading " + uploadInfo.getFile());
-                        }
-                    });
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mStatusTv.setText("upload " + uploadInfo.getFile() + "failed");
-                        }
-                    });
-                }
-
-                mCurrentUploadIndex++;
-
-                mHandler.sendEmptyMessageDelayed(UPLOAD_IN, 3000l);
-            } else {
+        String taskId = possUploadObject(uploadInfo, new PossUtil.PutObjectListener() {
+            @Override
+            public void onPutObjectError(String fileCode, String errMsg) {
+                //upload fail
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        enableAllBtn();
-
-                        mUploadBtn.setText("uploaded");
-
-                        mStatusTv.setText("upload all file completed");
+                        mStatusTv.setText("upload " + uploadInfo.getFile() + "failed, \n errpor: " + errMsg);
                     }
                 });
-            }
-        }
-    }
 
-    private void download() {
-        //
-        Log.e(TAG, "download()");
-        //
-        if (hasRunningTask()) {
-            //
-            Log.e(TAG, " upload() if (!hasRunningTask())");
-            //
+                mHandler.sendEmptyMessageDelayed(DOWNLOAD_IN, 4000l);
+            }
+
+            @Override
+            public void onPutObjectFinished(String fileCode) {
+
+            }
+        });
+
+        if (!TextUtils.isEmpty(taskId)) {
+            //start upload succeed
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mStatusTv.setText("uploading " + uploadInfo.getFile());
+                }
+            });
+
+            while (hasRunningTask(taskId)) {
+                //
+                Log.e(TAG, "uploadScan() while (hasRunningTask())");
+                //
+                try {
+                    Thread.sleep(2000l);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             mHandler.sendEmptyMessageDelayed(DOWNLOAD_IN, 2000l);
         } else {
-            //
-            Log.e(TAG, " download() if (!hasRunningTask())");
-            //
-            if (mCurrentDownloadIndex < mDownloadFileList.size()) {
-                FileInfo downloadFile = mDownloadFileList.get(mCurrentDownloadIndex);
-                String bucket = downloadFile.getBucketName();
-                String key = downloadFile.getName();
-                if (!TextUtils.isEmpty(bucket) && !TextUtils.isEmpty(key)) {
-                    DownloadInfo downloadInfo = new DownloadInfo();
-                    downloadInfo.setBucket(bucket);
-                    downloadInfo.setKey(key);
-                    downloadInfo.setChiPrice("" + 100);
 
-                    if (possGetObject(downloadInfo)) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mStatusTv.setText("downloading " + downloadFile.getBucketName() + "/" + downloadInfo.getKey());
-                            }
-                        });
-                    } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mStatusTv.setText("download " + downloadFile.getBucketName() + "/" + downloadInfo.getKey() + " failed... ");
-                            }
-                        });
-                    }
-                }
+        }
+    }
 
-                mCurrentDownloadIndex++;
-                mHandler.sendEmptyMessageDelayed(DOWNLOAD_IN, 3000l);
-            } else {
+    private void downloadScan() {
+        ArrayList<FileInfo> list = PossUtil.listObject(Constant.Data.DEFAULT_BUCKET, new PossUtil.ListObjectListener() {
+            @Override
+            public void onListObjectError(String errMsg) {
+
+            }
+        });
+
+        //
+        Log.e(TAG, "downloadScan() download list = " + list);
+        //
+        if (list != null) {
+            //
+            Log.e(TAG, "downloadScan() list.size() = " + list.size());
+            //
+            for (int i = 0; i < list.size(); i++) {
+                FileInfo fileInfo = list.get(i);
+                Log.e(TAG, "downloadScan() list.get(" + i + "). bucket  = " + fileInfo.getBucketName());
+                Log.e(TAG, "downloadScan() list.get(" + i + "). key  = " + fileInfo.getName());
+            }
+        }
+
+        DownloadInfo downloadInfo = new DownloadInfo();
+        downloadInfo.setBucket(Constant.Data.DEFAULT_BUCKET);
+        downloadInfo.setKey(mCurrentFileKey);
+        downloadInfo.setChiPrice("" + 100);
+
+        String taskId = possGetObject(downloadInfo, new PossUtil.GetObjectListener() {
+            @Override
+            public void onGetObjectError(String errMsg) {
+                //start download fail
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        enableAllBtn();
-                        mDownloadBtn.setText("downloaded");
-                        mStatusTv.setText("download all file completed");
+                        Log.e(TAG, "downloadScan() fail " + downloadInfo.getBucket() + downloadInfo.getKey() + " \n error: " + errMsg);
+                        mStatusTv.setText("downloadScan() fail " + downloadInfo.getBucket() + downloadInfo.getKey() + " \n error: " + errMsg);
                     }
                 });
-            }
-        }
-    }
 
-    private void ergodicAllFiles(String dirPath) {
-        File directory = new File(dirPath);
-        if (directory.exists()) {
-            if (directory.isDirectory()) {
-                //
-                if ("com.huangyuan.jidinghe_ppio".equals(directory.getName())) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ToastUtil.showToast(TestActivity.this, "is com.huangyuan.jidinghe_ppio !", Toast.LENGTH_LONG);
-                        }
-                    });
-                } else {
-                    //
-                    File[] files = directory.listFiles();
-                    if (files != null) {
-                        for (int i = 0; i < files.length; i++) {
-                            File file = files[i];
-                            if (file != null && file.exists()) {
-                                if (file.isDirectory()) {
-                                    //
-                                    Log.e(TAG, "ergodicAllFiles() directory " + file.getAbsolutePath());
-                                    //
-                                    ergodicAllFiles(file.getAbsolutePath());
-                                } else {
-                                    //
-                                    Log.e(TAG, "ergodicAllFiles() file " + file.getAbsolutePath());
-                                    mUploadFileList.add(file);
-                                    //
-                                }
-                            }
-                        }
-                    }
+                mHandler.sendEmptyMessageDelayed(UPLOAD_IN, 4000l);
+            }
+        });
+
+        if (!TextUtils.isEmpty(taskId)) {//start download succeed
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mStatusTv.setText("downloading " + downloadInfo.getBucket() + "/" + downloadInfo.getKey());
                 }
-            } else {
+            });
+
+            while (hasRunningTask(taskId)) {
                 //
-                Log.e(TAG, "ergodicAllFiles() directory " + directory.getAbsolutePath());
+                Log.e(TAG, "downloadScan() while (hasRunningTask())");
                 //
+                try {
+                    Thread.sleep(2000l);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+
+            mHandler.sendEmptyMessageDelayed(UPLOAD_IN, 2000l);
+        } else {
+            Log.e(TAG, "download fail...");
         }
     }
 
-    private boolean possUploadObject(UploadInfo uploadInfo) {
+    private String possUploadObject(UploadInfo uploadInfo, PossUtil.PutObjectListener putObjectListener) {
         final String bucket = "bucket";
-        final String fileName = uploadInfo.getFileName();
+        //final String fileName = uploadInfo.getFileName();
         final String filePath = uploadInfo.getFile();
-        final String key = DateUtil.getCurrentTimeStr() + fileName;
+        final String key = uploadInfo.getFileName();
         final String meta = "filename=" + "fileName" + ",fileSize=" + uploadInfo.getFileSize();
         final long copies = uploadInfo.getCopiesCount();
         final String storageTime = uploadInfo.getExpiredTime();
         final String chiPriceStr = uploadInfo.getChiPrice();
         final boolean encrypt = uploadInfo.isSecure();
-        final String fileCode = SystemClock.currentThreadTimeMillis() + "_" + fileName;
+        final String fileCode = uploadInfo.getFileName();
 
         Log.e(TAG, "possUploadObject()" +
                 "\n bucket :" + bucket +
@@ -727,7 +640,7 @@ public class TestActivity extends BaseActivity {
 
         if (copies < 1) {
             //publishProgress("copies is less than 1");
-            return false;
+            return "";
         }
 
         int chiPrice;
@@ -736,12 +649,12 @@ public class TestActivity extends BaseActivity {
             if (chiPrice < 1) {
                 //publishProgress("chi price can not be less than 1!");
 
-                return false;
+                return "";
             }
         } catch (NumberFormatException e) {
             //publishProgress("chi price format is incorrect, " + e.getMessage());
 
-            return false;
+            return "";
         }
 
         PossUtil.createBucket(Constant.Data.DEFAULT_BUCKET, new PossUtil.CreateBucketListener() {
@@ -766,18 +679,7 @@ public class TestActivity extends BaseActivity {
                 storageTime,
                 encrypt,
                 fileCode,
-                new PossUtil.PutObjectListener() {
-                    @Override
-                    public void onPutObjectError(String fileCode, String errMsg) {
-                        //publishProgress(errMsg);
-                        Log.e(TAG, "possUploadObject()  " + filePath + "onPutObjectError() error: = " + errMsg);
-                    }
-
-                    @Override
-                    public void onPutObjectFinished(String fileCode) {
-
-                    }
-                });
+                putObjectListener);
 
         if (!TextUtils.isEmpty(taskId)) {
 
@@ -805,13 +707,13 @@ public class TestActivity extends BaseActivity {
                     hasTaskId = true;
                 }
             }
-            return true;
+            return taskId;
         }
 
-        return false;
+        return "";
     }
 
-    private boolean possGetObject(DownloadInfo downloadInfo) {
+    private String possGetObject(DownloadInfo downloadInfo, PossUtil.GetObjectListener getObjectListener) {
         File downloadDir = new File(Constant.PPIO_File.DOWNLOAD_DIR);
         boolean directoryExists = downloadDir.exists();
         if (!directoryExists) {
@@ -868,26 +770,21 @@ public class TestActivity extends BaseActivity {
 
                 String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + fileName;
 
-                return PossUtil.getObject(bucket, key, file, chiPrice, new PossUtil.GetObjectListener() {
-                    @Override
-                    public void onGetObjectError(String errMsg) {
-
-                    }
-                });
+                return PossUtil.getObject(bucket, key, file, chiPrice, getObjectListener);
             }
         }
 
-        return false;
+        return "";
     }
 
     private void disableAllBtn() {
-        mUploadBtn.setEnabled(false);
-        mDownloadBtn.setEnabled(false);
+//        mUploadBtn.setEnabled(false);
+//        mDownloadBtn.setEnabled(false);
     }
 
     private void enableAllBtn() {
-        mUploadBtn.setEnabled(true);
-        mDownloadBtn.setEnabled(true);
+//        mUploadBtn.setEnabled(true);
+//        mDownloadBtn.setEnabled(true);
     }
 
     public void bindUploadService(IBinder service) {

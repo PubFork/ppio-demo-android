@@ -4,20 +4,28 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/upload_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="Upload"
-        android:textAllCaps="false" />
+    <!--<Button-->
+    <!--android:id="@+id/upload_btn"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_margin="10dp"-->
+    <!--android:text="Upload"-->
+    <!--android:textAllCaps="false" />-->
+
+    <!--<Button-->
+    <!--android:id="@+id/download_btn"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_margin="10dp"-->
+    <!--android:text="Download"-->
+    <!--android:textAllCaps="false" />-->
 
     <Button
-        android:id="@+id/download_btn"
+        android:id="@+id/start_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="Download"
+        android:text="Start"
         android:textAllCaps="false" />
 
     <Button

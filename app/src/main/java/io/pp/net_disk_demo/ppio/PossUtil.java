@@ -521,23 +521,24 @@ public class PossUtil {
         return objectStatus;
     }
 
-    public static boolean getObject(String bucket, String key, String file, String
+    public static String getObject(String bucket, String key, String file, String
             chiPrice, GetObjectListener getObjectListener) {
         if (mUser != null) {
             try {
-                mUser.getObject(bucket, key, "", file, chiPrice);
+                return mUser.getObject(bucket, key, "", file, chiPrice);
             } catch (Exception e) {
                 if (getObjectListener != null) {
                     getObjectListener.onGetObjectError(e.getMessage());
                 }
 
-                return false;
             }
         } else {
-
+            if (getObjectListener != null) {
+                getObjectListener.onGetObjectError("poss is null");
+            }
         }
 
-        return true;
+        return "";
     }
 
     public static boolean getObjectShared(String shareCode, String file, String
@@ -649,7 +650,7 @@ public class PossUtil {
 
                     taskInfo.setId(jsonObject.getString(Constant.TaskKey.ID));
                     taskInfo.setType(jsonObject.getString(Constant.TaskKey.TYPE));
-                    taskInfo.setState(jsonObject.getString(Constant.TaskKey.TYPE));
+                    taskInfo.setState(jsonObject.getString(Constant.TaskKey.STATE));
                     taskInfo.setFrom(jsonObject.getString(Constant.TaskKey.FROM));
                     taskInfo.setTo(jsonObject.getString(Constant.TaskKey.TO));
                     taskInfo.setTotal(jsonObject.getLong(Constant.TaskKey.TOTAL));

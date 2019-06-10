@@ -361,14 +361,14 @@ public class DownloadService extends Service {
 
                     String file = Constant.PPIO_File.DOWNLOAD_PATH_SUFFIX + fileName;
 
-                    return PossUtil.getObject(bucket, key, file, chiPrice, new PossUtil.GetObjectListener() {
+                    return !TextUtils.isEmpty(PossUtil.getObject(bucket, key, file, chiPrice, new PossUtil.GetObjectListener() {
                         @Override
                         public void onGetObjectError(String errMsg) {
                             if (mExecuteTasksServiceWeakReference.get() != null) {
                                 mExecuteTasksServiceWeakReference.get().showDownloadStartFail(errMsg);
                             }
                         }
-                    });
+                    }));
                 } else {
                     return false;
                 }
