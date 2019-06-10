@@ -31,20 +31,20 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity
-            android:name=".activity.CheckHasKeyStoreActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/LoadingActivityTheme">
+        <!--<activity-->
+        <!--android:name=".activity.CheckHasKeyStoreActivity"-->
+        <!--android:screenOrientation="portrait"-->
+        <!--android:theme="@style/LoadingActivityTheme">-->
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.MAIN" />-->
+        <!--<action android:name="android.intent.action.VIEW" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+        <!--<category android:name="android.intent.category.LAUNCHER" />-->
+        <!--<category android:name="android.intent.category.DEFAULT" />-->
+        <!--</intent-filter>-->
 
-        </activity>
+        <!--</activity>-->
 
         <activity
             android:name=".activity.InputPassPhraseActivity"
@@ -123,8 +123,15 @@
 
         <activity
             android:name=".activity.TestActivity"
-            android:launchMode="singleTop"
             android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
 
         </activity>
 

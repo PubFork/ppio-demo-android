@@ -111,6 +111,17 @@ public class DownloadService extends Service {
         super.onDestroy();
     }
 
+    public void startNotification() {
+        Notification notification = getDownloadingNotification(0, 0);
+        mNotificationManager.notify(mUploadingNotificationId, notification);
+        startForeground(mUploadingNotificationId, notification);
+    }
+
+    public void cancelNotification() {
+        stopForeground(true);
+        mNotificationManager.cancel(mUploadingNotificationId);
+    }
+
     private Notification getDownloadingNotification(int downloadingCount, double progress) {
         progress = progress <= 1.00d ? progress : 1.00d;
 

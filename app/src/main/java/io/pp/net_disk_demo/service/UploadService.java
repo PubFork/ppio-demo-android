@@ -107,6 +107,17 @@ public class UploadService extends Service {
         super.onRebind(intent);
     }
 
+    public void startNotification() {
+        Notification notification = getUploadingNotification(0, 0);
+        mNotificationManager.notify(mUploadingNotificationId, notification);
+        startForeground(mUploadingNotificationId, notification);
+    }
+
+    public void cancelNotification() {
+        stopForeground(true);
+        mNotificationManager.cancel(mUploadingNotificationId);
+    }
+
     private Notification getUploadingNotification(int uploadingCount, double progress) {
         progress = progress <= 1.00d ? progress : 1.00d;
 
