@@ -62,6 +62,8 @@ public class TestActivity extends BaseActivity {
 
     private TextView mStatusTv = null;
 
+    private static ArrayList<String> mStatusStrList = null;
+
     private int mOperate = -1;
 
     private String mCurrentFileKey = null;
@@ -255,6 +257,8 @@ public class TestActivity extends BaseActivity {
     }
 
     private void initData() {
+        mStatusStrList = new ArrayList<>();
+
         mLoopThreadPool = new CancelFixedThreadPool(1);
         mLoopRunnable = new LoopRunnable(TestActivity.this);
         mHandler = new LoopHandler();
@@ -437,41 +441,55 @@ public class TestActivity extends BaseActivity {
         for (int i = 0; i < taskInfoList.size(); i++) {
             TaskInfo taskInfo = taskInfoList.get(i);
 
+            if (taskId.equals(taskInfo.getId())) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
+                        double progressPercent = 0;
+                        if (progress.getTotalBytes() != 0) {
+                            progressPercent = (double) progress.getFinishedBytes() / progress.getTotalBytes();
+                        }
 
-            //if (taskId.equals(taskInfo.getId())) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Progress progress = PossUtil.getTaskProgress(taskInfo.getId());
-                    double progressPercent = 0;
-                    if (progress.getTotalBytes() != 0) {
-                        progressPercent = (double) progress.getFinishedBytes() / progress.getTotalBytes();
+                        String statusStr = DateUtil.getCurrentTimeStr() + " " + taskInfo.getType() + " to: " + taskInfo.getTo() + " " + taskInfo.getState() + " [" + taskInfo.getError() + "]\n\n";
+                        mStatusStrList.add(0, statusStr);
+                        if (mStatusStrList.size() > 100) {
+                            mStatusStrList.remove(100);
+                        }
+
+
+                        String str = "";
+                        for (int i = 0; i < mStatusStrList.size(); i++) {
+                            str = str + mStatusStrList.get(i);
+                        }
+
+                        mStatusTv.setText(str);
+
+
+//                    mStatusTv.setText("hasRunningTask() Id: " + taskInfo.getId() + "\n" +
+//                            "type: " + taskInfo.getType() + "\n" +
+//                            "form: " + taskInfo.getFrom() + "\n" +
+//                            "to: " + taskInfo.getTo() + "\n" +
+//                            "state: " + taskInfo.getState() + "\n" +
+//                            "error: " + taskInfo.getError() + "\n" +
+//                            "progress: " + progressPercent);
+
+                        Log.e(TAG, "hasRunningTask()() Id: " + taskInfo.getId() + "\n" +
+                                "type: " + taskInfo.getType() + "\n" +
+                                "form: " + taskInfo.getFrom() + "\n" +
+                                "to: " + taskInfo.getTo() + "\n" +
+                                "state: " + taskInfo.getState() + "\n" +
+                                "error: " + taskInfo.getError() + "\n" +
+                                "progress: " + progressPercent);
                     }
-
-                    mStatusTv.setText("hasRunningTask() Id: " + taskInfo.getId() + "\n" +
-                            "type: " + taskInfo.getType() + "\n" +
-                            "form: " + taskInfo.getFrom() + "\n" +
-                            "to: " + taskInfo.getTo() + "\n" +
-                            "state: " + taskInfo.getState() + "\n" +
-                            "error: " + taskInfo.getError() + "\n" +
-                            "progress: " + progressPercent);
-
-                    Log.e(TAG, "hasRunningTask()() Id: " + taskInfo.getId() + "\n" +
-                            "type: " + taskInfo.getType() + "\n" +
-                            "form: " + taskInfo.getFrom() + "\n" +
-                            "to: " + taskInfo.getTo() + "\n" +
-                            "state: " + taskInfo.getState() + "\n" +
-                            "error: " + taskInfo.getError() + "\n" +
-                            "progress: " + progressPercent);
-                }
-            });
+                });
+            }
 
             if ((Constant.TaskState.PENDING.equals(taskInfo.getState()) ||
                     Constant.TaskState.RUNNING.equals(taskInfo.getState()))) {
 
                 return true;
             }
-            //}
         }
 
         return false;
@@ -522,6 +540,8 @@ public class TestActivity extends BaseActivity {
             }
         });
 
+        String statusStr = DateUtil.getCurrentTimeStr() + " put" + " to: " + uploadInfo.getBucket() + "/" + uploadInfo.getKey() + " start upload  []\n\n";
+
         if (!TextUtils.isEmpty(taskId)) {
             //start upload succeed
             runOnUiThread(new Runnable() {
@@ -541,11 +561,27 @@ public class TestActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             }
-
             mHandler.sendEmptyMessageDelayed(DOWNLOAD_IN, 2000l);
         } else {
-
+            statusStr = DateUtil.getCurrentTimeStr() + " put" + " to: " + uploadInfo.getBucket() + "/" + uploadInfo.getKey() + " start upload failed []\n\n";
         }
+
+        mStatusStrList.add(0, statusStr);
+        if (mStatusStrList.size() > 100) {
+            mStatusStrList.remove(100);
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String str = "";
+                for (int i = 0; i < mStatusStrList.size(); i++) {
+                    str = str + mStatusStrList.get(i);
+                }
+
+                mStatusTv.setText(str);
+            }
+        });
     }
 
     private void downloadScan() {
@@ -591,6 +627,8 @@ public class TestActivity extends BaseActivity {
             }
         });
 
+        String statusStr = DateUtil.getCurrentTimeStr() + " get" + " to: " + Constant.PPIO_File.DOWNLOAD_DIR + "/" + downloadInfo.getKey() + " start download  fail[]\n\n";
+
         if (!TextUtils.isEmpty(taskId)) {//start download succeed
             runOnUiThread(new Runnable() {
                 @Override
@@ -613,7 +651,25 @@ public class TestActivity extends BaseActivity {
             mHandler.sendEmptyMessageDelayed(UPLOAD_IN, 2000l);
         } else {
             Log.e(TAG, "download fail...");
+            statusStr = DateUtil.getCurrentTimeStr() + " put" + " to: " + Constant.PPIO_File.DOWNLOAD_DIR + "/" + downloadInfo.getKey() + " start download  []\n\n";
         }
+
+        mStatusStrList.add(0, statusStr);
+        if (mStatusStrList.size() > 100) {
+            mStatusStrList.remove(100);
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String str = "";
+                for (int i = 0; i < mStatusStrList.size(); i++) {
+                    str = str + mStatusStrList.get(i);
+                }
+
+                mStatusTv.setText(str);
+            }
+        });
     }
 
     private String possUploadObject(UploadInfo uploadInfo, PossUtil.PutObjectListener putObjectListener) {
